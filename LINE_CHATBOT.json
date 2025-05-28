@@ -1,0 +1,332 @@
+{
+  "name": "LINE_CHATBOT",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        20,
+        200
+      ],
+      "id": "437bf421-8fb1-442b-a17b-03fa208de26f",
+      "name": "Google Gemini (或其他 AI)",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "PoTsaDz24d76snFz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Webhook 入口\n\n**說明：**\n- 監聽來自 LINE 的訊息，觸發自動回應流程。\n\n**注意事項：**\n1. 確保 Webhook 設定正確，確保 LINE 可發送請求。\n2. 需要在 LINE Developers Console 設定 Webhook URL。",
+        "height": 260,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        180
+      ],
+      "id": "d7d3fe94-bfd3-4f97-b2c4-276d1ad6256e",
+      "name": "Webhook 入口說明"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.body.events[0].message.text }}」\n\n## 內容判斷與處理邏輯\n\n### 技術相關內容處理\n\n**判斷標準**：包含技術文件、會議記錄、專業討論等內容\n**處理方式**：\n\n1. 如內容包含網址，使用 \"HTTP\\_Request\"或是\"Jina AI\" 工具讀取完整內容\n2. 一般情況依照「標準輸出模板」格式化回覆\n3. 若使用者要求詳細報告,則依照「詳細輸出模板」輸出\n4. 內容與技術內容不相關，依照「非技術內容處理」輸出\n\n### 非技術內容處理\n\n**處理方式**：展現個性化的對話風格\n\n## 技術內容輸出規範\n\n### 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 500 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n\n### 標準輸出模板\n\n#### 標題區塊\n📋 {會議主題或內容標題}\n\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n### 詳細輸出模板\n\n#### 標題區塊\n```\n📋 {會議主題或內容標題}\n\n━━━━━━━━━━━━━━━━━━━━\n\n```\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n**📋 詳細內容**  \n- 整理重要討論點和關鍵資訊\n- 保持邏輯順序和完整脈絡\n\n**✅ 重要結論**\n- 歸納達成的共識和決議\n- 明確列出後續行動項目\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n\n## 執行提醒\n- 基於提供的原始內容進行分析總結\n- 確保回覆內容準確且具有實用價值\n- 保持專業性的同時兼顧易讀性",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        20,
+        -120
+      ],
+      "id": "1b92bf9d-4d26-4eda-be1d-4f3a81f42ce8",
+      "name": "AI 語言模型"
+    },
+    {
+      "parameters": {
+        "content": "## AI 語言模型\n\n**說明：**\n- 呼叫 AI 模型（如 Google Gemini）來產生適當回應。\n\n**注意事項：**\n1. 確保 API Key 正確填寫，避免請求失敗。\n2. 設定 `prompt` 要求輸出 JSON，避免格式錯誤。",
+        "height": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -820,
+        -420
+      ],
+      "id": "73a130da-b699-4d84-bb6f-6f8038ef8a5f",
+      "name": "AI 語言模型說明"
+    },
+    {
+      "parameters": {
+        "content": "## 處理 AI 回應\n\n**說明：**\n- 解析 AI 產生的回應，取得 `replyToken` 和 `text`。\n\n**注意事項：**\n1. 確保 AI Agent 輸出的格式正確。\n2. 若 AI 輸出錯誤，應該要在這裡處理錯誤邏輯。",
+        "height": 280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        480,
+        280
+      ],
+      "id": "4820deb2-01ee-4a44-a08f-5f99887e1cb2",
+      "name": "處理 AI 回應的說明"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer uRqMFQ1KdVU79IOYm3svDPEctOSxF3ud1hDocb+tIw5D2w7nbEVEoUGSeQhQHf1h69pl2RP47ekJuLsHURRv7iRSvBJaT41Spm3gUKIZvWlHKOhA9EJZgzSal/c50gz3NPY+X1L19fKUL1q77I0dLgdB04t89/1O/w1cDnyilFU="
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.text }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        980,
+        -140
+      ],
+      "id": "5618f32a-c0bb-471f-9ddb-0ae253c0cd84",
+      "name": "發送回應給 LINE"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 確保數據存在並加入錯誤處理\ntry {\n  const replyTokenItem = items.find(item => item.json.body?.events?.[0]?.replyToken);\n  const outputItem = items.find(item => item.json.output);\n  \n  // 檢查必要數據是否存在\n  if (!replyTokenItem) {\n    throw new Error('找不到 replyToken 數據');\n  }\n  \n  if (!outputItem) {\n    throw new Error('找不到 output 數據');\n  }\n  \n  // 取得 replyToken 和 output\n  const replyToken = replyTokenItem.json.body.events[0].replyToken;\n  let text = outputItem.json.output;\n  \n  // 文字清理和格式化 - 保留換行符號\n  if (typeof text === 'string') {\n    text = text\n      .trim()                                    // 移除前後空白\n      .replace(/\\\\/g, '\\\\\\\\')                   // 先處理反斜線轉義\n      .replace(/\"/g, '\\\\\"')                     // 轉義雙引號\n      .replace(/'/g, \"\\\\'\")                     // 轉義單引號\n      .replace(/\\\\\\\\n/g, '\\n')                  // 將字面上的 \\\\n 轉換為真正的換行\n      .replace(/\\r\\n/g, '\\n')                   // 統一換行符號 (Windows)\n      .replace(/\\r/g, '\\n')                     // 統一換行符號 (Mac)\n      .replace(/\\t/g, '    ')                   // 將 tab 替換為 4 個空格\n      .replace(/[ \\f\\v]+/g, ' ')                // 多個空格、換頁符、垂直tab合併為一個空格\n      .replace(/\\n[ ]+/g, '\\n')                 // 移除換行後的多餘空格\n      .replace(/[ ]+\\n/g, '\\n')                 // 移除換行前的多餘空格\n      .replace(/\\n{3,}/g, '\\n\\n')               // 超過兩個連續換行合併為兩個\n      .replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]/g, '') // 移除控制字符但保留換行(\\n)和tab\n      .replace(/[\\u2028\\u2029]/g, '\\n');        // 處理 Unicode 行分隔符\n  }\n  \n  // 檢查文字長度限制 (LINE 限制 5000 字符)\n  if (text.length > 5000) {\n    // 在適當位置截斷，避免在單詞中間截斷\n    const truncated = text.substring(0, 4950);\n    const lastNewline = truncated.lastIndexOf('\\n');\n    const lastSpace = truncated.lastIndexOf(' ');\n    \n    // 選擇最近的自然分割點\n    const cutPoint = Math.max(lastNewline, lastSpace);\n    text = (cutPoint > 4900 ? truncated.substring(0, cutPoint) : truncated) + '\\n...(內容已截斷)';\n  }\n  \n  // 最終清理 - 確保開頭結尾沒有多餘換行，並進行 JSON 安全處理\n  text = text.replace(/^\\n+/, '').replace(/\\n+$/, '');\n  \n  // 額外的 JSON 安全處理\n  text = JSON.stringify(text).slice(1, -1); // 使用 JSON.stringify 然後移除前後引號\n  \n  // 回傳整理後的結果\n  return [\n    {\n      json: {\n        replyToken: replyToken,\n        text: text\n      }\n    }\n  ];\n} catch (error) {\n  // 錯誤處理\n  console.error('處理數據時發生錯誤:', error.message);\n  \n  // 回傳錯誤回應 (如果有 replyToken 的話)\n  const fallbackReplyToken = items.find(item => item.json.body?.events?.[0]?.replyToken)?.json.body.events[0].replyToken;\n  \n  if (fallbackReplyToken) {\n    return [\n      {\n        json: {\n          replyToken: fallbackReplyToken,\n          text: \"抱歉，處理您的訊息時發生錯誤，請稍後再試。\"\n        }\n      }\n    ];\n  }\n  \n  // 如果連 replyToken 都沒有，拋出錯誤\n  throw error;\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        -140
+      ],
+      "id": "0d3aecd2-1c6c-4adb-9294-e929349baffa",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        500,
+        -140
+      ],
+      "id": "c3ca7291-c357-408c-90d1-42620636a9f3",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.jinaAiTool",
+      "typeVersion": 1,
+      "position": [
+        280,
+        220
+      ],
+      "id": "3de56d7d-a59d-4e20-b8d4-0d8589cb49c6",
+      "name": "Jina AI",
+      "credentials": {
+        "jinaAiApi": {
+          "id": "MKnucIegvfsgyWL4",
+          "name": "Jina AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        220
+      ],
+      "id": "657dc453-a9ed-4b26-85e3-8d95f5239951",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9e44df2e-2952-4a20-9fde-3771e82e5ff9",
+              "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+              "rightValue": "@ITR",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -260,
+        -280
+      ],
+      "id": "e6b9d182-494a-4fe4-a24a-56c1b519ed5e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "line-message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        -280
+      ],
+      "id": "03e29655-a15e-45ce-89d5-23c5a786de43",
+      "name": "Webhook 入口",
+      "webhookId": "PLACEHOLDER-WEBHOOK-ID"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI 語言模型": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini (或其他 AI)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI 語言模型",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "發送回應給 LINE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jina AI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI 語言模型",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI 語言模型",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI 語言模型",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook 入口": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "44b13769-5065-4013-a45c-e9d841e0ba1c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb3f9b2fee6e714b2916ba49eaf273b935d3e76a0bff08cad465e088bae1e755"
+  },
+  "id": "a40AeTVHCx0fAtEz",
+  "tags": []
+}
