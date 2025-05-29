@@ -1,0 +1,85 @@
+{
+  "name": "YT影片逐字稿",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "URL"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        200,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "videoId": "={{ $json.URL }}"
+      },
+      "type": "n8n-nodes-youtube-transcription-kasha.youtubeTranscripter",
+      "typeVersion": 1,
+      "position": [
+        400,
+        340
+      ],
+      "id": "2696653f-6a2d-4c5d-910c-6262fb6203be",
+      "name": "YouTube Transcript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 取得 transcript 陣列\nconst transcript = $json.transcript;\n\n// 合併所有 text 欄位成一整段文字（限制最多 1000 筆）\nconst combinedText = transcript\n  .map(item => item.text.trim()) // 取出 text 並去除首尾空白\n  .join(' ') // 用空格組合\n\n// 回傳新的 JSON 結構\nreturn [\n  {\n    json: {\n      combinedText\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        340
+      ],
+      "id": "d4380e3e-f3ed-4eec-ad92-6613b5136154",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "YouTube Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube Transcript": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2d2e5c13-2de5-499a-b524-8dbb763c4587",
+  "meta": {
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "2sjWStiS9b6WOMsi",
+  "tags": []
+}
