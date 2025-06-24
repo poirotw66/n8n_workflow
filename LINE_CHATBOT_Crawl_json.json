@@ -1,0 +1,120 @@
+{
+  "name": "LINE CHATBOT_Crawl_json",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=網頁爬蟲結果 {{ $json.data.html }} \n網頁的url:{{ $json.data.url }}\n你是一個專門從原始 HTML 內容中提取主要資訊的智能助理。你的任務是精確地辨識並提取網頁中的核心文章內容及相關元數據。\n\n請嚴格遵循以下指示：\n\n1. 輸出格式：\n   - 你必須以單一的 JSON 物件形式返回所有提取的數據。\n   - 如果某個欄位無法找到，請將其值設置為 空字串 \"\"，而不是 null 或省略該欄位。\n\n2. 要提取的資訊欄位：\n   - `title` (字串): 網頁的主要標題。\n   - `description` (字串): 網頁的簡短描述或摘要。\n   - `content` (字串): 文章的核心內容。\n     - 內容要求：必須是純文本，移除所有 HTML 標籤。應移除所有多餘的空白字元、換行符、以及 HTML 實體編碼。保持段落之間的合理換行，確保文本的可讀性。\n     - 必須排除以下噪音和非主要內容：導航菜單、頁首、頁腳、側邊欄、廣告、社交分享按鈕、評論區、相關文章、版權信息、任何不屬於文章主體敘事的程式碼區塊或樣式資訊。如果圖片說明不是文章主體內容的一部分，也請移除。\n   - `author` (字串): 文章的作者名稱。\n   - `publication_date` (字串): 文章的發布日期。請以 `YYYY-MM-DD` 格式返回。\n   - `keywords` (字串陣列): 文章的關鍵字或標籤。\n\n3. 輸入 HTML 內容：\n   - 你將收到未經處理的原始 HTML 文本。\n   - 請忽略 HTML 結構中的雜訊和排版細節，專注於提取語義上有意義的資訊。\n\n這是期望的 JSON 輸出結構範例（請根據實際內容填寫）：\n```json\n{\n  \"title\": \"\",\n  \"description\": \"\",\n  \"content\": \"\",\n  \"author\": \"\",\n  \"publication_date\": \"\",\n  \"url\": \"\",\n  \"keywords\": []\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -120
+      ],
+      "id": "8de1d9d2-8948-4995-ae72-abcf8eeab799",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.URL }}",
+        "operation": "extractHtml"
+      },
+      "type": "n8n-nodes-crawl-and-scrape.crawleeNode",
+      "typeVersion": 1,
+      "position": [
+        100,
+        -120
+      ],
+      "id": "b075c671-2de3-4ce5-bffc-d547ed74823f",
+      "name": "Crawl and Scrape"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-lite-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        200,
+        100
+      ],
+      "id": "c58f1aae-fe77-45e3-ad4e-13533549cd2b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gP2wixnvp3ugX2H0",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "URL"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -120,
+        -120
+      ],
+      "id": "edeb8c12-f22d-49ea-a36e-012d682cf109",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Crawl and Scrape": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Crawl and Scrape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "029c6eb1-9cb7-407e-93cd-a505ef858a76",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "fuPMDOgf9FmrW7zB",
+  "tags": []
+}

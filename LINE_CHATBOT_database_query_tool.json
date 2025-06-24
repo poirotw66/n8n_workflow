@@ -1,0 +1,148 @@
+{
+  "name": "LINE_CHATBOT_database_query_tool",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "natural_language_query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "462df11f-ae8e-49d5-960d-28bad78b8c4a",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "{{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        600,
+        0
+      ],
+      "id": "725d26d3-fbce-4939-82ac-2c7d7fe03d71",
+      "name": "Google BigQuery",
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "Jdp63T30KmHZ0bgj",
+          "name": "Google BigQuery account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=你有權限讀取一個儲存新聞文章的 BigQuery 資料庫表格。\n\n使用「news_agent.news_articles」這個表格名稱來存取資料。\n\n今天的日期是 {{ $now.setZone('Asia/Taipei').format('yyyy-LL-dd') }}\n\n表格的 schema 是：\n```\n[\n  {\n    \"description\": \"UUID\",\n    \"mode\": \"REQUIRED\",\n    \"name\": \"id\",\n    \"type\": \"STRING\"\n  },\n  {\n    \"mode\": \"REQUIRED\",\n    \"name\": \"url\",\n    \"type\": \"STRING\"\n  },\n  {\n    \"name\": \"title\",\n    \"type\": \"STRING\"\n  },\n  {\n    \"description\": \"Markdown string\",\n    \"name\": \"content\",\n    \"type\": \"STRING\"\n  },\n  {\n    \"mode\": \"REPEATED\",\n    \"name\": \"embedding\",\n    \"type\": \"FLOAT\"\n  },\n  {\n    \"name\": \"pub_date\",\n    \"type\": \"TIMESTAMP\"\n  }\n]\n```\n\n生成一個 SQL 查詢以達成以下需求：\n```\n{{ $json.natural_language_query }}\n```\n\n重要：\n1. 「只能」使用存在於上述 schema 的欄位名稱\n2. 「絕對不能」虛構沒有在 schema 列出的欄位名稱或其他 JSON 屬性\n3. 輸出「只能」包含單純的 SQL 指令，並且以分號結尾\n4. 輸出「絕對不能」包含前綴或後綴的反引號 (```)、換行符號 (\\n)、\"sql\" 字串\n5. 如果使用者只需查詢新聞標題，查詢欄位「不須包含 content」\n6. 如果有指定欄位查詢新聞標題與內文，查詢欄位「須包含 title 與 content」",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "你是一個生成 SQL 查詢的專家，你的工作是根據自然語言的需求建立精確的 Google BigQuery SQL 查詢。你必須嚴格遵從給定的資料庫 schema，且「絕對不能」虛構出不存在的欄位。\n\n須嚴格遵守的 schema 規則：\n\n1. 「只能」使用 schema 內明確列出的欄位\n2. 「絕對不能」虛構欄位名稱，或是任何不存在 schema 內的 metadata 屬性\n\n資料型別處理：\n\n* TIMESTAMP/DATE 型別\n  - 優先以「使用者提供之當日日期」生成查詢，而不是在查詢中使用 CURRENT_DATE() 函數\n  - 比較日期時，優先以 DATE() 函數將 TIMESTAMP 型別進行轉換\n  - 「不要」查詢未來的資料\n  - 使用者查詢「本週」資料時，生成「前7天至當天」資料的查詢，而不是從星期一開始\n\n查詢生成準則：\n- 輸出「絕對不能」包含前綴或後綴的反引號 (```)、換行符號 (\\n)、\"sql\" 字串\n- 使用 ORDER BY 日期 DESC 排序查詢結果"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "bd87b21a-6a98-4e03-8455-c3bd4cbbbdbb",
+      "name": "Generate SQL"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-04-17",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        200
+      ],
+      "id": "aaf2090b-5d4a-47e3-a752-006a8ac4034b",
+      "name": "gemini-2.5-flash-preview-04-17",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "natural_language_query": "這三天新聞內文"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Generate SQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate SQL": {
+      "main": [
+        [
+          {
+            "node": "Google BigQuery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini-2.5-flash-preview-04-17": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate SQL",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "69766e68-cc42-4f50-9990-d9fedf61dad0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "HAIIAhz50naJPpU4",
+  "tags": []
+}

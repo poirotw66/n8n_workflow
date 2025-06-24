@@ -1,44 +1,6 @@
 {
-  "name": "LINE_CHATBOT",
+  "name": "LINE CHATBOT",
   "nodes": [
-    {
-      "parameters": {
-        "modelName": "models/gemini-2.5-flash-preview-05-20",
-        "options": {
-          "temperature": 0.4
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        700,
-        420
-      ],
-      "id": "b5ea9355-7989-4885-b01c-d4f341567bb4",
-      "name": "Google Gemini (或其他 AI)",
-      "credentials": {
-        "googlePalmApi": {
-          "id": "m3rIFo4KWXjpkCMd",
-          "name": "Google Gemini(PaLM) Api account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.body.events[0].message.text }}」\n\n## 內容判斷與處理邏輯\n\n### 技術相關內容處理\n**判斷標準**：包含技術文件、會議記錄、專業討論等內容\n**處理方式**：\n- 如內容包含網址，使用 \"HTTP Request\"或是\"Jina AI\" 工具讀取完整內容。若沒有正確爬取內容請回覆錯誤訊息。\n- 如內容包含youtube網址，使用\"Youtube Transcript\"工具讀取影片逐字稿。若沒有正確爬取內容請回覆錯誤訊息。\n- 一般情況依照「標準輸出模板」格式化回覆,\n- 若使用者要求詳細報告,則依照「詳細輸出模板」輸出\n- 內容與技術內容不相關，依照「非技術內容處理」輸出\n\n## 技術內容輸出規範\n\n### 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 500 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n\n### 標準輸出模板\n\n#### 標題區塊\n📋 {會議主題或內容標題}\n\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n### 詳細輸出模板\n\n#### 標題區塊\n```\n📋 {會議主題或內容標題}\n\n```\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n**📋 詳細內容**  \n- 整理重要討論點和關鍵資訊\n- 保持邏輯順序和完整脈絡\n\n**✅ 重要結論**\n- 歸納達成的共識和決議\n- 明確列出後續行動項目\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n\n## 執行提醒\n- 基於提供的原始內容進行分析總結\n- 確保回覆內容準確且具有實用價值\n- 保持專業性的同時兼顧易讀性",
-        "hasOutputParser": true,
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 1.7,
-      "position": [
-        800,
-        240
-      ],
-      "id": "2feca3e8-e0f5-4ea4-8fd7-b97b630f6efd",
-      "name": "AI 語言模型"
-    },
     {
       "parameters": {
         "method": "POST",
@@ -64,21 +26,22 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1440,
-        140
+        1920,
+        -150
       ],
       "id": "d148138d-5be6-4b01-a1b4-0d01c71b263e",
-      "name": "發送回應給 LINE"
+      "name": "發送回應給 LINE",
+      "retryOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "// 確保數據存在並加入錯誤處理\ntry {\n  const replyTokenItem = items.find(item => item.json.body?.events?.[0]?.replyToken);\n  const outputItem = items.find(item => item.json.output);\n  \n  // 檢查必要數據是否存在\n  if (!replyTokenItem) {\n    throw new Error('找不到 replyToken 數據');\n  }\n  \n  if (!outputItem) {\n    throw new Error('找不到 output 數據');\n  }\n  \n  // 取得 replyToken 和 output\n  const replyToken = replyTokenItem.json.body.events[0].replyToken;\n  let text = outputItem.json.output;\n  \n  // 文字清理和格式化 - 保留換行符號\n  if (typeof text === 'string') {\n    text = text\n      .trim()                                    // 移除前後空白\n      .replace(/\\\\/g, '\\\\\\\\')                   // 先處理反斜線轉義\n      .replace(/\"/g, '\\\\\"')                     // 轉義雙引號\n      .replace(/'/g, \"\\\\'\")                     // 轉義單引號\n      .replace(/\\\\\\\\n/g, '\\n')                  // 將字面上的 \\\\n 轉換為真正的換行\n      .replace(/\\r\\n/g, '\\n')                   // 統一換行符號 (Windows)\n      .replace(/\\r/g, '\\n')                     // 統一換行符號 (Mac)\n      .replace(/\\t/g, '    ')                   // 將 tab 替換為 4 個空格\n      .replace(/[ \\f\\v]+/g, ' ')                // 多個空格、換頁符、垂直tab合併為一個空格\n      .replace(/\\n[ ]+/g, '\\n')                 // 移除換行後的多餘空格\n      .replace(/[ ]+\\n/g, '\\n')                 // 移除換行前的多餘空格\n      .replace(/\\n{3,}/g, '\\n\\n')               // 超過兩個連續換行合併為兩個\n      .replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]/g, '') // 移除控制字符但保留換行(\\n)和tab\n      .replace(/[\\u2028\\u2029]/g, '\\n')       // 處理 Unicode 行分隔符\n      .replace(/\\*\\*(.*?)\\*\\*/g, '$1');\n  }\n  \n  // 檢查文字長度限制 (LINE 限制 5000 字符)\n  if (text.length > 5000) {\n    // 在適當位置截斷，避免在單詞中間截斷\n    const truncated = text.substring(0, 4950);\n    const lastNewline = truncated.lastIndexOf('\\n');\n    const lastSpace = truncated.lastIndexOf(' ');\n    \n    // 選擇最近的自然分割點\n    const cutPoint = Math.max(lastNewline, lastSpace);\n    text = (cutPoint > 4900 ? truncated.substring(0, cutPoint) : truncated) + '\\n...(內容已截斷)';\n  }\n  \n  // 最終清理 - 確保開頭結尾沒有多餘換行，並進行 JSON 安全處理\n  text = text.replace(/^\\n+/, '').replace(/\\n+$/, '');\n  \n  // 額外的 JSON 安全處理\n  text = JSON.stringify(text).slice(1, -1); // 使用 JSON.stringify 然後移除前後引號\n  \n  // 回傳整理後的結果\n  return [\n    {\n      json: {\n        replyToken: replyToken,\n        text: text\n      }\n    }\n  ];\n} catch (error) {\n  // 錯誤處理\n  console.error('處理數據時發生錯誤:', error.message);\n  \n  // 回傳錯誤回應 (如果有 replyToken 的話)\n  const fallbackReplyToken = items.find(item => item.json.body?.events?.[0]?.replyToken)?.json.body.events[0].replyToken;\n  \n  if (fallbackReplyToken) {\n    return [\n      {\n        json: {\n          replyToken: fallbackReplyToken,\n          text: \"抱歉，處理您的訊息時發生錯誤，請稍後再試。\"\n        }\n      }\n    ];\n  }\n  \n  // 如果連 replyToken 都沒有，拋出錯誤\n  throw error;\n}"
+        "jsCode": "// n8n Code Node - LINE Bot 文字處理 (修正版)\ntry {\n  // 尋找包含 replyToken 的項目 - 修正數據結構\n  const replyTokenItem = items.find(item => \n    (item.json?.body?.events?.[0]?.replyToken) || \n    (item.body?.events?.[0]?.replyToken)\n  );\n  \n  // 尋找包含 output 的項目 - 修正數據結構\n  const outputItem = items.find(item => \n    (item.json?.output) || \n    (item.output)\n  );\n  \n  // 檢查必要數據是否存在\n  if (!replyTokenItem) {\n    throw new Error('找不到 replyToken 數據');\n  }\n  \n  if (!outputItem) {\n    throw new Error('找不到有效的 output 數據');\n  }\n  \n  // 取得 replyToken - 適應不同的數據結構\n  const replyToken = replyTokenItem.json?.body?.events?.[0]?.replyToken || \n                     replyTokenItem.body?.events?.[0]?.replyToken;\n  \n  // 取得 output 內容 - 適應不同的數據結構和類型\n  let text;\n  const outputContent = outputItem.json?.output || outputItem.output;\n  \n  if (typeof outputContent === 'string') {\n    // 如果 output 直接是字符串\n    text = outputContent;\n  } else if (Array.isArray(outputContent)) {\n    // 如果 output 是數組，從中提取文字內容\n    const textParts = outputContent\n      .filter(item => item.type === 'text' && item.text)\n      .map(item => item.text);\n    \n    if (textParts.length === 0) {\n      throw new Error('output 數組中沒有找到文字內容');\n    }\n    text = textParts.join('');\n  } else {\n    throw new Error('output 格式不正確');\n  }\n  \n  // 檢查是否有文字內容\n  if (!text || typeof text !== 'string') {\n    throw new Error('沒有找到有效的文字內容');\n  }\n  \n  // 輕量化文字清理 - 只處理必要的 JSON 特殊字符，保留 emoji 和換行\n  if (text.length > 0) {\n    text = text\n      .trim()                                    // 移除前後空白\n      .replace(/\\\\/g, '\\\\\\\\')                   // 轉義反斜線\n      .replace(/\"/g, '\\\\\"')                     // 轉義雙引號\n      .replace(/\\r\\n/g, '\\n')                   // 統一換行符號 (Windows)\n      .replace(/\\r/g, '\\n')                     // 統一換行符號 (Mac)\n      .replace(/\\n{4,}/g, '\\n\\n\\n')             // 超過三個連續換行合併為三個\n      .replace(/[ \\t]+/g, ' ')                  // 多個空格和 tab 合併為一個空格\n      .replace(/\\n[ ]+/g, '\\n')                 // 移除換行後的空格\n      .replace(/[ ]+\\n/g, '\\n')                 // 移除換行前的空格\n      .replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]/g, '') // 只移除危險的控制字符，保留換行\n      .replace(/\\*\\*(.*?)\\*\\*/g, '$1');         // 移除粗體標記\n  }\n  \n  // 檢查處理後的文字是否為空\n  if (!text || text.trim().length === 0) {\n    throw new Error('處理後的文字內容為空');\n  }\n  \n  // 檢查文字長度限制 (LINE 限制 5000 字符)\n  if (text.length > 5000) {\n    // 在適當位置截斷，避免在單詞中間截斷\n    const truncated = text.substring(0, 4950);\n    const lastNewline = truncated.lastIndexOf('\\n');\n    const lastSpace = truncated.lastIndexOf(' ');\n    \n    // 選擇最近的自然分割點\n    const cutPoint = Math.max(lastNewline, lastSpace);\n    text = (cutPoint > 4900 ? truncated.substring(0, cutPoint) : truncated) + '\\n...(內容已截斷)';\n  }\n  \n  // 使用 JavaScript 內建的 JSON.stringify 來安全處理特殊字符\n  // 這會自動處理所有需要轉義的字符，包括保留 emoji\n  const safeText = JSON.stringify(text);\n  // 移除 JSON.stringify 添加的前後引號，因為 n8n 會自動添加\n  const finalText = safeText.slice(1, -1);\n  \n  // 最終驗證\n  try {\n    JSON.parse('\"' + finalText + '\"');\n  } catch (jsonError) {\n    console.error('JSON 驗證失敗:', jsonError.message);\n    console.error('問題文字:', finalText);\n    throw new Error('文字包含無法處理的字符');\n  }\n  \n  // 回傳整理後的結果\n  return [\n    {\n      json: {\n        replyToken: replyToken,\n        text: finalText\n      }\n    }\n  ];\n  \n} catch (error) {\n  // 錯誤處理和日誌記錄\n  console.error('處理數據時發生錯誤:', error.message);\n  console.error('錯誤詳情:', error);\n  \n  // 嘗試取得 replyToken 用於錯誤回應\n  let fallbackReplyToken = null;\n  try {\n    const replyTokenItem = items.find(item => \n      (item.json?.body?.events?.[0]?.replyToken) || \n      (item.body?.events?.[0]?.replyToken)\n    );\n    fallbackReplyToken = replyTokenItem?.json?.body?.events?.[0]?.replyToken || \n                        replyTokenItem?.body?.events?.[0]?.replyToken;\n  } catch (e) {\n    console.error('無法取得 fallback replyToken:', e.message);\n  }\n  \n  // 如果有 replyToken，回傳錯誤訊息\n  if (fallbackReplyToken) {\n    return [\n      {\n        json: {\n          replyToken: fallbackReplyToken,\n          text: \"抱歉，處理您的訊息時發生錯誤，請稍後再試。\"\n        }\n      }\n    ];\n  }\n  \n  // 如果連 replyToken 都沒有，拋出錯誤讓 n8n 處理\n  throw new Error('無法處理請求：' + error.message);\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1300,
-        140
+        1700,
+        -150
       ],
       "id": "319724b9-e2a9-4fcd-b13e-6df39820e314",
       "name": "Code"
@@ -88,79 +51,11 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
       "position": [
-        1160,
-        140
+        1480,
+        -150
       ],
       "id": "67387018-1bc1-4995-a8f6-af17f85ba9be",
       "name": "Merge"
-    },
-    {
-      "parameters": {
-        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
-        "options": {},
-        "requestOptions": {}
-      },
-      "type": "n8n-nodes-base.jinaAiTool",
-      "typeVersion": 1,
-      "position": [
-        1080,
-        560
-      ],
-      "id": "9d474a77-a70d-4276-a440-4a20fc19f930",
-      "name": "Jina AI",
-      "credentials": {
-        "jinaAiApi": {
-          "id": "ZmuJsTfIvReyvBPy",
-          "name": "Jina AI account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequestTool",
-      "typeVersion": 4.2,
-      "position": [
-        960,
-        560
-      ],
-      "id": "48447b56-30a5-46fd-aa0e-aa05ba55c443",
-      "name": "HTTP Request"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "9e44df2e-2952-4a20-9fde-3771e82e5ff9",
-              "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
-              "rightValue": "@ITR",
-              "operator": {
-                "type": "string",
-                "operation": "contains"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        560,
-        140
-      ],
-      "id": "d11e0386-81f3-40fe-9078-acca33c6cad2",
-      "name": "If"
     },
     {
       "parameters": {
@@ -171,8 +66,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        400,
-        140
+        260,
+        -150
       ],
       "id": "3e20df60-b42d-4dfd-b13a-5434953f4f7e",
       "name": "Webhook 入口",
@@ -180,12 +75,152 @@
     },
     {
       "parameters": {
-        "description": "Call this tool to get a youtube transcript",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@ITR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "c528785b-7a2a-48d7-893b-75b93f661466"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3593438c-d64d-421e-a2c3-e193690cc884",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@FACT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4e2c522a-a476-42d8-8a32-64ea60b5a82e",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@NEWS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "610549b7-2ef1-4c27-ac34-f7201350a4c3",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@DR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        -171
+      ],
+      "id": "a87e12ff-cd4e-4c4f-9b65-aad332d309b7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 請你根據以下格式，**全面分析這段內容的真實性、情緒傾向與客觀程度**。請特別注意是否存在潛在偏見、誤導、誇大或虛假訊息。內容如下：\n**「{{ $json.body.events[0].message.text }}」**\n\n  - 如內容包含網址，嘗試使用 \"Crawl Json\"或\"Jina AI\"工具讀取完整內容，若沒有正確爬取內容請回覆錯誤訊息。內容依照要求輸出。\n\n  - 如內容包含youtube網址，使用\"Gemini_video_understand\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n## 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 300 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n- ✅ 僅輸出：最終整理完成的內容總結\n\n## 🔍 請根據以下格式輸出分析結果：\n\n📊 **客觀分析**  \n分析內容是否以事實為基礎，是否引用可信來源，語句是否中立。指出其中陳述的事實與意見分別為何。\n\n🎭 **情緒傾向分析**  \n分析語氣是否具煽動性、憤怒、悲傷、樂觀等情緒傾向。判斷這些情緒是否會影響閱聽人判斷。\n\n🚨 **潛在的虛假信息或偏見，以及可疑點**  \n指出內容中是否出現不實、誤導性敘述、單方面觀點、刻板印象等。請列舉具體語句或段落，並說明為何值得懷疑。\n\n🔍 **建議查證的事實**  \n列出需要進一步查證的具體資訊（如人名、數字、事件、引用、圖片、來源、影片等），以釐清其真實性。\n\n📝 **總結**  \n請簡要概括以上欄位的主旨與要傳達的核心訊息。\n\n✅ **補充建議**\n- 若原始內容為圖片、影片、社群貼文，請說明是否存在篡改或斷章取義的可能性。\n- 若你能引用具公信力來源（如官方、學術、主流媒體）來佐證或反駁，也請列出。",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1012,
+        -500
+      ],
+      "id": "7ebc4d53-85bb-4327-82a1-fe8144f0c2ab",
+      "name": "FACT Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        -280
+      ],
+      "id": "88c99857-86ff-46af-89e8-7a07268de61a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gP2wixnvp3ugX2H0",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "It lets you use crawl and scrape websites in your n8n workflows.\n",
         "workflowId": {
           "__rl": true,
-          "value": "2sjWStiS9b6WOMsi",
+          "value": "fuPMDOgf9FmrW7zB",
           "mode": "list",
-          "cachedResultName": "YT影片逐字稿"
+          "cachedResultName": "LINE CHATBOT_Crawl_json"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
@@ -214,37 +249,264 @@
       "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
       "typeVersion": 2.2,
       "position": [
-        1240,
-        540
+        1040,
+        -680
       ],
-      "id": "0667d9cb-994f-41a8-addb-cf4bfbac9a5e",
-      "name": "Youtube Transcript"
+      "id": "0a42f462-131e-433b-a90e-9b9fc3feabb4",
+      "name": "Crawl_Json"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this tool to get a youtube  video summary.\n",
+        "url": "http://gemini-api:8000/summarize",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        -680
+      ],
+      "id": "b802de13-8738-4752-9677-7a10dfbee5c0",
+      "name": "Gemini_Video_Understand"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use firecrawl and scrape websites in your n8n workflows.",
+        "method": "POST",
+        "url": "http://api:3002/v1/scrape",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "formats",
+              "value": "={{ [\"markdown\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        -680
+      ],
+      "id": "90497786-0e01-4bf9-9162-6933498c7d38",
+      "name": "Firecrawl"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        920,
+        -680
+      ],
+      "id": "b5ea9355-7989-4885-b01c-d4f341567bb4",
+      "name": "gemini-2.5-flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        720
+      ],
+      "id": "a8d4b483-2e43-4cde-8d8d-09fff7966f28",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "使用這個工具取得新聞文章，資料庫內包含的欄位有新聞的標題、發布時間、內文、網址，輸入以這些欄位為條件的自然語言指令。這個工具會將自然語言的需求轉換為 SQL 查詢，並回傳新聞文章的查詢結果。\n\n輸入範例：\n1. 列出今日所有的新聞標題\n2. 列出本週的新聞標題與內文與網址\n3. 列出這三天的新聞標題與內文與網址\n\n重要：\n- 這個工具不能產生摘要，只能回傳新聞文章陣列\n- 不要以「摘要⋯⋯」作為 natural_language_query",
+        "workflowId": {
+          "__rl": true,
+          "value": "HAIIAhz50naJPpU4",
+          "mode": "list",
+          "cachedResultName": "LINE_CHATBOT_database_query_tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "natural_language_query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('natural_language_query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "natural_language_query"
+          ],
+          "schema": [
+            {
+              "id": "natural_language_query",
+              "displayName": "natural_language_query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1160,
+        720
+      ],
+      "id": "10f34095-943c-45a1-a577-7e37252adfed",
+      "name": "News_db_query"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        700,
+        500
+      ],
+      "id": "753157b1-e3f4-4c04-973e-afdb663cfb68",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "toolDescription": "The agent is designed to perform comprehensive research on a user's query by dynamically generating search terms, querying the web using Google Search, reflecting on the results to identify knowledge gaps, and iteratively refining its search until it can provide a well-supported answer with citations. \neffort=[low, medium, high],default=medium",
+        "method": "POST",
+        "url": "http://gemini-dr-api:8080/ask",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "effort",
+              "value": "=medium"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        220
+      ],
+      "id": "ce8622a3-ec81-487b-a35a-4c20f05450ab",
+      "name": "Deep Research"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        220
+      ],
+      "id": "331eb170-6f55-427c-beda-583340b2deaa",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=使用者輸入**「{{ $('Switch').item.json.body.events[0].message.text }}」**\n  - 如內容包含網址，依序使用 \"Firecrawl\"、\"Crawl_json\"工具讀取完整內容，若沒有正確爬取內容嘗試下一個工具,都沒有正確爬取的話，請回覆錯誤訊息。內容依照要求輸出。\n  - 如內容包含youtube網址，使用\"Gemini_video_understand\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n  - 使用工具\"Deep Reasearch\"對使用者輸入進行深度研究",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1012,
+        0
+      ],
+      "id": "275e0c92-2693-44de-bd8b-5e23739ad684",
+      "name": "DR Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=根據當前時間 {{ $json.currentDate }} 決定後續參數設定\n使用者輸入**「{{ $('Switch').item.json.body.events[0].message.text }}」**",
+        "options": {
+          "systemMessage": "=## 📰 角色指令：新聞整理專家\n\n你是一位擅長資訊統整的新聞整理專家，負責根據使用者需求，回傳清晰、有組織的新聞資訊。  \n你可以使用內建的工具：新聞查詢工具**News_db_query**。\n\n### 📌 操作規則\n\n#### 1. 當使用者要求「摘要新聞」時：\n- 使用**News_db_query**主動查詢當前熱門或相關新聞，需要輸出新聞內文、來源網址。\n- 將查詢結果進行**整理與摘要**，強調重點與背景脈絡。\n- 如有多篇報導涉及相同主題，請：\n  - 整合內容，**避免重複**。\n  - 提供**完整、連貫的綜合摘要**，字可以稍多，100字內。\n  - 每篇報導後，附上來源網址\n\n#### 2. 當使用者要求「列出新聞標題」時：\n- 同樣使用**News_db_query**取得新聞文章。\n- 萃取所有標題，並根據**主題相似性進行分組**。\n- 為每一組提供**簡短的主題說明**，方便使用者快速掌握焦點。\n\n#### 3. 查詢新聞時的主動性：\n- **不要求使用者輸入新聞主題**。\n- 直接根據時事、熱門趨勢、關鍵字等，自行判斷查詢目標。\n- 保持主動性與智慧判斷，確保資訊的即時性與完整性。\n\n### 🧰 可用工具\n\n- `News_db_query`：可用來查找最新、相關新聞內容。\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1012,
+        500
+      ],
+      "id": "1c3380c0-3200-4f51-93f1-72951b6776a4",
+      "name": "NEWS Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.body.events[0].message.text }}」\n\n## 處理邏輯\n\n### 內容處理\n**處理方式**：\n  - 確保傳入的url和原文一樣。\n  - 如內容包含網址，依序使用 \"Firecrawl\"、\"Crawl_json\"工具讀取完整內容，若沒有正確爬取內容嘗試下一個工具,都沒有正確爬取的話，請回覆錯誤訊息。內容依照要求輸出。\n- 如內容包含youtube網址，使用\"Gemini_video_understand\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n### 輸出樣板選擇\n- 一般情況依照「標準輸出模板」格式化回覆,\n- 若使用者要求詳細報告,則依照「詳細輸出模板」輸出\n- 內容與技術內容不相關，依照「非技術內容處理」輸出\n\n## 技術內容輸出規範\n\n### 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 500 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n\n### 標準輸出模板\n\n#### 標題區塊\n📋 {會議主題或內容標題}\n\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n### 詳細輸出模板\n\n#### 標題區塊\n```\n📋 {會議主題或內容標題}\n\n```\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n**📋 詳細內容**  \n- 整理重要討論點和關鍵資訊\n- 保持邏輯順序和完整脈絡\n\n**✅ 重要結論**\n- 歸納達成的共識和決議\n- 明確列出後續行動項目\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n\n## 執行提醒\n- 基於提供的原始內容進行分析總結\n- 確保回覆內容準確且具有實用價值\n- 保持專業性的同時兼顧易讀性",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1012,
+        -900
+      ],
+      "id": "2feca3e8-e0f5-4ea4-8fd7-b97b630f6efd",
+      "name": "ITR Agent"
     }
   ],
   "pinData": {},
   "connections": {
-    "AI 語言模型": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Google Gemini (或其他 AI)": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI 語言模型",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Code": {
       "main": [
         [
@@ -267,33 +529,58 @@
         ]
       ]
     },
-    "Jina AI": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI 語言模型",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request": {
-      "ai_tool": [
-        [
-          {
-            "node": "AI 語言模型",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If": {
+    "Webhook 入口": {
       "main": [
         [
           {
-            "node": "AI 語言模型",
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ITR Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FACT Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DR Agent",
             "type": "main",
             "index": 0
           },
@@ -305,24 +592,181 @@
         ]
       ]
     },
-    "Webhook 入口": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FACT Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl_Json": {
+      "ai_tool": [
+        [
+          {
+            "node": "FACT Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "ITR Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FACT Agent": {
       "main": [
         [
           {
-            "node": "If",
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gemini_Video_Understand": {
+      "ai_tool": [
+        [
+          {
+            "node": "ITR Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "FACT Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firecrawl": {
+      "ai_tool": [
+        [
+          {
+            "node": "ITR Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini-2.5-flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ITR Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "NEWS Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News_db_query": {
+      "ai_tool": [
+        [
+          {
+            "node": "NEWS Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "NEWS Agent",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Youtube Transcript": {
+    "Deep Research": {
       "ai_tool": [
         [
           {
-            "node": "AI 語言模型",
+            "node": "DR Agent",
             "type": "ai_tool",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DR Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "NEWS Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "ITR Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
           }
         ]
       ]
@@ -332,7 +776,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "48f2cfa3-3231-442c-9a23-1a1d5c774c07",
+  "versionId": "ecfb199c-c8df-4999-9677-bdb43489a5a2",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
