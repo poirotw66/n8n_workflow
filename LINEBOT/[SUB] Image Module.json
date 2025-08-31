@@ -1,0 +1,179 @@
+{
+  "name": "[SUB] Image Module",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userId"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -96,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// 設定使用者 flag\nconst userId = $json[\"userId\"];\nif (!globalThis.foodFlags) globalThis.foodFlags = {};\nglobalThis.foodFlags[userId] = true;\nreturn [{json:{status:'flag_set', userId:userId}}];\n"
+      },
+      "type": "n8n-nodes-base.function",
+      "name": "Set User /food Flag",
+      "typeVersion": 1,
+      "position": [
+        128,
+        240
+      ],
+      "id": "5373c4b0-48bf-4c8d-85ae-aefd237b84d5"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        352,
+        240
+      ],
+      "id": "c27f1cee-2421-4822-876e-ca713b826225",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "CFH-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "image_state",
+          "mode": "list",
+          "cachedResultName": "image_state"
+        },
+        "dataMode": "define",
+        "fieldsUi": {
+          "values": [
+            {
+              "fieldId": "=userId",
+              "fieldValue": "={{ $('Set User /food Flag').item.json.userId }}"
+            },
+            {
+              "fieldId": "=status",
+              "fieldValue": "={{ $('Set User /food Flag').item.json.status }}"
+            },
+            {
+              "fieldId": "=createdAt",
+              "fieldValue": "={{ $json.currentDate }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        576,
+        240
+      ],
+      "id": "cf3e1032-170d-43b4-863f-10ac5660f72a",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": [\n    \"👁️ 智慧之眼已開啟\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        256
+      ],
+      "id": "3473fe4b-8800-4e5b-9ff5-be00d213b056",
+      "name": "output Form"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Set User /food Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set User /food Flag": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "output Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7c0a85af-52e3-439f-9a44-1d71668cc58c",
+  "meta": {
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "0WKdsnjvehU1lghP",
+  "tags": []
+}

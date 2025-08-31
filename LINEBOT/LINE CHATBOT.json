@@ -1,0 +1,3220 @@
+{
+  "name": "LINE CHATBOT",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.text }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2816,
+        -64
+      ],
+      "id": "d148138d-5be6-4b01-a1b4-0d01c71b263e",
+      "name": "發送回應給 LINE",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code Node - LINE Bot 文字處理 (修正版)\ntry {\n  // 尋找包含 replyToken 的項目 - 修正數據結構\n  const replyTokenItem = items.find(item => \n    (item.json?.body?.events?.[0]?.replyToken) || \n    (item.body?.events?.[0]?.replyToken)\n  );\n  \n  // 尋找包含 output 的項目 - 修正數據結構\n  const outputItem = items.find(item => \n    (item.json?.output) || \n    (item.output)\n  );\n  \n  // 檢查必要數據是否存在\n  if (!replyTokenItem) {\n    throw new Error('找不到 replyToken 數據');\n  }\n  \n  if (!outputItem) {\n    throw new Error('找不到有效的 output 數據');\n  }\n  \n  // 取得 replyToken - 適應不同的數據結構\n  const replyToken = replyTokenItem.json?.body?.events?.[0]?.replyToken || \n                     replyTokenItem.body?.events?.[0]?.replyToken;\n  \n  // 取得 output 內容 - 適應不同的數據結構和類型\n  let text;\n  const outputContent = outputItem.json?.output || outputItem.output;\n  \n  if (typeof outputContent === 'string') {\n    // 如果 output 直接是字符串\n    text = outputContent;\n  } else if (Array.isArray(outputContent)) {\n    // 如果 output 是數組，從中提取文字內容\n    const textParts = outputContent\n      .filter(item => item.type === 'text' && item.text)\n      .map(item => item.text);\n    \n    if (textParts.length === 0) {\n      throw new Error('output 數組中沒有找到文字內容');\n    }\n    text = textParts.join('');\n  } else {\n    throw new Error('output 格式不正確');\n  }\n  \n  // 檢查是否有文字內容\n  if (!text || typeof text !== 'string') {\n    throw new Error('沒有找到有效的文字內容');\n  }\n  \n  // 輕量化文字清理 - 只處理必要的 JSON 特殊字符，保留 emoji 和換行\n  if (text.length > 0) {\n    text = text\n      .trim()                                    // 移除前後空白\n      .replace(/\\\\/g, '\\\\\\\\')                   // 轉義反斜線\n      .replace(/\"/g, '\\\\\"')                     // 轉義雙引號\n      .replace(/\\r\\n/g, '\\n')                   // 統一換行符號 (Windows)\n      .replace(/\\r/g, '\\n')                     // 統一換行符號 (Mac)\n      .replace(/\\n{4,}/g, '\\n\\n\\n')             // 超過三個連續換行合併為三個\n      .replace(/[ \\t]+/g, ' ')                  // 多個空格和 tab 合併為一個空格\n      .replace(/\\n[ ]+/g, '\\n')                 // 移除換行後的空格\n      .replace(/[ ]+\\n/g, '\\n')                 // 移除換行前的空格\n      .replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]/g, '') // 只移除危險的控制字符，保留換行\n      .replace(/\\*\\*(.*?)\\*\\*/g, '$1');         // 移除粗體標記\n  }\n  \n  // 檢查處理後的文字是否為空\n  if (!text || text.trim().length === 0) {\n    throw new Error('處理後的文字內容為空');\n  }\n  \n  // 檢查文字長度限制 (LINE 限制 5000 字符)\n  if (text.length > 5000) {\n    // 在適當位置截斷，避免在單詞中間截斷\n    const truncated = text.substring(0, 4950);\n    const lastNewline = truncated.lastIndexOf('\\n');\n    const lastSpace = truncated.lastIndexOf(' ');\n    \n    // 選擇最近的自然分割點\n    const cutPoint = Math.max(lastNewline, lastSpace);\n    text = (cutPoint > 4900 ? truncated.substring(0, cutPoint) : truncated) + '\\n...(內容已截斷)';\n  }\n  \n  // 使用 JavaScript 內建的 JSON.stringify 來安全處理特殊字符\n  // 這會自動處理所有需要轉義的字符，包括保留 emoji\n  const safeText = JSON.stringify(text);\n  // 移除 JSON.stringify 添加的前後引號，因為 n8n 會自動添加\n  const finalText = safeText.slice(1, -1);\n  \n  // 最終驗證\n  try {\n    JSON.parse('\"' + finalText + '\"');\n  } catch (jsonError) {\n    console.error('JSON 驗證失敗:', jsonError.message);\n    console.error('問題文字:', finalText);\n    throw new Error('文字包含無法處理的字符');\n  }\n  \n  // 回傳整理後的結果\n  return [\n    {\n      json: {\n        replyToken: replyToken,\n        text: finalText\n      }\n    }\n  ];\n  \n} catch (error) {\n  // 錯誤處理和日誌記錄\n  console.error('處理數據時發生錯誤:', error.message);\n  console.error('錯誤詳情:', error);\n  \n  // 嘗試取得 replyToken 用於錯誤回應\n  let fallbackReplyToken = null;\n  try {\n    const replyTokenItem = items.find(item => \n      (item.json?.body?.events?.[0]?.replyToken) || \n      (item.body?.events?.[0]?.replyToken)\n    );\n    fallbackReplyToken = replyTokenItem?.json?.body?.events?.[0]?.replyToken || \n                        replyTokenItem?.body?.events?.[0]?.replyToken;\n  } catch (e) {\n    console.error('無法取得 fallback replyToken:', e.message);\n  }\n  \n  // 如果有 replyToken，回傳錯誤訊息\n  if (fallbackReplyToken) {\n    return [\n      {\n        json: {\n          replyToken: fallbackReplyToken,\n          text: \"抱歉，處理您的訊息時發生錯誤，請稍後再試。\"\n        }\n      }\n    ];\n  }\n  \n  // 如果連 replyToken 都沒有，拋出錯誤讓 n8n 處理\n  throw new Error('無法處理請求：' + error.message);\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2512,
+        -16
+      ],
+      "id": "319724b9-e2a9-4fcd-b13e-6df39820e314",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2320,
+        32
+      ],
+      "id": "67387018-1bc1-4995-a8f6-af17f85ba9be",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@ITR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "c528785b-7a2a-48d7-893b-75b93f661466"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3593438c-d64d-421e-a2c3-e193690cc884",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@FACT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4e2c522a-a476-42d8-8a32-64ea60b5a82e",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@NEWS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "610549b7-2ef1-4c27-ac34-f7201350a4c3",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@DR",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "25037b5a-9c6c-47c7-8982-6fa877baaf64",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@STOCK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2a7c00d2-1f25-44da-a7ba-5710145dd71d",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@CB",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b1a4ab87-bb58-4984-9c29-586f6b412763",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@WEB",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5517c22e-36d7-4b02-af4f-23cafe5a556d",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@SUBS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ea96a8a5-0aa0-4ea4-a1bf-0415f375e2ee",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@EAT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5af5b924-b52e-47eb-9b7d-547d3b0da6b0",
+                    "leftValue": "={{ $json.body.events[0].message.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5a89aaf8-ef73-445a-87d8-2622ecaa65ee",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b9ae6f33-b95d-42bf-a029-f14c64e807af",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@GPT20 ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "01bf1084-fd82-4d9e-83a7-b3f3bec66bae",
+                    "leftValue": "={{$json[\"body\"][\"events\"][0][\"message\"][\"text\"]}}",
+                    "rightValue": "@GPT120 ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -208,
+        16
+      ],
+      "id": "a87e12ff-cd4e-4c4f-9b65-aad332d309b7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 請你根據以下格式，**全面分析這段內容的真實性、情緒傾向與客觀程度**。請特別注意是否存在潛在偏見、誤導、誇大或虛假訊息。內容如下：\n**「{{ $json.body.events[0].message.text }}」**\n\n  - 如內容包含網址，嘗試使用 \"Crawl Json\"或\"Jina AI\"工具讀取完整內容，若沒有正確爬取內容請回覆錯誤訊息。內容依照要求輸出。\n\n  - 如內容包含youtube網址，使用\"Gemini_video_understand\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n## 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 300 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n- ✅ 僅輸出：最終整理完成的內容總結\n\n## 🔍 請根據以下格式輸出分析結果：\n\n📊 **客觀分析**  \n分析內容是否以事實為基礎，是否引用可信來源，語句是否中立。指出其中陳述的事實與意見分別為何。\n\n🎭 **情緒傾向分析**  \n分析語氣是否具煽動性、憤怒、悲傷、樂觀等情緒傾向。判斷這些情緒是否會影響閱聽人判斷。\n\n🚨 **潛在的虛假信息或偏見，以及可疑點**  \n指出內容中是否出現不實、誤導性敘述、單方面觀點、刻板印象等。請列舉具體語句或段落，並說明為何值得懷疑。\n\n🔍 **建議查證的事實**  \n列出需要進一步查證的具體資訊（如人名、數字、事件、引用、圖片、來源、影片等），以釐清其真實性。\n\n📝 **總結**  \n請簡要概括以上欄位的主旨與要傳達的核心訊息。\n\n✅ **補充建議**\n- 若原始內容為圖片、影片、社群貼文，請說明是否存在篡改或斷章取義的可能性。\n- 若你能引用具公信力來源（如官方、學術、主流媒體）來佐證或反駁，也請列出。",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        -480
+      ],
+      "id": "7ebc4d53-85bb-4327-82a1-fe8144f0c2ab",
+      "name": "FACT Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        -288
+      ],
+      "id": "88c99857-86ff-46af-89e8-7a07268de61a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gP2wixnvp3ugX2H0",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "It lets you use crawl and scrape websites in your n8n workflows.\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "fuPMDOgf9FmrW7zB",
+          "mode": "list",
+          "cachedResultName": "LINE CHATBOT_Crawl_json"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "URL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "URL"
+          ],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1856,
+        -688
+      ],
+      "id": "0a42f462-131e-433b-a90e-9b9fc3feabb4",
+      "name": "Crawl_Json"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this tool to get a youtube  video summary.\n",
+        "url": "http://gemini-api:8000/summarize",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1968,
+        -688
+      ],
+      "id": "b802de13-8738-4752-9677-7a10dfbee5c0",
+      "name": "Gemini_Video_Understand"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use firecrawl and scrape websites in your n8n workflows.",
+        "method": "POST",
+        "url": "http://api:3002/v1/scrape",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "formats",
+              "value": "={{ [\"markdown\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        2096,
+        -688
+      ],
+      "id": "90497786-0e01-4bf9-9162-6933498c7d38",
+      "name": "Firecrawl"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        -688
+      ],
+      "id": "b5ea9355-7989-4885-b01c-d4f341567bb4",
+      "name": "gemini-2.5-flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        624
+      ],
+      "id": "a8d4b483-2e43-4cde-8d8d-09fff7966f28",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "使用這個工具取得新聞文章，資料庫內包含的欄位有新聞的標題、發布時間、內文、網址，輸入以這些欄位為條件的自然語言指令。這個工具會將自然語言的需求轉換為 SQL 查詢，並回傳新聞文章的查詢結果。\n\n輸入範例：\n1. 列出今日所有的新聞標題\n2. 列出本週的新聞標題與內文與網址\n3. 列出這三天的新聞標題與內文與網址\n\n重要：\n- 這個工具不能產生摘要，只能回傳新聞文章陣列\n- 不要以「摘要⋯⋯」作為 natural_language_query",
+        "workflowId": {
+          "__rl": true,
+          "value": "HAIIAhz50naJPpU4",
+          "mode": "list",
+          "cachedResultName": "LINE_CHATBOT_database_query_tool"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "natural_language_query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('natural_language_query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "natural_language_query"
+          ],
+          "schema": [
+            {
+              "id": "natural_language_query",
+              "displayName": "natural_language_query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1968,
+        624
+      ],
+      "id": "10f34095-943c-45a1-a577-7e37252adfed",
+      "name": "News_db_query"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        512
+      ],
+      "id": "753157b1-e3f4-4c04-973e-afdb663cfb68",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "toolDescription": "The agent is designed to perform comprehensive research on a user's query by dynamically generating search terms, querying the web using Google Search, reflecting on the results to identify knowledge gaps, and iteratively refining its search until it can provide a well-supported answer with citations. \neffort=[low, medium, high],default=medium",
+        "method": "POST",
+        "url": "http://gemini-dr-api:8080/ask",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "effort",
+              "value": "=medium"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1968,
+        224
+      ],
+      "id": "ce8622a3-ec81-487b-a35a-4c20f05450ab",
+      "name": "Deep Research"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        224
+      ],
+      "id": "331eb170-6f55-427c-beda-583340b2deaa",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=使用者輸入**「{{ $('Switch').item.json.body.events[0].message.text }}」**\n- 使用工具\"Deep Reasearch\"對使用者輸入進行深度研究\n\n## 輸出格式要求\n* 整理成一份 適合在 LINE 傳送的「研究報告格式」：\n* 條列清楚、分段有小標題\n* 適度使用 emoji 作為分隔符號（避免太多裝飾）\n* 保留資訊完整性與「研究感」\n* 引用來源要保留，但以簡潔形式呈現（如 [youlai]、[ettoday]、[xzh6]），在文章最後呈現網址\nurl必須是有效連結！\n  例如：[yahoo]https://tw.yahoo.com/\n  [google]https://www.google.com/?hl=zh_TW\n* 可以適度延長內文，讓內容看起來更有「研究深度」",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        0
+      ],
+      "id": "275e0c92-2693-44de-bd8b-5e23739ad684",
+      "name": "DR Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=根據當前時間 {{ $json.currentDate }} 決定後續參數設定\n使用者輸入**「{{ $('Switch').item.json.body.events[0].message.text }}」**",
+        "options": {
+          "systemMessage": "=## 📰 角色指令：新聞整理專家\n\n你是一位擅長資訊統整的新聞整理專家，負責根據使用者需求，回傳清晰、有組織的新聞資訊。  \n你可以使用內建的工具：新聞查詢工具**News_db_query**。\n\n### 📌 操作規則\n\n#### 1. 當使用者要求「摘要新聞」時：\n- 使用**News_db_query**主動查詢當前熱門或相關新聞，需要輸出新聞內文、來源網址。\n- 將查詢結果進行**整理與摘要**，強調重點與背景脈絡。\n- 如有多篇報導涉及相同主題，請：\n  - 整合內容，**避免重複**。\n  - 提供**完整、連貫的綜合摘要**，字可以稍多，100字內。\n  - 每篇報導後，附上來源網址\n\n#### 2. 當使用者要求「列出新聞標題」時：\n- 同樣使用**News_db_query**取得新聞文章。\n- 萃取所有標題，並根據**主題相似性進行分組**。\n- 為每一組提供**簡短的主題說明**，方便使用者快速掌握焦點。\n\n#### 3. 查詢新聞時的主動性：\n- **不要求使用者輸入新聞主題**。\n- 直接根據時事、熱門趨勢、關鍵字等，自行判斷查詢目標。\n- 保持主動性與智慧判斷，確保資訊的即時性與完整性。\n\n### 🧰 可用工具\n\n- `News_db_query`：可用來查找最新、相關新聞內容。\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        400
+      ],
+      "id": "1c3380c0-3200-4f51-93f1-72951b6776a4",
+      "name": "NEWS Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.body.events[0].message.text }}」\n\n## 處理邏輯\n\n### 內容處理\n**處理方式**：\n  - 確保傳入的url和原文一樣。\n  - 如內容包含網址，依序使用 \"Firecrawl\"、\"Crawl_json\"工具讀取完整內容，若沒有正確爬取內容嘗試下一個工具,都沒有正確爬取的話，請回覆錯誤訊息。內容依照要求輸出。\n- 如內容包含youtube網址，使用\"Gemini_video_understand\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n### 輸出樣板選擇\n- 一般情況依照「標準輸出模板」格式化回覆,\n- 若使用者要求詳細報告,則依照「詳細輸出模板」輸出\n- 內容與技術內容不相關，依照「非技術內容處理」輸出\n\n## 技術內容輸出規範\n\n### 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 500 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n\n### 標準輸出模板\n\n#### 標題區塊\n📋 {會議主題或內容標題}\n\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n### 詳細輸出模板\n\n#### 標題區塊\n```\n📋 {會議主題或內容標題}\n\n```\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n**📋 詳細內容**  \n- 整理重要討論點和關鍵資訊\n- 保持邏輯順序和完整脈絡\n\n**✅ 重要結論**\n- 歸納達成的共識和決議\n- 明確列出後續行動項目\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n\n## 執行提醒\n- 基於提供的原始內容進行分析總結\n- 確保回覆內容準確且具有實用價值\n- 保持專業性的同時兼顧易讀性",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1808,
+        -1008
+      ],
+      "id": "2feca3e8-e0f5-4ea4-8fd7-b97b630f6efd",
+      "name": "ITR Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.events[0].message.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=你是一個股價查詢小幫手。\n使用者會輸入想查詢的股票代碼（例如：0050），有時也會包含查詢日期（例如：2025-06-24）。\n請依據輸入判斷以下資訊：\nstock_id：股票代碼（必填）\ndate：查詢日期（選填，若未輸入，預設為今天）\nnow_or_history：判斷使用者想查詢的是即時資料還是歷史資料，若未輸入日期或輸入的日期是今天，請設為 \"now\"，若輸入的日期不是今天，請設為 \"history\"\n請將上述資訊整理成 JSON 並傳遞至下個 HTTP Request 節點。"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        896,
+        832
+      ],
+      "id": "7db263b5-7187-45bf-9538-b4e6aafbcdb5",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\ndef execute(input):\n  try:\n    # 從 js 物件轉 python\n    py_input = input.to_py()\n    # 將 dict 轉成 json\n    raw_data = json.loads(py_input['json']['data'])\n    # 取得 msgArray 中的第一筆資料\n    msg = raw_data[\"msgArray\"][0]\n    \n    # 擷取所需欄位\n    stock_code = msg.get(\"c\", \"N/A\")\n    stock_name = msg.get(\"n\", \"N/A\")\n    current_price = msg.get(\"z\", \"N/A\")\n    open_price = msg.get(\"o\", \"N/A\")\n    high_price = msg.get(\"h\", \"N/A\")\n    low_price = msg.get(\"l\", \"N/A\")\n    volumn = msg.get(\"v\", \"N/A\")\n    last_time = msg.get(\"t\", \"N/A\")\n    \n    return [{\n        \"json\": {\n            \"stock_code\": stock_code,\n            \"stock_name\": stock_name,\n            \"current_price\": current_price,\n            \"open_price\":open_price,\n            \"high_price\":high_price,\n            \"low_price\":low_price,\n            \"volumn\":volumn,\n            \"last_time\":last_time\n        }\n    }]\n    \n  except Exception as e:\n    return [{\n        \"json\": {\n            \"error\": f\"解析失敗: {str(e)}\"\n        }\n    }]\nprint(_input.first())\nr = execute(_input.first())\nreturn r"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        832
+      ],
+      "id": "559a06f8-ad9c-441c-ad2d-6399448e0307",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "=https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{{$json.output.stock_id}}.tw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        832
+      ],
+      "id": "c16a32e5-f39d-46a8-ad8a-a3cd4d3a1890",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json}}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=你是一位金融資訊助理，專門用簡單明瞭的方式解釋股票的即時報價資料。\n請根據以下提供的欄位資訊，分析這檔股票目前的交易情況，並說明：\n- 股票代號（stock_code）\n- 股票名稱（stock_name） \n- 當盤成交價（current_price）：即目前最新成交價 \n- 今日開盤價（open_price）：當日市場開盤的第一筆成交價 \n- 今日最高價（high_price）：今日截至目前的最高成交價 \n- 今日最低價（low_price）：今日截至目前的最低成交價\n- 當盤成交量（volumn）：今日截至目前的成交量\n- 最近成交時刻（last_time）：最近成交時刻（格式為 HH:MM:SS）\n請以條列式提供以上資訊，並根據下列邏輯撰寫「今日股價波動描述」：\n- 台股交易時間為 09:00–13:30，若 {{$json.last_time}} 為 13:30:30，代表今日已收盤，可根據當日高低點與開收價總結全天走勢。\n- 若目前仍為盤中（非 13:30）或成交價無效為 \"-\"，可用開盤價、最高價與最低價的相對關係，簡要描述今日盤中波動情況。\n- 可以指出目前價格與開盤價相比的漲跌狀況（上漲、下跌或持平）。\n請使用中立、專業且語意簡潔的語氣回答。\n\n### 格式優化指引\n- 適當運用分隔線和空行提升結構清晰度\n- 如果數字有小數點，請統一取到小數點後第二位\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1792,
+        832
+      ],
+      "id": "9b4b4879-27ee-4b73-9060-17c18fc47aaa",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        896,
+        960
+      ],
+      "id": "e2a3882c-32e1-406c-a72f-c9f8db0d833c",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        992
+      ],
+      "id": "a4a7dd1c-d3d5-4a2a-b6da-0595ce699fd5",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"stock_id\": \"0050\",\n\t\"date\": \"2025-06-15\",\n    \"now_or_history\":\"now\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1056,
+        960
+      ],
+      "id": "de9fdc7f-be8a-4e64-a29b-7e874de567fe",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"output\": \"股票代號：2330\\n股票名稱：台積電\\n當盤成交價：1050.0000\\n今日開盤價：1045.0000\\n今日最高價：1050.0000\\n今日最低價：1040.0000\\n當盤成交量：27924\\n最近成交時刻：13:30:00\\n\\n今日台積電收盤價為 1050.0000，較開盤價上漲。全天股價在 1040.0000 至 1050.0000 之間波動。\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1952,
+        992
+      ],
+      "id": "8cf7516e-d642-4b37-bd5b-cfcae98482da",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "line-message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        160
+      ],
+      "id": "3e20df60-b42d-4dfd-b13a-5434953f4f7e",
+      "name": "Webhook",
+      "webhookId": "PLACEHOLDER-WEBHOOK-ID"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT *\nFROM `itr-aimasteryhub-lab.Update_Notifier.update_info`\nWHERE website = \"{{$json.website}}\"\nORDER BY create_date DESC\nLIMIT 1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        1712,
+        1216
+      ],
+      "id": "6c4fcf90-5c99-4fda-aafe-8494e1d5f4ec",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        1360
+      ],
+      "id": "1e22557c-0c08-4047-b848-5cc9f69966a9",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bmQtF6LTFzuCRm0S",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"output\":\"summarize content\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2032,
+        1360
+      ],
+      "id": "6e3791ed-3614-4a0d-8880-af365884c290",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=處理指示\n你是一位負責產品更新通知的助理，請根據以下資訊，請依照以下步驟處理我提供的「更新內容」，並遵循所有格式要求：\n\n1. 內部理解（不輸出）\n- 仔細閱讀提供的「content」更新說明。\n- 不需輸出任何閱讀過程或解釋。\n\n2. 輸出版本更新摘要（僅輸出此部分）\n請根據「更新內容」來撰寫「更新重點摘要」，條列重要的改動，具體結構如下：\n- 請先輸出標題：\n  - 第一行輸出 您好，以下是 {{$json.website}} 版本資訊！\n  - 第二行輸出 網站名稱：{{$json.website}} \n  - 第三行輸出 最新版本：{{$json.version}}\n- 輸出更新內容摘要 (請摘要並條列本段內容)\n\t完整更新內容：{{ $json.content }}\n\n\t輸出範例:\n\t---\n  您好，以下是 Cursor 版本資訊：\n\n\t● 網站名稱：Cursor  \n\t● 最新版本：0.48.9\n\n\t本次更新重點包括：\n\t- 引入 Chat Tabs，可同時進行多個對話  \n\t- 全新「自訂模式（Custom Modes）」支援鍵盤快速鍵  \n\t- 索引效能大幅提升，大型專案處理更迅速  \n\t- 聊天完成時新增音效通知（Beta）  \n\t- 可查看每次聊天的模型使用成本\n\t---\n\n3. 輸出限制\n- 請僅輸出步驟2的「版本更新摘要」。\n- 禁止使用：Markdown 語法（#、**、[]()等）\n- 禁止使用：HTML 標籤\n- 禁止輸出：處理過程說明或額外註解\n- 全文必須使用繁體中文。",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1856,
+        1216
+      ],
+      "id": "06e2b476-e9de-4958-9423-631f74a73220",
+      "name": "Basic LLM Chain2"
+    },
+    {
+      "parameters": {
+        "content": "## 取得網站更新資訊",
+        "height": 80,
+        "width": 260,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        672,
+        1184
+      ],
+      "typeVersion": 1,
+      "id": "b96c16fc-7b72-4a28-bb00-acd607501832",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "query = items[0].json['body']['events'][0]['message']['text']\nweb = query[5:]\nreturn {\"website\": web}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        1232
+      ],
+      "id": "a889ac8b-abe2-4bbc-b0c7-4546de14a14c",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a570f00a-acca-4eda-aa3f-f08ede6842ed",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "none",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        1248
+      ],
+      "id": "3793809c-4551-4967-a06e-57017499d2c8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": \"無該網站版本資訊\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        1520
+      ],
+      "id": "160b0221-beeb-4298-a54d-91452664ce2c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "Update_Notifier",
+          "mode": "list",
+          "cachedResultName": "Update_Notifier"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "Subscriber",
+          "mode": "list",
+          "cachedResultName": "Subscriber"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        1792,
+        1808
+      ],
+      "id": "724103e7-bcb7-4a8c-a8ea-d71b65896abb",
+      "name": "Insert rows in a table",
+      "retryOnFail": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "outputFieldName": "create_date",
+        "options": {
+          "includeInputFields": true
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        816,
+        1696
+      ],
+      "id": "c2cb5a60-7e11-48ab-8b4d-852a06794e5e",
+      "name": "Date & Time1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# 有提供服務的網站\nwebsite_list = [i['website'] for i in items[1].json['website_list']]\n# 找出要訂閱的網站\nquery = items[0].json['body']['events'][0]['message']['text']\nsubs_website = []\nif \"ALL\" in query:\n  subs_website = website_list\nelse:\n  # 移除 @SUBS 並取後面的字串\n  parts = query.replace('@SUBS', '').strip().split()\n  # 抓有提供服務的網站名稱\n  subs_website = [i for i in parts if i in website_list]\n\n# 使用者類型, user/group\nuser_type = items[0].json[\"body\"][\"events\"][0][\"source\"][\"type\"]\nuser_type_list = {'user': 0, 'group': 1}\nuser_type = user_type_list[user_type]\n\n# 抓 userId\nuserId = \"\"\nif user_type == 0:\n  userId = items[0].json[\"body\"][\"events\"][0][\"source\"][\"userId\"]\nelse:\n  userId = items[0].json[\"body\"][\"events\"][0][\"source\"][\"groupId\"]\n\n# 現在時間\ncreate_date = items[0].json['create_date']\n\nreturn {\n  \"subs_website\": subs_website,\n  \"user_type\": user_type,\n  \"userId\": userId,\n  \"website_list\": website_list,\n  \"create_date\": create_date\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        1712
+      ],
+      "id": "79c85d0a-7dd7-4de0-8af9-4c22d9bb0e91",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "content": "## 股價查詢",
+        "height": 80,
+        "width": 150,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        768
+      ],
+      "typeVersion": 1,
+      "id": "10ce5018-26ae-41e6-a84b-430b33ae9080",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "subs_website = items[0].json['subs_website']\nwebs = ' '.join(subs_website)\noutput = f\"已訂閱 {webs} 更新通知！\"\n\nreturn {\n  \"output\": output\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        1728
+      ],
+      "id": "7cb1cc63-aa41-4ed0-8f96-23312a20fbfc",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "subs_website = items[0].json['subs_website']\ncreate_date = items[0].json['create_date']\nuserId = items[0].json['userId']\nuser_type = items[0].json['user_type']\n\nreturn [{\n  \"create_date\": create_date,\n  \"user_type\": user_type,\n  \"userId\": userId,\n  \"website\": website\n} for website in subs_website]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        1808
+      ],
+      "id": "463ee924-823c-46f5-acc0-63ce0231b1c6",
+      "name": "Code4",
+      "notesInFlow": true,
+      "notes": "FOR INSERT DB"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1952,
+        1728
+      ],
+      "id": "093b6f0a-1d8c-4329-8bd9-f36b10b4ae73",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "content": "## 訂閱更新通知",
+        "height": 80,
+        "width": 180,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        624,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "4f0eb946-d272-4596-9198-09ba4d4c3b1f",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 抓訂閱者資料",
+        "height": 80,
+        "width": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1232,
+        1648
+      ],
+      "typeVersion": 1,
+      "id": "65ce634a-647a-4f90-8e55-39cf35322033",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 存進 DB",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1472,
+        1760
+      ],
+      "typeVersion": 1,
+      "id": "04ba8dba-a21b-479f-bff8-3a4dd4afccd6",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT DISTINCT website FROM `itr-aimasteryhub-lab.Update_Notifier.website_list`;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        976,
+        1808
+      ],
+      "id": "03e208fd-b8eb-4299-8d9e-5616e1d7e524",
+      "name": "Execute a SQL query1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1296,
+        1712
+      ],
+      "id": "de3a747a-7f3b-484b-b34e-424cfed6200b",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "website_list",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        1808
+      ],
+      "id": "00b13a73-52e9-4a77-89fb-34dc6be62efd",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT DISTINCT website FROM `itr-aimasteryhub-lab.Update_Notifier.website_list`;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        944,
+        1360
+      ],
+      "id": "a447267e-fe8c-42a2-b6ba-4797484fbe20",
+      "name": "Execute a SQL query2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "website_list",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        1360
+      ],
+      "id": "3cc1fcea-7cbe-46b1-a76b-6b72fdf10567",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1232,
+        1248
+      ],
+      "id": "1b34f136-ea7d-466e-85b3-d6cf7a6ee455",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# 有提供服務的網站\nwebsite_list = [i['website'] for i in items[1].json['website_list']]\nweb = items[0].json['website']\n\noutput = \"none\"\nif web in website_list:\n  output = web\n\nreturn {\n  \"website\": output\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1376,
+        1248
+      ],
+      "id": "2c2d034b-e317-43f2-b2b1-406c39514a45",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "content": "## 工具目錄",
+        "height": 80,
+        "width": 150,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        2704
+      ],
+      "typeVersion": 1,
+      "id": "749134be-c643-4408-baad-a1b8674c0909",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## 食物監測(圖片)",
+        "height": 80,
+        "width": 198,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        2256
+      ],
+      "typeVersion": 1,
+      "id": "4142e630-a5cd-4257-919a-589feb08af36",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## 食物監測(文字)",
+        "height": 80,
+        "width": 230,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        1968
+      ],
+      "typeVersion": 1,
+      "id": "df82d1ef-99fd-4c99-86b4-b0870250284f",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "824ab596-dfdd-4b2c-a525-12825bbcd8b7"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1fcc7f1d-48fb-42c8-a17f-a4d22df38413",
+                    "leftValue": "={{ $json.text }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1232,
+        2496
+      ],
+      "id": "51007ad1-8bf5-41ed-b57a-9683e9a40449",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=請判斷此是否是食物的圖片",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "你是一位辨識食物圖片的專家，如果圖片中有食物請輸出1；沒有的話請輸出2。"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        960,
+        2416
+      ],
+      "id": "d55f0cf0-3161-44e5-8236-e6103ca128af",
+      "name": "Basic LLM Chain3"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        928,
+        2576
+      ],
+      "id": "eb70f565-710b-4f54-a45b-6d8a26ca3810",
+      "name": "Google Gemini Chat Model6",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "32XNUgTU87AB6a9Q",
+          "name": "Google Gemini(PaLM) Api account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1376,
+        2352
+      ],
+      "id": "cce8000d-1527-4111-978e-8d184857294b",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": [\n    \"@ITR - 技術趨勢內容整理\",\n    \"@FACT - 內容真實性、情緒傾向與客觀分析\",\n    \"@NEWS - 新聞查詢與整理\",\n    \"@DR - 深度研究與多來源整合\",\n    \"@STOCK - 股票即時/歷史查詢\",\n    \"@WEB - 網頁爬取與摘要\",\n    \"@SUBS - 訂閱網站更新通知\",\n    \"@EAT - 作燴午餐小助手\",\n    \"上傳圖片 - 食物分析\",\n    \"@GPT20 - 體驗gpt-oss-20b\",\n    \"@GPT120 - 體驗gpt-oss-120b\",\n    \"@CB - C_Booking助手\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        2768
+      ],
+      "id": "d18fba1e-474c-42d8-ba35-dfa596a554f7",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://food-detection-api:8084/food_detection",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "=image",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        2352
+      ],
+      "id": "24c41732-2b38-4ac6-9ee8-da0eac567fcc",
+      "name": "連線程式碼API_圖像"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://food-detection-api:8084/ask_Q",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{ $json.body.events[0].message.text }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        2016
+      ],
+      "id": "5b768dc3-dc8a-4a9f-bfcf-d6256d141528",
+      "name": "連線程式碼API_文字"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.messages[0].text }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        2992
+      ],
+      "id": "7c300f58-4ad6-4b06-aedd-c290ca93e61c",
+      "name": "發送回應給 LINE1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        2800
+      ],
+      "id": "a847d180-85eb-4b87-9f9b-856d285dd952",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const allItems = $input.all();\n\n  const webhookItem = allItems.find(item =>\n    item.json?.body?.events?.[0]?.replyToken\n  );\n\n  const outputItem = allItems.find(item =>\n    item.json?.output !== undefined && item.json?.output !== null\n  );\n\n  if (!webhookItem) {\n    throw new Error(\"找不到來自 LINE Webhook 的有效輸入，缺少 replyToken。\");\n  }\n  if (!outputItem) {\n    throw new Error(\"找不到包含 'output' 的有效輸入。\");\n  }\n\n  const replyToken = webhookItem.json.body.events[0].replyToken;\n  let outputContent = outputItem.json.output;\n\n  let messageText = \"\";\n  if (Array.isArray(outputContent)) {\n    messageText = outputContent.join(\"\\n\");\n  } else {\n    messageText = String(outputContent);\n  }\n\n  // 轉義所有可能破壞 JSON 的字元\n  messageText = messageText\n    .replace(/\\\\/g, \"\\\\\\\\\")   // 反斜線\n    .replace(/\"/g, '\\\\\"')     // 雙引號\n    .replace(/\\r?\\n/g, \"\\\\n\"); // 換行轉成 \\n\n\n  messageText = messageText.substring(0, 5000);\n\n  if (!messageText.trim()) {\n    throw new Error(\"訊息內容為空，請確認 'output' 欄位有資料。\");\n  }\n\n  return [\n    {\n      json: {\n        replyToken,\n        messages: [\n          {\n            type: \"text\",\n            text: messageText\n          }\n        ]\n      }\n    }\n  ];\n\n} catch (error) {\n  console.error(\"Code 節點執行失敗:\", error.message);\n  throw error;\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        2800
+      ],
+      "id": "106a5b0e-84dc-4789-85cb-9c075d3d84f0",
+      "name": "Code7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $node[\"Webhook\"].json[\"body\"][\"events\"][\"0\"][\"source\"][\"userId\"] }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.messages[0].text }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        2800
+      ],
+      "id": "9aaec935-141f-43a4-a827-5932d24a88c7",
+      "name": "[TEST]發送回應給 LINE2",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        880
+      ],
+      "id": "9ce894ea-1817-4afe-be35-022cfdb2220c",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "A8xi9VTTog9AoAe0",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.events[0].source.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        864
+      ],
+      "id": "0ef5672a-ebd5-4661-b57e-425bcd747dba",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        1392
+      ],
+      "id": "8a6e09f7-4753-4043-927d-7ead05038a95",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "A8xi9VTTog9AoAe0",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=你的名字是gpt-oss-120b，請忽略@gpt120,這是我觸發的關鍵字，根據使用者輸入回答問題，，若使用者沒有特別指定語言請使用繁體中文回答，\n\n使用者輸入：\n{{ $json.body.events[0].message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -400,
+        1056
+      ],
+      "id": "eaed8f2c-56ca-4b06-9ac2-033e0d554bf3",
+      "name": "gpt-oss-120b"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=你的名字是gpt-oss-20b，請忽略@gpt20,這是我觸發的關鍵字，根據使用者輸入回答問題，若使用者沒有特別指定語言請使用繁體中文回答，\n使用者輸入：\n{{ $json.body.events[0].message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -528,
+        640
+      ],
+      "id": "2beb601f-76c4-42a3-a556-07695cbddbfb",
+      "name": "gpt-oss-20b"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 取得輸入資料\nconst input = $input.first().json.result;\n\n// 將輸入轉成字串，避免非字串資料出錯\nlet text = String(input);\n\n// 將換行字元換成 \\n，確保 JSON 字串格式安全\ntext = text.replace(/\\r\\n|\\r|\\n/g, '\\\\n');\n\n// 如果字串裡有雙引號，跳脫它們\ntext = text.replace(/\"/g, '\\\\\"');\n\n// 回傳新資料給後續節點使用\nreturn [\n  {\n    json: {\n      cleanedText: text\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        2352
+      ],
+      "id": "939713e0-bbbc-4858-949a-e42a50b72a79",
+      "name": "輸出不違反json格式"
+    },
+    {
+      "parameters": {
+        "url": "=https://api-data.line.me/v2/bot/message/{{ $json.body.events[0].message.id }}/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        2336
+      ],
+      "id": "93a69cf0-1a4e-4c98-953d-1482c124718d",
+      "name": "接收圖片1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Webhook').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.cleanedText }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1808,
+        2352
+      ],
+      "id": "80d02c4f-4030-4bff-933c-563917c13597",
+      "name": "發送回應給 LINE2",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// 取得輸入資料\nconst input = $input.first().json.answer;\n\n// 將輸入轉成字串，避免非字串資料出錯\nlet text = String(input);\n\n// 將換行字元換成 \\n，確保 JSON 字串格式安全\ntext = text.replace(/\\r\\n|\\r|\\n/g, '\\\\n');\n\n// 如果字串裡有雙引號，跳脫它們\ntext = text.replace(/\"/g, '\\\\\"');\n\n// 回傳新資料給後續節點使用\nreturn [\n  {\n    json: {\n      cleanedText: text\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        2016
+      ],
+      "id": "894cbfe3-557b-4c11-9204-d71cfa5c4cd6",
+      "name": "輸出不違反json格式2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('Webhook').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.cleanedText }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1216,
+        2016
+      ],
+      "id": "a6135e27-6014-4f70-8eae-77a6ffe8da46",
+      "name": "發送回應給 LINE3",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "Room Inquiry api,\"data\"的格式必須是XXXX/XX/XX(例如：2025/08/20)",
+        "method": "POST",
+        "url": "http://host.docker.internal:5000/run",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "date",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        -1120
+      ],
+      "id": "13b5cfa6-28ba-4dd1-9c2c-8013213365cf",
+      "name": "Room Inquiry"
+    },
+    {
+      "parameters": {
+        "toolDescription": "=Room booking api\n會議室名稱必須匹配(room_number) = [\n    \"15F-15樓接待大廳\",\n    \"15F-階梯教室\",\n    \"15F-深水炸彈-1(15-1)\",\n    \"15F-深水炸彈-2(15-2)\",\n    \"15F-老經典(15-3)\",\n    \"15F-香格里拉(15-4)(觀察室)\",\n    \"15F-血腥瑪麗(15-5)(受訪室)\",\n    \"15F-亞歷山大(15-10)\",\n    \"15F-琴通寧(15-11)\",\n    \"4F-安新芽\",\n    \"4F-微風Chill室\",\n    \"4F-滴大地\",\n    \"4F-光影綠谷\",\n    \"4F-剛果秘境\",\n    \"4F-未來綠洲\",\n    \"4F-森林之光\",\n    \"4F-優勝美地\",\n    \"4F-亞馬遜雨林\",\n    \"3F-HIVE\",\n    \"3F-Kafka\",\n    \"3F-中心樹投影3\",\n    \"3F-中心樹投影5\",\n    \"3F-Scala\",\n    \"3F-中心樹投影6\",\n    \"3F-Matlab\",\n    \"3F-中心樹投影4\",\n    \"3F-Python\",\n    \"3F-Julia\",\n    \"3F-中心樹投影1\",\n    \"3F-R\",\n    \"3F-Spark\",\n    \"3F-SQL\",\n    \"3F-Base\",\n    \"3F-Java\",\n    \"3F-C++\"\n]\n其餘參數依照對話填入",
+        "method": "POST",
+        "url": "http://host.docker.internal:5000/book",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "start_date",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "room_number",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', ``, 'string') }}"
+            },
+            {
+              "name": "meeting_subject",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', ``, 'string') }}"
+            },
+            {
+              "name": "time_from",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters3_Value', ``, 'string') }}"
+            },
+            {
+              "name": "time_to",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        -1120
+      ],
+      "id": "2f771eb7-da54-498c-b01e-d38ddbabc890",
+      "name": "Room booking api"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $json.replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.text }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2816,
+        144
+      ],
+      "id": "ab28e82c-315d-4a7f-a7e9-5b6203866f85",
+      "name": "[TEST]發送回應給 LINE1",
+      "retryOnFail": true,
+      "notesInFlow": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/push",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"to\": \"{{ $node[\"Webhook\"].json[\"body\"][\"events\"][\"0\"][\"source\"][\"userId\"] }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{ $json.text }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2656,
+        -384
+      ],
+      "id": "59c3e5b9-8acb-4f9b-bbe1-4f1e5513d018",
+      "name": "[TEST]發送回應給 LINE,PUSH",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.events[0].source.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        -1120
+      ],
+      "id": "f9de8dfb-d210-444f-835b-491d4728584e",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 您的任務是協助訂會議室，您的名字是ITR。\n\n您要與使用者進行對話，協助他們預訂會議室。\n使用\"Date & Time2\"工具查詢當前時間\n使用\"Room Inquiry\"工具查詢已經被借用的會議室，並且回覆尚可借用的會議室。\n使用\"Room Booking\"工具進行預約會議室\n若要預訂會議室，您需要下列資訊：借用日期(start_date)、會議號碼(meeting_number)、會議名稱(meeting_subject)、借用時間(time_from)、結束時間(time_to)。\n\n收集完資訊後，請以下列格式提供輸出: '我將幫您預訂會議室，請確認以下資訊：\n借用日期(start_date):xxxx/xx/xx\n會議室名稱(meeting_number):xxxx\n會議名稱(meeting_subject):xxxxxx\n借用時間(time_from):xxxxx\n結束時間(time_to):xxxxx'\n\n會議室的可借用時間為9:00至18:00，其餘時間不提供借用。\n若使用者沒有提供會議名稱,則預設為\"會議討論\"\n若使用者沒有提供借用時間的西元年份,使用工具\"Date & Time2\"查詢當前時間設定最相近的年份\n逐步推理回答問題，不用回答無法借用的時段，輸出依照時段找可用會議室的表格,確保表格正確無誤！\n簡潔清單式排版 + emoji 分隔，保持在手機螢幕內可讀性。\n\n## 使用者輸入：{{ $json.body.events[0].message.text }}\n\n## 會議室名稱\n會議室名稱自動匹配(room_number) = [\n    \"15F-15樓接待大廳\",\n    \"15F-階梯教室\",\n    \"15F-深水炸彈-1(15-1)\",\n    \"15F-深水炸彈-2(15-2)\",\n    \"15F-老經典(15-3)\",\n    \"15F-香格里拉(15-4)(觀察室)\",\n    \"15F-血腥瑪麗(15-5)(受訪室)\",\n    \"15F-亞歷山大(15-10)\",\n    \"15F-琴通寧(15-11)\",\n    \"4F-安新芽\",\n    \"4F-微風Chill室\",\n    \"4F-滴大地\",\n    \"4F-光影綠谷\",\n    \"4F-剛果秘境\",\n    \"4F-未來綠洲\",\n    \"4F-森林之光\",\n    \"4F-優勝美地\",\n    \"4F-亞馬遜雨林\",\n    \"3F-HIVE\",\n    \"3F-Kafka\",\n    \"3F-中心樹投影3\",\n    \"3F-中心樹投影5\",\n    \"3F-Scala\",\n    \"3F-中心樹投影6\",\n    \"3F-Matlab\",\n    \"3F-中心樹投影4\",\n    \"3F-Python\",\n    \"3F-Julia\",\n    \"3F-中心樹投影1\",\n    \"3F-R\",\n    \"3F-Spark\",\n    \"3F-SQL\",\n    \"3F-Base\",\n    \"3F-Java\",\n    \"3F-C++\"\n]",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -1344
+      ],
+      "id": "3a8c9d18-f966-40cf-81fa-e3e9fcaf6591",
+      "name": "C_Booking Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -1232
+      ],
+      "id": "d5960f1d-ee25-45ce-9029-4cb8938851b7",
+      "name": "Date & Time2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -1136
+      ],
+      "id": "00537af7-c1cd-4c9f-8d1b-37fac3e68c55",
+      "name": "Google Gemini 2.5 flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7623f21d-cb43-411c-ab3a-bd74d9430b14",
+              "leftValue": "={{ $node[\"Webhook\"].json[\"body\"][\"events\"][\"0\"][\"source\"][\"userId\"] }}",
+              "rightValue": "Udf3d230fe023ddb3908ed9bd7a47e48d",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        -944
+      ],
+      "id": "95881339-ef13-47a5-b064-7265e2254387",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Room Inquiry api,\"data\"的格式必須是XXXX/XX/XX(例如：2025/08/20)",
+        "method": "POST",
+        "url": "http://host.docker.internal:5000/run",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "date",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        -688
+      ],
+      "id": "0b3ec68c-cfe4-4ce8-b2d5-4e387b1f0226",
+      "name": "Room Inquiry1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.events[0].source.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        -688
+      ],
+      "id": "0030e669-ae0b-43cf-9344-ee09ee086181",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 您的任務是協助訂會議室，您的名字是ITR。\n\n您要與使用者進行對話，協助他們預訂會議室。\n使用\"Date & Time2\"工具查詢當前時間\n使用\"Room Inquiry\"工具查詢已經被借用的會議室，並且回覆尚可借用的會議室。\n使用\"Room Booking\"工具進行預約會議室\n若要預訂會議室，您需要下列資訊：借用日期(start_date)、會議號碼(meeting_number)、會議名稱(meeting_subject)、借用時間(time_from)、結束時間(time_to)。\n\n收集完資訊後，請以下列格式提供輸出: '我將幫您預訂會議室，請確認以下資訊：\n借用日期(start_date):xxxx/xx/xx\n會議室名稱(meeting_number):xxxx\n會議名稱(meeting_subject):xxxxxx\n借用時間(time_from):xxxxx\n結束時間(time_to):xxxxx'\n\n會議室的可借用時間為9:00至18:00，其餘時間不提供借用。\n若使用者沒有提供會議名稱,則預設為\"會議討論\"\n若使用者沒有提供借用時間的西元年份,使用工具\"Date & Time2\"查詢當前時間設定最相近的年份\n逐步推理回答問題，不用回答無法借用的時段，輸出依照時段找可用會議室的表格,確保表格正確無誤！\n簡潔清單式排版 + emoji 分隔，保持在手機螢幕內可讀性。\n\n## 使用者輸入：{{ $json.body.events[0].message.text }}\n\n## 會議室名稱\n會議室名稱自動匹配(room_number) = [\n    \"15F-15樓接待大廳\",\n    \"15F-階梯教室\",\n    \"15F-深水炸彈-1(15-1)\",\n    \"15F-深水炸彈-2(15-2)\",\n    \"15F-老經典(15-3)\",\n    \"15F-香格里拉(15-4)(觀察室)\",\n    \"15F-血腥瑪麗(15-5)(受訪室)\",\n    \"15F-亞歷山大(15-10)\",\n    \"15F-琴通寧(15-11)\",\n    \"4F-安新芽\",\n    \"4F-微風Chill室\",\n    \"4F-滴大地\",\n    \"4F-光影綠谷\",\n    \"4F-剛果秘境\",\n    \"4F-未來綠洲\",\n    \"4F-森林之光\",\n    \"4F-優勝美地\",\n    \"4F-亞馬遜雨林\",\n    \"3F-HIVE\",\n    \"3F-Kafka\",\n    \"3F-中心樹投影3\",\n    \"3F-中心樹投影5\",\n    \"3F-Scala\",\n    \"3F-中心樹投影6\",\n    \"3F-Matlab\",\n    \"3F-中心樹投影4\",\n    \"3F-Python\",\n    \"3F-Julia\",\n    \"3F-中心樹投影1\",\n    \"3F-R\",\n    \"3F-Spark\",\n    \"3F-SQL\",\n    \"3F-Base\",\n    \"3F-Java\",\n    \"3F-C++\"\n]",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        -912
+      ],
+      "id": "2fc63bf8-adc0-483c-8411-66599103ad7d",
+      "name": "C_Booking Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -800
+      ],
+      "id": "1c08956c-8bf2-4a54-beac-143fd9110ee1",
+      "name": "Date & Time3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -704
+      ],
+      "id": "62bf62dc-3347-4d11-92aa-5ac433837fd8",
+      "name": "Google Gemini 2.5 flash1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "[TEST]發送回應給 LINE1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "發送回應給 LINE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ITR Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FACT Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DR Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Date & Time1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "連線程式碼API_文字",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "接收圖片1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "gpt-oss-20b",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "gpt-oss-120b",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FACT Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl_Json": {
+      "ai_tool": [
+        [
+          {
+            "node": "FACT Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "ITR Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FACT Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gemini_Video_Understand": {
+      "ai_tool": [
+        [
+          {
+            "node": "ITR Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "FACT Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firecrawl": {
+      "ai_tool": [
+        [
+          {
+            "node": "ITR Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini-2.5-flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ITR Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "NEWS Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News_db_query": {
+      "ai_tool": [
+        [
+          {
+            "node": "NEWS Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "NEWS Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deep Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DR Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "NEWS Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "ITR Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Date & Time1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        []
+      ]
+    },
+    "Basic LLM Chain3": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "連線程式碼API_圖像",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "連線程式碼API_圖像": {
+      "main": [
+        [
+          {
+            "node": "輸出不違反json格式",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "連線程式碼API_文字": {
+      "main": [
+        [
+          {
+            "node": "輸出不違反json格式2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "[TEST]發送回應給 LINE2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "發送回應給 LINE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "gpt-oss-20b",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "gpt-oss-20b",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "gpt-oss-120b",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "ITR Agent",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "DR Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "gpt-oss-120b",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-oss-20b": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "gpt-oss-120b": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "輸出不違反json格式": {
+      "main": [
+        [
+          {
+            "node": "發送回應給 LINE2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "接收圖片1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "輸出不違反json格式2": {
+      "main": [
+        [
+          {
+            "node": "發送回應給 LINE3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Room Inquiry": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Room booking api": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "C_Booking Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Date & Time2": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini 2.5 flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Room Inquiry1": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time3": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini 2.5 flash1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "C_Booking Agent1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8232063d-c89d-4553-81da-5df91e989ecd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "Y7K0chYq48AtJYer",
+  "tags": []
+}

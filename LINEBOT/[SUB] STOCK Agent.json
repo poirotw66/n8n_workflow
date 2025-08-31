@@ -1,0 +1,282 @@
+{
+  "name": "[SUB] STOCK Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.userInput }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=你是一個股價查詢小幫手。\n使用者會輸入想查詢的股票代碼（例如：0050），有時也會包含查詢日期（例如：2025-06-24）。\n請依據輸入判斷以下資訊：\nstock_id：股票代碼（必填）\ndate：查詢日期（選填，若未輸入，預設為今天）\nnow_or_history：判斷使用者想查詢的是即時資料還是歷史資料，若未輸入日期或輸入的日期是今天，請設為 \"now\"，若輸入的日期不是今天，請設為 \"history\"\n請將上述資訊整理成 JSON 並傳遞至下個 HTTP Request 節點。"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1200,
+        -80
+      ],
+      "id": "82e48c29-7057-48cb-9f1d-8ceda210a5e4",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\ndef execute(input):\n  try:\n    # 從 js 物件轉 python\n    py_input = input.to_py()\n    # 將 dict 轉成 json\n    raw_data = json.loads(py_input['json']['data'])\n    # 取得 msgArray 中的第一筆資料\n    msg = raw_data[\"msgArray\"][0]\n    \n    # 擷取所需欄位\n    stock_code = msg.get(\"c\", \"N/A\")\n    stock_name = msg.get(\"n\", \"N/A\")\n    current_price = msg.get(\"z\", \"N/A\")\n    open_price = msg.get(\"o\", \"N/A\")\n    high_price = msg.get(\"h\", \"N/A\")\n    low_price = msg.get(\"l\", \"N/A\")\n    volumn = msg.get(\"v\", \"N/A\")\n    last_time = msg.get(\"t\", \"N/A\")\n    \n    return [{\n        \"json\": {\n            \"stock_code\": stock_code,\n            \"stock_name\": stock_name,\n            \"current_price\": current_price,\n            \"open_price\":open_price,\n            \"high_price\":high_price,\n            \"low_price\":low_price,\n            \"volumn\":volumn,\n            \"last_time\":last_time\n        }\n    }]\n    \n  except Exception as e:\n    return [{\n        \"json\": {\n            \"error\": f\"解析失敗: {str(e)}\"\n        }\n    }]\nprint(_input.first())\nr = execute(_input.first())\nreturn r"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        -80
+      ],
+      "id": "b549b0a6-1370-4028-8969-d6c04ff47faa",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "=https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_{{$json.output.stock_id}}.tw",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -848,
+        -80
+      ],
+      "id": "086c7958-255a-4386-b5fd-2b290cc5ce9c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{$json}}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=你是一位金融資訊助理，專門用簡單明瞭的方式解釋股票的即時報價資料。\n請根據以下提供的欄位資訊，分析這檔股票目前的交易情況，並說明：\n- 股票代號（stock_code）\n- 股票名稱（stock_name） \n- 當盤成交價（current_price）：即目前最新成交價 \n- 今日開盤價（open_price）：當日市場開盤的第一筆成交價 \n- 今日最高價（high_price）：今日截至目前的最高成交價 \n- 今日最低價（low_price）：今日截至目前的最低成交價\n- 當盤成交量（volumn）：今日截至目前的成交量\n- 最近成交時刻（last_time）：最近成交時刻（格式為 HH:MM:SS）\n請以條列式提供以上資訊，並根據下列邏輯撰寫「今日股價波動描述」：\n- 台股交易時間為 09:00–13:30，若 {{$json.last_time}} 為 13:30:30，代表今日已收盤，可根據當日高低點與開收價總結全天走勢。\n- 若目前仍為盤中（非 13:30）或成交價無效為 \"-\"，可用開盤價、最高價與最低價的相對關係，簡要描述今日盤中波動情況。\n- 可以指出目前價格與開盤價相比的漲跌狀況（上漲、下跌或持平）。\n請使用中立、專業且語意簡潔的語氣回答。\n\n### 格式優化指引\n- 適當運用分隔線和空行提升結構清晰度\n- 如果數字有小數點，請統一取到小數點後第二位\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -400,
+        -96
+      ],
+      "id": "e2cef9a0-7442-4007-8be2-fe95d62883cf",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        144
+      ],
+      "id": "7d89de3b-b1bd-4730-b803-2abb2463f5fb",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        112
+      ],
+      "id": "03cf2cca-4610-4bde-b3e9-7ca2b144a02e",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"stock_id\": \"0050\",\n\t\"date\": \"2025-06-15\",\n    \"now_or_history\":\"now\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1008,
+        128
+      ],
+      "id": "558da736-698e-48a2-9673-4439d4e4af7f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"output\": \"股票代號：2330\\n股票名稱：台積電\\n當盤成交價：1050.0000\\n今日開盤價：1045.0000\\n今日最高價：1050.0000\\n今日最低價：1040.0000\\n當盤成交量：27924\\n最近成交時刻：13:30:00\\n\\n今日台積電收盤價為 1050.0000，較開盤價上漲。全天股價在 1040.0000 至 1050.0000 之間波動。\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -304,
+        96
+      ],
+      "id": "90b41d6b-cb5d-4381-b3d6-75b43c735322",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            },
+            {
+              "name": "url"
+            },
+            {
+              "name": "userId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1408,
+        -80
+      ],
+      "id": "42ced16d-7bab-4307-836d-9c8c50d0e42e",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "186461fe-e50d-4410-b331-3796aa10a1fe",
+  "meta": {
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "PaQ43QCGzFQWzCS6",
+  "tags": [
+    {
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}

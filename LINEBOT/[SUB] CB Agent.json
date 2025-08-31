@@ -1,0 +1,390 @@
+{
+  "name": "[SUB] CB Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            },
+            {
+              "name": "userId"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Room Inquiry api,\"data\"的格式必須是XXXX/XX/XX(例如：2025/08/20)",
+        "method": "POST",
+        "url": "http://host.docker.internal:5000/run",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "date",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        976,
+        64
+      ],
+      "id": "d0154cee-4792-449d-8d01-1205b0af3e09",
+      "name": "Room Inquiry"
+    },
+    {
+      "parameters": {
+        "toolDescription": "=Room booking api\n會議室名稱必須匹配(room_number) = [\n    \"15F-15樓接待大廳\",\n    \"15F-階梯教室\",\n    \"15F-深水炸彈-1(15-1)\",\n    \"15F-深水炸彈-2(15-2)\",\n    \"15F-老經典(15-3)\",\n    \"15F-香格里拉(15-4)(觀察室)\",\n    \"15F-血腥瑪麗(15-5)(受訪室)\",\n    \"15F-亞歷山大(15-10)\",\n    \"15F-琴通寧(15-11)\",\n    \"4F-安新芽\",\n    \"4F-微風Chill室\",\n    \"4F-滴大地\",\n    \"4F-光影綠谷\",\n    \"4F-剛果秘境\",\n    \"4F-未來綠洲\",\n    \"4F-森林之光\",\n    \"4F-優勝美地\",\n    \"4F-亞馬遜雨林\",\n    \"3F-HIVE\",\n    \"3F-Kafka\",\n    \"3F-中心樹投影3\",\n    \"3F-中心樹投影5\",\n    \"3F-Scala\",\n    \"3F-中心樹投影6\",\n    \"3F-Matlab\",\n    \"3F-中心樹投影4\",\n    \"3F-Python\",\n    \"3F-Julia\",\n    \"3F-中心樹投影1\",\n    \"3F-R\",\n    \"3F-Spark\",\n    \"3F-SQL\",\n    \"3F-Base\",\n    \"3F-Java\",\n    \"3F-C++\"\n]\n其餘參數依照對話填入",
+        "method": "POST",
+        "url": "http://host.docker.internal:5000/book",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "start_date",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "room_number",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', ``, 'string') }}"
+            },
+            {
+              "name": "meeting_subject",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', ``, 'string') }}"
+            },
+            {
+              "name": "time_from",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters3_Value', ``, 'string') }}"
+            },
+            {
+              "name": "time_to",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        64
+      ],
+      "id": "da874991-76ae-45e3-bec1-44a02536a56b",
+      "name": "Room booking api"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 您的任務是協助訂會議室，您的名字是ITR。\n\n您要與使用者進行對話，協助他們預訂會議室。\n使用\"Date & Time\"工具查詢當前時間\n使用\"Room Inquiry\"工具查詢已經被借用的會議室，並且回覆尚可借用的會議室。\n使用\"Room Booking\"工具進行預約會議室\n若要預訂會議室，您需要下列資訊：借用日期(start_date)、會議號碼(meeting_number)、會議名稱(meeting_subject)、借用時間(time_from)、結束時間(time_to)。\n\n收集完資訊後，請以下列格式提供輸出: '我將幫您預訂會議室，請確認以下資訊：\n借用日期(start_date):xxxx/xx/xx\n會議室名稱(meeting_number):xxxx\n會議名稱(meeting_subject):xxxxxx\n借用時間(time_from):xxxxx\n結束時間(time_to):xxxxx'\n\n會議室的可借用時間為9:00至18:00，其餘時間不提供借用。\n若使用者沒有提供會議名稱,則預設為\"會議討論\"\n若使用者沒有提供借用時間的西元年份,使用工具\"Date & Time2\"查詢當前時間設定最相近的年份\n逐步推理回答問題，不用回答無法借用的時段，輸出依照時段找可用會議室的表格,確保表格正確無誤！\n簡潔清單式排版 + emoji 分隔，保持在手機螢幕內可讀性。\n\n## 使用者輸入：[{{ $json.userInput }}]\n\n## 會議室名稱\n會議室名稱自動匹配(room_number) = [\n    \"15F-15樓接待大廳\",\n    \"15F-階梯教室\",\n    \"15F-深水炸彈-1(15-1)\",\n    \"15F-深水炸彈-2(15-2)\",\n    \"15F-老經典(15-3)\",\n    \"15F-香格里拉(15-4)(觀察室)\",\n    \"15F-血腥瑪麗(15-5)(受訪室)\",\n    \"15F-亞歷山大(15-10)\",\n    \"15F-琴通寧(15-11)\",\n    \"4F-安新芽\",\n    \"4F-微風Chill室\",\n    \"4F-滴大地\",\n    \"4F-光影綠谷\",\n    \"4F-剛果秘境\",\n    \"4F-未來綠洲\",\n    \"4F-森林之光\",\n    \"4F-優勝美地\",\n    \"4F-亞馬遜雨林\",\n    \"3F-HIVE\",\n    \"3F-Kafka\",\n    \"3F-中心樹投影3\",\n    \"3F-中心樹投影5\",\n    \"3F-Scala\",\n    \"3F-中心樹投影6\",\n    \"3F-Matlab\",\n    \"3F-中心樹投影4\",\n    \"3F-Python\",\n    \"3F-Julia\",\n    \"3F-中心樹投影1\",\n    \"3F-R\",\n    \"3F-Spark\",\n    \"3F-SQL\",\n    \"3F-Base\",\n    \"3F-Java\",\n    \"3F-C++\"\n]",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        -160
+      ],
+      "id": "b41ad3ee-da70-4328-b46b-6e4f4a9fc9a6",
+      "name": "C_Booking Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        720,
+        64
+      ],
+      "id": "bf96df95-d0f0-41ba-89b4-c4c63eb6392c",
+      "name": "Google Gemini 2.5 flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7623f21d-cb43-411c-ab3a-bd74d9430b14",
+              "leftValue": "={{ $json.userId }}",
+              "rightValue": "Udf3d230fe023ddb3908ed9bd7a47e48d",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        496,
+        144
+      ],
+      "id": "1653f9ae-6fda-414f-8837-e1b552cd19a9",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Room Inquiry api,\"data\"的格式必須是XXXX/XX/XX(例如：2025/08/20)",
+        "method": "POST",
+        "url": "http://host.docker.internal:5000/run",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "date",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        576
+      ],
+      "id": "477ba496-18b1-41ca-afaa-b716557fa130",
+      "name": "Room Inquiry1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 您的任務是協助訂會議室，您的名字是ITR。\n\n您要與使用者進行對話，協助他們預訂會議室。\n使用\"Date & Time\"工具查詢當前時間\n使用\"Room Inquiry\"工具查詢已經被借用的會議室，並且回覆尚可借用的會議室。\n使用\"Room Booking\"工具進行預約會議室\n若要預訂會議室，您需要下列資訊：借用日期(start_date)、會議號碼(meeting_number)、會議名稱(meeting_subject)、借用時間(time_from)、結束時間(time_to)。\n\n收集完資訊後，請以下列格式提供輸出: '我將幫您預訂會議室，請確認以下資訊：\n借用日期(start_date):xxxx/xx/xx\n會議室名稱(meeting_number):xxxx\n會議名稱(meeting_subject):xxxxxx\n借用時間(time_from):xxxxx\n結束時間(time_to):xxxxx'\n\n會議室的可借用時間為9:00至18:00，其餘時間不提供借用。\n若使用者沒有提供會議名稱,則預設為\"會議討論\"\n若使用者沒有提供借用時間的西元年份,使用工具\"Date & Time2\"查詢當前時間設定最相近的年份\n逐步推理回答問題，不用回答無法借用的時段，輸出依照時段找可用會議室的表格,確保表格正確無誤！\n簡潔清單式排版 + emoji 分隔，保持在手機螢幕內可讀性。\n\n## 使用者輸入：[{{ $json.userInput }}]\n\n## 會議室名稱\n會議室名稱自動匹配(room_number) = [\n    \"15F-15樓接待大廳\",\n    \"15F-階梯教室\",\n    \"15F-深水炸彈-1(15-1)\",\n    \"15F-深水炸彈-2(15-2)\",\n    \"15F-老經典(15-3)\",\n    \"15F-香格里拉(15-4)(觀察室)\",\n    \"15F-血腥瑪麗(15-5)(受訪室)\",\n    \"15F-亞歷山大(15-10)\",\n    \"15F-琴通寧(15-11)\",\n    \"4F-安新芽\",\n    \"4F-微風Chill室\",\n    \"4F-滴大地\",\n    \"4F-光影綠谷\",\n    \"4F-剛果秘境\",\n    \"4F-未來綠洲\",\n    \"4F-森林之光\",\n    \"4F-優勝美地\",\n    \"4F-亞馬遜雨林\",\n    \"3F-HIVE\",\n    \"3F-Kafka\",\n    \"3F-中心樹投影3\",\n    \"3F-中心樹投影5\",\n    \"3F-Scala\",\n    \"3F-中心樹投影6\",\n    \"3F-Matlab\",\n    \"3F-中心樹投影4\",\n    \"3F-Python\",\n    \"3F-Julia\",\n    \"3F-中心樹投影1\",\n    \"3F-R\",\n    \"3F-Spark\",\n    \"3F-SQL\",\n    \"3F-Base\",\n    \"3F-Java\",\n    \"3F-C++\"\n]",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        352
+      ],
+      "id": "89c1c475-79c6-49db-b367-a2867aae6019",
+      "name": "C_Booking Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        912,
+        576
+      ],
+      "id": "794bab91-a0d3-4efd-ab37-6e8886489829",
+      "name": "Google Gemini 2.5 flash1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('If1').item.json.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryZep",
+      "typeVersion": 1.3,
+      "position": [
+        848,
+        64
+      ],
+      "id": "5e6d5adf-f1f8-4a9f-98ce-ef6c918048d4",
+      "name": "Zep",
+      "credentials": {
+        "zepApi": {
+          "id": "tR57ak8KfkLp9cPh",
+          "name": "Zep Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        64
+      ],
+      "id": "4ac6a8ef-1e54-49d3-9f3e-38a37f015ce5",
+      "name": "Date & Time"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Room Inquiry": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Room booking api": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini 2.5 flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Room Inquiry1": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini 2.5 flash1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zep": {
+      "ai_memory": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "C_Booking Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "C_Booking Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "409591f2-5f93-4f13-8907-96b62808961b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "pREFTPr9mIe4as8L",
+  "tags": [
+    {
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}
