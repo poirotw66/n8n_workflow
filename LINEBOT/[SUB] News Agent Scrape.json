@@ -1,0 +1,628 @@
+{
+  "name": "[SUB] News Agent Scrape",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2416,
+        352
+      ],
+      "id": "7cd6ad3a-8f36-4c12-8270-29912e3d78b1",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "content": "## RSS Feeds\n### 中文\n* 中央社即時新聞 科技新聞\nhttps://feeds.feedburner.com/rsscna/technology\n* 新頭殼要聞 - 科技\nhttps://newtalk.tw/rss/category/8\n\n\n\n",
+        "height": 320,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2480,
+        192
+      ],
+      "id": "9eb2a6d0-ed06-4f40-b6b7-b77b50770522",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8c00469-890b-4b5b-8e2e-2ad9ec2d0815",
+              "name": "rss",
+              "type": "array",
+              "value": "=[\n\"https://feeds.feedburner.com/rsscna/technology\",\n\"https://newtalk.tw/rss/category/8\"\n]\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da8b86a7-8615-487e-90d2-c508ae69db39",
+      "name": "Set Tech News RSS Feeds",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -2208,
+        352
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1984,
+        352
+      ],
+      "id": "888a345d-66b4-45d7-9d35-225098cf2ebd",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.rss }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        -1760,
+        352
+      ],
+      "id": "3ef074b5-53c2-44c3-912a-969ac5f6cf9c",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ed921166-e1fc-4f54-97b4-73fda80a01ca",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        208
+      ],
+      "id": "3caff23a-c695-4c34-9914-f30ec2615266",
+      "name": "completed?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6f83b952-c3a2-4737-912e-27ffaea737a0",
+              "leftValue": "={{ $('Check completion').item.json.status }}",
+              "rightValue": "scraping",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        352
+      ],
+      "id": "ef2bcc75-4a36-4d59-8526-86a09aad0c3e",
+      "name": "scraping?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://api:3002/v1/batch/scrape",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"urls\": {{ $('Filter out Unscraped items').first().json.data.map(item => item.link).toJsonString()}},\n  \"formats\": [\n    \"markdown\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        352
+      ],
+      "id": "4c12fff4-9afb-4c47-9591-c3282e57654f",
+      "name": "Scrape"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        432
+      ],
+      "id": "fc0b346d-82c8-4d87-b558-109acc56ee25",
+      "name": "Wait",
+      "webhookId": "47908cc9-48dc-41d4-b9b7-ed2d92e7fd2b"
+    },
+    {
+      "parameters": {
+        "url": "=http://api:3002/v1/batch/scrape/{{ $(\"Scrape\").first().json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -656,
+        288
+      ],
+      "id": "d072e887-e36c-4ca8-86be-4e095f37842a",
+      "name": "Check completion"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get newly scraped metadata\nconst arr1 = $('Filter out Unscraped items').first().json.data;\n// Get newly scraped contents\nconst arr2 = $input.first().json.data;\n\n// Merge arrays by matching items based on og:url metadata and link field\nlet data = arr1.map(item1 => {\n  const item2 = arr2.find(item => item.metadata[\"og:url\"] === item1.link);\n  return {...item1, ...item2};\n});\n\n// Transform data structure to extract only needed fields and rename some\ndata = data.map(({title, link, pubDate, markdown}) => ({\n  title,\n  url: link,\n  content: markdown,\n  pub_date: pubDate\n}));\n\n// Filter out items with undefined/empty content or title\ndata = data.filter(item => {\n  const hasTitle = item.title && item.title.trim() !== '';\n  const hasContent = item.content && item.content.trim() !== '';\n  return hasTitle && hasContent;\n});\n\n// Format pub_date preserving the original UTC+8 local time\ndata = data.map(({pub_date, ...rest}) => {\n  // Parse the date string and extract components while preserving original timezone\n  const date = new Date(pub_date);\n  \n  // Calculate the offset to get back to the original UTC+8 time\n  const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);\n  const utc8Time = new Date(utcTime + (8 * 3600000)); // Add 8 hours for UTC+8\n  \n  // Helper function to pad single digits with leading zeros\n  const pad = n => n.toString().padStart(2, '0');\n  \n  // Format to 'YYYY-MM-DD HH:MM:SS' preserving the original UTC+8 local time\n  const formatted = `${utc8Time.getFullYear()}-${pad(utc8Time.getMonth() + 1)}-${pad(utc8Time.getDate())} ${pad(utc8Time.getHours())}:${pad(utc8Time.getMinutes())}:${pad(utc8Time.getSeconds())}`;\n  return {pub_date: formatted, ...rest};\n});\n\n// Return the processed and cleaned data\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        112
+      ],
+      "id": "13b86c83-eab6-4f2f-985a-2a0d88e6cfa7",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "title, link, pubDate",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        368
+      ],
+      "id": "9c5eeb67-bf80-4aa7-95b6-9f9f3c3989d4",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "id"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        608,
+        112
+      ],
+      "id": "d2e84fbc-fd2c-4698-b4bc-52977b6d2377",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT url\nFROM `news_agent.news_articles`\nWHERE url IN ({{ $input.first().json.data.map(item => \"\\'\" + item.link + \"\\'\").join(',') }})\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        -1328,
+        352
+      ],
+      "id": "777c8654-98ba-4b3d-8737-685f85fb5ec6",
+      "name": "Get Scraped URLs",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rss_data = $('Aggregate').first().json.data;\n\nconst scraped_urls = $('Get Scraped URLs').all().map(item => item.json.url);\n\nreturn {data: rss_data.filter(item => !scraped_urls.includes(item.link))};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        352
+      ],
+      "id": "713eccee-9c78-4d5c-9c12-bc3c07064f93",
+      "name": "Filter out Unscraped items"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"pub_date\": \"{{ $('Code').item.json.pub_date }}\",\n  \"url\": \"{{ $('Code').item.json.url }}\",\n  \"title\": \"{{ $('Code').item.json.title }}\",\n  \"content\": {{ $json.text.toJsonString() }},\n  \"embedding\": {{ null }}\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        112
+      ],
+      "id": "ed23dceb-cb7d-4d12-b555-e0f0427d28e3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "你的工作是從新聞網頁的 Markdown 字串中，擷取出新聞的正文，移除其他不相關的資訊。\n\n規則：\n- 輸出「只能」包含新聞正文\n- 輸出「絕對不能」包含前綴或後綴的反引號 (```)、\"markdown\" 字串"
+            }
+          ]
+        },
+        "batching": {
+          "batchSize": 30,
+          "delayBetweenBatches": 60000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f120d561-5bf3-4964-850d-90daa864954e",
+      "name": "Extract Content"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 11
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2416,
+        528
+      ],
+      "id": "7b74a142-d9f4-4013-bb82-b9a6470e3ad5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "news_agent",
+          "mode": "list",
+          "cachedResultName": "news_agent"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "news_articles",
+          "mode": "list",
+          "cachedResultName": "news_articles"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        816,
+        112
+      ],
+      "id": "4baa07d4-7a2f-411c-9af7-201f74ebd855",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        96,
+        224
+      ],
+      "id": "45d697f0-f518-4acb-924f-114016eb6e36",
+      "name": "gemini-2.5-flash-lite",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "IPHSLQRyWQXZYdKx",
+          "name": "Google Gemini(PaLM) Api account 5"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Set Tech News RSS Feeds": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "completed?": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "scraping?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "scraping?": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Scrape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape": {
+      "main": [
+        [
+          {
+            "node": "Check completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Check completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check completion": {
+      "main": [
+        [
+          {
+            "node": "completed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Get Scraped URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Extract Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Scraped URLs": {
+      "main": [
+        [
+          {
+            "node": "Filter out Unscraped items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter out Unscraped items": {
+      "main": [
+        [
+          {
+            "node": "Scrape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Content": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Tech News RSS Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gemini-2.5-flash-lite": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "63d074df-ff12-48c2-ac22-c4427f5da34f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "tyrFu0QDuqriox6a",
+  "tags": [
+    {
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}

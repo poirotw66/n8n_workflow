@@ -1,0 +1,306 @@
+{
+  "name": "[SUB] DR Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "description": "It lets you use crawl and scrape websites in your n8n workflows.\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "fuPMDOgf9FmrW7zB",
+          "mode": "list",
+          "cachedResultName": "LINE CHATBOT_Crawl_json"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "URL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "URL"
+          ],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        240
+      ],
+      "id": "68a9b3df-945e-4096-9879-3d7930a26dee",
+      "name": "Crawl_Json"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this tool to get a youtube  video summary.\n",
+        "url": "http://gemini-api:8000/summarize",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        240
+      ],
+      "id": "aa5e61f8-4fbe-4291-93f1-2f2228297adc",
+      "name": "Gemini_Video_Understand"
+    },
+    {
+      "parameters": {
+        "toolDescription": "use firecrawl and scrape websites in your n8n workflows.",
+        "method": "POST",
+        "url": "http://api:3002/v1/scrape",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "formats",
+              "value": "={{ [\"markdown\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        240
+      ],
+      "id": "5e92f44f-0189-4c5a-a12b-31aa4be45aec",
+      "name": "Firecrawl"
+    },
+    {
+      "parameters": {
+        "toolDescription": "The agent is designed to perform comprehensive research on a user's query by dynamically generating search terms, querying the web using Google Search, reflecting on the results to identify knowledge gaps, and iteratively refining its search until it can provide a well-supported answer with citations. \neffort=[low, medium, high],default=medium",
+        "method": "POST",
+        "url": "http://gemini-dr-api:8080/ask",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "question",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "effort",
+              "value": "=medium"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        240
+      ],
+      "id": "a1a56bd0-4b71-4499-8567-5ba95fff6991",
+      "name": "Deep Research"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        240
+      ],
+      "id": "821b4231-003d-47d4-8562-25b0e6037c27",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=使用者輸入**「{{ $json.userInput }}」**\n包含網址 **「{{ $json.url }}」**\n- 如果包含影片，使用工具\"Gemini_Video_Understand\",爬取影片內容\n- 如果包含網址，使用工具\"Firecrawl\"爬取網址內容\n- 使用工具\"Deep Reasearch\"對使用者輸入進行深度研究\n\n## 輸出格式要求\n* 整理成一份 適合在 LINE 傳送的「研究報告格式」：\n* 條列清楚、分段有小標題\n* 適度使用 emoji 作為分隔符號（避免太多裝飾）\n* 保留資訊完整性與「研究感」\n* 引用來源要保留，但以簡潔形式呈現（如 [youlai]、[ettoday]、[xzh6]），在文章最後呈現網址\nurl必須是有效連結！\n  例如：[yahoo]https://tw.yahoo.com/\n  [google]https://www.google.com/?hl=zh_TW\n* 可以適度延長內文，讓內容看起來更有「研究深度」",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        0,
+        32
+      ],
+      "id": "cb008f12-55fb-41be-947c-b63b8995a180",
+      "name": "DR Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.userId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryZep",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        240
+      ],
+      "id": "d26a9227-c402-40c4-8c1b-17499b687ca0",
+      "name": "Zep",
+      "credentials": {
+        "zepApi": {
+          "id": "tR57ak8KfkLp9cPh",
+          "name": "Zep Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            },
+            {
+              "name": "url"
+            },
+            {
+              "name": "userId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        16
+      ],
+      "id": "e696251f-f2a3-4ec5-b08b-971a7b09cf37",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Crawl_Json": {
+      "ai_tool": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini_Video_Understand": {
+      "ai_tool": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firecrawl": {
+      "ai_tool": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deep Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zep": {
+      "ai_memory": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "DR Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f3f00636-1eb2-4d80-9d56-c18596e70f5c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "21S6H1nrg1hD1XLG",
+  "tags": [
+    {
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}
