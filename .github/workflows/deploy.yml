@@ -8,55 +8,48 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Setup Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
       
-      - name: Deploy to gh-pages
-        run: |
-          # 設置遠程 URL 使用 token
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          
-          # 獲取所有遠程引用
-          git fetch origin --prune
-          
-          # 嘗試刪除遠程的 gh-pages 分支（如果存在）
-          git push origin :refs/heads/gh-pages 2>/dev/null || true
-          
-          # 等待一下確保遠程操作完成
-          sleep 2
-          
-          # 創建新的 orphan 分支
-          git checkout --orphan gh-pages
-          
-          # 清理所有文件
-          git rm -rf . 2>/dev/null || true
-          
-          # 從 main 分支複製需要的文件（包括 image 文件夾）
-          git checkout main -- index.html styles.css .nojekyll image/ 2>/dev/null || true
-          
-          # 如果從 main 複製失敗，直接創建文件
-          if [ ! -f index.html ]; then
-            echo "Error: Cannot find index.html" >&2
-            exit 1
-          fi
-          
-          # 提交更改
-          git add -A
-          git commit -m "Deploy GitHub Pages [$(date +%Y-%m-%d\ %H:%M:%S)]"
-          
-          # 推送到 gh-pages 分支（創建新分支）
-          git push origin gh-pages --force
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+          exclude: |
+            LINEBOT/
+            *.json
+            *.txt
+            .git/
+            .github/
+            backup_*/
+            scripts/
+            *.md
+            !README.md
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
