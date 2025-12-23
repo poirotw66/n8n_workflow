@@ -6,167 +6,225 @@
 }
 
 :root {
-    --primary-color: #6366f1;
-    --primary-dark: #4f46e5;
-    --secondary-color: #8b5cf6;
-    --accent-color: #ec4899;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --bg-light: #f9fafb;
-    --bg-white: #ffffff;
-    --border-color: #e5e7eb;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    /* 自然色調 - 參考海邊風景 */
+    --ocean-blue: #4A90A4;
+    --deep-blue: #2C5F7A;
+    --sand-beige: #F5F1E8;
+    --warm-tan: #D4C5B9;
+    --stone-brown: #8B7355;
+    --soft-gray: #E8E3DB;
+    
+    /* 文字顏色 */
+    --text-primary: #2C3E50;
+    --text-secondary: #6B7A8A;
+    --text-light: #8B9AAB;
+    
+    /* 背景 */
+    --bg-primary: #FAF9F6;
+    --bg-white: #FFFFFF;
+    --bg-card: #FFFFFF;
+    
+    /* 邊框和陰影 */
+    --border-color: #E8E3DB;
+    --shadow-soft: 0 2px 8px rgba(44, 95, 122, 0.08);
+    --shadow-medium: 0 4px 16px rgba(44, 95, 122, 0.12);
+    --shadow-strong: 0 8px 24px rgba(44, 95, 122, 0.16);
 }
 
 body {
     font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    line-height: 1.6;
+    line-height: 1.7;
     color: var(--text-primary);
-    background-color: var(--bg-light);
+    background: linear-gradient(180deg, #FAF9F6 0%, #F5F1E8 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 24px;
 }
 
-/* Header / Hero Section */
+/* Header / Hero Section - 簡約優雅 */
 .hero {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--ocean-blue) 100%);
     color: white;
-    padding: 80px 20px;
+    padding: 100px 20px 80px;
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero .container {
+    position: relative;
+    z-index: 1;
 }
 
 .hero-title {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 16px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 3.5rem;
+    font-weight: 300;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
 }
 
 .hero-subtitle {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 400;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     opacity: 0.95;
+    letter-spacing: 0.01em;
 }
 
 .hero-description {
-    font-size: 1.1rem;
-    max-width: 800px;
+    font-size: 1.05rem;
+    max-width: 700px;
     margin: 0 auto;
     opacity: 0.9;
     line-height: 1.8;
+    font-weight: 300;
 }
 
-/* Section Styles */
+/* Section Styles - 增加留白 */
 section {
-    margin-bottom: 60px;
+    margin-bottom: 80px;
 }
 
 section h2 {
     font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 30px;
+    font-weight: 400;
+    margin-bottom: 40px;
     color: var(--text-primary);
-    border-bottom: 3px solid var(--primary-color);
-    padding-bottom: 10px;
+    letter-spacing: -0.01em;
+    position: relative;
+    padding-bottom: 16px;
 }
 
-/* Intro Section */
+section h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--ocean-blue), var(--warm-tan));
+    border-radius: 2px;
+}
+
+/* Intro Section - 簡約卡片 */
 .intro-section {
     background: var(--bg-white);
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-    margin-bottom: 40px;
+    padding: 60px 50px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 60px;
+    border: 1px solid var(--border-color);
 }
 
 .intro-content p {
     font-size: 1.1rem;
     color: var(--text-secondary);
-    margin-bottom: 30px;
-    line-height: 1.8;
+    margin-bottom: 40px;
+    line-height: 1.9;
+    font-weight: 300;
 }
 
 .features-highlight {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 16px;
     justify-content: center;
 }
 
 .feature-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     padding: 12px 24px;
-    background: var(--bg-light);
-    border-radius: 8px;
-    font-weight: 500;
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: var(--sand-beige);
+    border-radius: 50px;
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
 }
 
 .feature-item:hover {
+    background: var(--bg-white);
+    border-color: var(--border-color);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-soft);
 }
 
 .feature-item .icon {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
 }
 
-/* Workflow Cards */
+/* Workflow Cards - 簡約優雅 */
 .workflow-card {
     background: var(--bg-white);
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
 }
 
 .workflow-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--ocean-blue);
 }
 
 .main-card {
-    border: 2px solid var(--primary-color);
+    border: 2px solid var(--ocean-blue);
+    box-shadow: var(--shadow-medium);
 }
 
 .card-header {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--ocean-blue) 100%);
     color: white;
-    padding: 20px 24px;
+    padding: 24px 28px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .main-card .card-header {
-    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--ocean-blue) 100%);
 }
 
 .card-header h3 {
     font-size: 1.3rem;
-    font-weight: 600;
+    font-weight: 400;
     margin: 0;
+    letter-spacing: -0.01em;
 }
 
 .badge {
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    background: rgba(255, 255, 255, 0.2);
+    font-size: 0.8rem;
+    font-weight: 400;
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(10px);
+    letter-spacing: 0.02em;
 }
 
 .badge-primary {
@@ -174,78 +232,86 @@ section h2 {
 }
 
 .badge-image {
-    background: rgba(236, 72, 153, 0.3);
+    background: rgba(212, 197, 185, 0.4);
 }
 
 .badge-rag {
-    background: rgba(139, 92, 246, 0.3);
+    background: rgba(139, 115, 85, 0.4);
 }
 
 .badge-news {
-    background: rgba(59, 130, 246, 0.3);
+    background: rgba(74, 144, 164, 0.4);
 }
 
 .badge-stock {
-    background: rgba(34, 197, 94, 0.3);
+    background: rgba(139, 115, 85, 0.4);
 }
 
 .badge-agent {
-    background: rgba(245, 158, 11, 0.3);
+    background: rgba(212, 197, 185, 0.4);
 }
 
 .badge-fact {
-    background: rgba(239, 68, 68, 0.3);
+    background: rgba(139, 115, 85, 0.4);
 }
 
 .badge-web {
-    background: rgba(20, 184, 166, 0.3);
+    background: rgba(74, 144, 164, 0.4);
 }
 
 .badge-module {
-    background: rgba(168, 85, 247, 0.3);
+    background: rgba(212, 197, 185, 0.4);
 }
 
 .badge-tool {
-    background: rgba(107, 114, 128, 0.3);
+    background: rgba(139, 115, 85, 0.4);
 }
 
 .card-body {
-    padding: 24px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .card-description {
     color: var(--text-secondary);
-    margin-bottom: 20px;
-    line-height: 1.7;
+    margin-bottom: 24px;
+    line-height: 1.8;
+    font-weight: 300;
+    font-size: 0.98rem;
 }
 
 .workflow-features {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 20px;
+    margin-top: auto;
+    padding-top: 20px;
 }
 
 .feature-tag {
-    padding: 6px 12px;
-    background: var(--bg-light);
-    border-radius: 6px;
+    padding: 6px 14px;
+    background: var(--sand-beige);
+    border-radius: 20px;
     font-size: 0.85rem;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
+    font-weight: 300;
 }
 
 .workflow-details {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: 28px;
+    padding-top: 28px;
     border-top: 1px solid var(--border-color);
 }
 
 .workflow-details h4 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 12px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin-bottom: 16px;
     color: var(--text-primary);
+    letter-spacing: -0.01em;
 }
 
 .workflow-details ul {
@@ -254,229 +320,145 @@ section h2 {
 }
 
 .workflow-details li {
-    padding: 8px 0;
-    padding-left: 24px;
+    padding: 10px 0;
+    padding-left: 28px;
     position: relative;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.7;
+    font-weight: 300;
 }
 
 .workflow-details li::before {
-    content: "✓";
+    content: "•";
     position: absolute;
-    left: 0;
-    color: var(--primary-color);
-    font-weight: bold;
+    left: 8px;
+    color: var(--ocean-blue);
+    font-size: 1.2rem;
+    font-weight: 300;
 }
 
-/* Workflows Grid */
+/* Workflows Grid - 優雅間距 */
 .workflows-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
 }
 
 .main-workflow-section {
-    margin-bottom: 60px;
+    margin-bottom: 80px;
 }
 
-/* Tech Section */
+/* Tech Section - 簡約設計 */
 .tech-section {
     background: var(--bg-white);
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
+    padding: 60px 50px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
 }
 
 .tech-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
+    gap: 28px;
 }
 
 .tech-card {
     text-align: center;
-    padding: 30px 20px;
-    background: var(--bg-light);
+    padding: 40px 24px;
+    background: var(--sand-beige);
     border-radius: 12px;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.3s ease;
     border: 1px solid var(--border-color);
 }
 
 .tech-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-soft);
+    background: var(--bg-white);
 }
 
 .tech-icon {
     font-size: 3rem;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .tech-card h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 500;
     margin-bottom: 12px;
     color: var(--text-primary);
+    letter-spacing: -0.01em;
 }
 
 .tech-card p {
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.7;
+    font-weight: 300;
+    font-size: 0.95rem;
 }
 
 /* Features Section */
 .features-section {
     background: var(--bg-white);
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
+    padding: 60px 50px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
 }
 
 .features-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
+    gap: 28px;
 }
 
 .feature-box {
     text-align: center;
-    padding: 30px 20px;
-    background: var(--bg-light);
+    padding: 40px 24px;
+    background: var(--sand-beige);
     border-radius: 12px;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.3s ease;
     border: 1px solid var(--border-color);
 }
 
 .feature-box:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-soft);
+    background: var(--bg-white);
 }
 
 .feature-icon {
     font-size: 3rem;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .feature-box h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 500;
     margin-bottom: 12px;
     color: var(--text-primary);
+    letter-spacing: -0.01em;
 }
 
 .feature-box p {
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.7;
+    font-weight: 300;
+    font-size: 0.95rem;
 }
 
-/* Footer */
-.footer {
-    background: var(--text-primary);
-    color: white;
-    padding: 40px 20px;
-    text-align: center;
-    margin-top: 80px;
-}
-
-.footer p {
-    margin-bottom: 8px;
-}
-
-.footer-links {
-    margin-top: 16px;
-}
-
-.footer-links a {
-    color: white;
-    text-decoration: none;
-    transition: opacity 0.2s;
-}
-
-.footer-links a:hover {
-    opacity: 0.8;
-}
-
-.footer-links span {
-    margin: 0 12px;
-    opacity: 0.5;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
-    }
-
-    .hero-description {
-        font-size: 1rem;
-    }
-
-    section h2 {
-        font-size: 1.5rem;
-    }
-
-    .workflows-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .tech-grid,
-    .features-list {
-        grid-template-columns: 1fr;
-    }
-
-    .intro-section,
-    .tech-section,
-    .features-section {
-        padding: 24px;
-    }
-
-    .features-highlight {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .feature-item {
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .hero {
-        padding: 60px 20px;
-    }
-
-    .hero-title {
-        font-size: 1.75rem;
-    }
-
-    .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .card-header h3 {
-        font-size: 1.1rem;
-    }
-}
-
-
-
-/* 工作流圖片展示 */
+/* 工作流圖片展示 - 優雅設計 */
 .workflow-image-container {
     position: relative;
     width: 100%;
-    margin: 20px 0;
-    border-radius: 8px;
+    margin: 24px 0;
+    border-radius: 12px;
     overflow: hidden;
-    background: var(--bg-light);
+    background: var(--sand-beige);
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-color);
     max-height: 300px;
     display: flex;
     align-items: center;
@@ -484,8 +466,9 @@ section h2 {
 }
 
 .workflow-image-container:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--ocean-blue);
 }
 
 .workflow-image-container:hover .image-overlay {
@@ -498,7 +481,7 @@ section h2 {
     max-height: 300px;
     object-fit: contain;
     display: block;
-    transition: transform 0.3s;
+    transition: transform 0.4s ease;
 }
 
 .workflow-image-container:hover .workflow-image {
@@ -511,23 +494,24 @@ section h2 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(44, 95, 122, 0.7);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s ease;
     pointer-events: none;
 }
 
 .image-hint {
     color: white;
-    font-size: 1rem;
-    font-weight: 500;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-size: 0.95rem;
+    font-weight: 400;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.02em;
 }
 
-/* 圖片燈箱模態框 */
+/* 圖片燈箱模態框 - 優雅設計 */
 .image-modal {
     display: none;
     position: fixed;
@@ -536,8 +520,9 @@ section h2 {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    animation: fadeIn 0.3s;
+    background-color: rgba(44, 95, 122, 0.95);
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
     cursor: pointer;
 }
 
@@ -556,13 +541,15 @@ section h2 {
     max-width: 90%;
     max-height: 90%;
     margin-top: 5%;
-    animation: zoomIn 0.3s;
+    animation: zoomIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: default;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 @keyframes zoomIn {
     from {
-        transform: scale(0.8);
+        transform: scale(0.9);
         opacity: 0;
     }
     to {
@@ -573,18 +560,28 @@ section h2 {
 
 .modal-close {
     position: absolute;
-    top: 20px;
-    right: 35px;
-    color: #f1f1f1;
-    font-size: 40px;
-    font-weight: bold;
+    top: 24px;
+    right: 32px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 36px;
+    font-weight: 300;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: all 0.3s ease;
     z-index: 10000;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
 }
 
 .modal-close:hover {
-    color: #fff;
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
 }
 
 .modal-caption {
@@ -593,16 +590,108 @@ section h2 {
     width: 80%;
     max-width: 700px;
     text-align: center;
-    color: #ccc;
-    padding: 20px 0;
-    font-size: 1.2rem;
-    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 24px 0;
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
 }
 
-/* 響應式圖片 */
+/* Footer - 簡約設計 */
+.footer {
+    background: var(--deep-blue);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 50px 20px;
+    text-align: center;
+    margin-top: 100px;
+}
+
+.footer p {
+    margin-bottom: 12px;
+    font-weight: 300;
+    font-size: 0.95rem;
+}
+
+.footer-links {
+    margin-top: 20px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 300;
+}
+
+.footer-links a:hover {
+    color: white;
+    opacity: 1;
+}
+
+.footer-links span {
+    margin: 0 16px;
+    opacity: 0.4;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+    .hero {
+        padding: 80px 20px 60px;
+    }
+
+    .hero-title {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+    }
+
+    section {
+        margin-bottom: 60px;
+    }
+
+    section h2 {
+        font-size: 1.6rem;
+        margin-bottom: 32px;
+    }
+
+    .workflows-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .tech-grid,
+    .features-list {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .intro-section,
+    .tech-section,
+    .features-section {
+        padding: 40px 32px;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    .features-highlight {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .feature-item {
+        justify-content: center;
+    }
+
     .workflow-image-container {
-        margin: 15px 0;
+        margin: 20px 0;
     }
 
     .modal-content {
@@ -611,30 +700,42 @@ section h2 {
     }
 
     .modal-close {
-        top: 10px;
+        top: 16px;
         right: 20px;
-        font-size: 30px;
+        font-size: 28px;
+        width: 36px;
+        height: 36px;
     }
 
     .modal-caption {
-        font-size: 1rem;
-        padding: 15px 0;
+        font-size: 0.95rem;
+        padding: 20px 0;
     }
 }
 
-/* 優化卡片間距 */
-.workflow-card {
-    display: flex;
-    flex-direction: column;
-}
+@media (max-width: 480px) {
+    .hero {
+        padding: 60px 20px 50px;
+    }
 
-.card-body {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
+    .hero-title {
+        font-size: 1.9rem;
+    }
 
-.workflow-features {
-    margin-top: auto;
-    padding-top: 15px;
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 20px;
+    }
+
+    .card-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .intro-section,
+    .tech-section,
+    .features-section {
+        padding: 32px 24px;
+    }
 }
