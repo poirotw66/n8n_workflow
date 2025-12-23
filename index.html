@@ -108,6 +108,15 @@
                     </div>
                     <div class="card-body">
                         <p class="card-description">檢索增強生成代理，結合知識庫檢索和 AI 生成能力，提供準確的資訊回答。</p>
+                        <div class="workflow-image-container">
+                            <img src="image/[SUB] 1399_rag_agent.png" 
+                                 alt="1399 RAG Agent 工作流圖" 
+                                 class="workflow-image"
+                                 onclick="openImageModal('image/[SUB] 1399_rag_agent.png', '1399 RAG Agent 工作流')">
+                            <div class="image-overlay">
+                                <span class="image-hint">點擊查看大圖</span>
+                            </div>
+                        </div>
                         <div class="workflow-features">
                             <div class="feature-tag">知識檢索</div>
                             <div class="feature-tag">智能問答</div>
@@ -424,6 +433,43 @@
             </p>
         </div>
     </footer>
+
+    <!-- 圖片燈箱模態框 -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage" alt="工作流圖">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script>
+        // 打開圖片燈箱
+        function openImageModal(imageSrc, caption) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const captionText = document.getElementById('modalCaption');
+            
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+            captionText.innerHTML = caption;
+            
+            // 防止點擊圖片時關閉
+            modalImg.onclick = function(e) {
+                e.stopPropagation();
+            };
+        }
+
+        // 關閉圖片燈箱
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // 按 ESC 鍵關閉
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+    </script>
 </body>
 </html>
 
