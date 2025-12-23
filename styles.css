@@ -477,6 +477,10 @@ section h2 {
     background: var(--bg-light);
     cursor: pointer;
     transition: transform 0.3s, box-shadow 0.3s;
+    max-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .workflow-image-container:hover {
@@ -491,6 +495,8 @@ section h2 {
 .workflow-image {
     width: 100%;
     height: auto;
+    max-height: 300px;
+    object-fit: contain;
     display: block;
     transition: transform 0.3s;
 }
