@@ -30,8 +30,14 @@ jobs:
           # 設置遠程 URL 使用 token
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           
-          # 刪除遠程的 gh-pages 分支（如果存在）以解決引用不一致問題
-          git push origin :gh-pages 2>/dev/null || true
+          # 獲取所有遠程引用
+          git fetch origin --prune
+          
+          # 嘗試刪除遠程的 gh-pages 分支（如果存在）
+          git push origin :refs/heads/gh-pages 2>/dev/null || true
+          
+          # 等待一下確保遠程操作完成
+          sleep 2
           
           # 創建新的 orphan 分支
           git checkout --orphan gh-pages
@@ -39,8 +45,8 @@ jobs:
           # 清理所有文件
           git rm -rf . 2>/dev/null || true
           
-          # 從 main 分支複製需要的文件
-          git checkout main -- index.html styles.css .nojekyll 2>/dev/null || true
+          # 從 main 分支複製需要的文件（包括 image 文件夾）
+          git checkout main -- index.html styles.css .nojekyll image/ 2>/dev/null || true
           
           # 如果從 main 複製失敗，直接創建文件
           if [ ! -f index.html ]; then
