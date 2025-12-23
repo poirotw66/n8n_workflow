@@ -1,40 +1,50 @@
 # GitHub Pages 部署指南
 
-如果遇到部署錯誤，請按照以下步驟操作：
+## 自動部署（推薦方法）
 
-## 方法一：使用 GitHub Actions 自動部署（推薦）
+本專案已配置自動部署工作流，會自動將網站部署到 `gh-pages` 分支。
 
-### 步驟 1：啟用 GitHub Pages
-
-1. 前往您的 GitHub 倉庫
-2. 點擊 **Settings**（設置）
-3. 在左側選單中找到 **Pages**
-4. 在 **Source** 部分：
-   - 選擇 **GitHub Actions** 作為來源
-   - 或者選擇 **Deploy from a branch**，然後選擇 `gh-pages` 分支和 `/ (root)` 目錄
-5. 點擊 **Save**（保存）
-
-### 步驟 2：推送代碼
+### 步驟 1：推送代碼
 
 ```bash
 git add .
-git commit -m "Add GitHub Pages"
+git commit -m "Deploy GitHub Pages"
 git push origin main
 ```
 
-### 步驟 3：檢查部署狀態
+### 步驟 2：等待部署完成
 
 1. 前往倉庫的 **Actions** 標籤
-2. 查看工作流執行狀態
-3. 如果成功，幾分鐘後即可訪問您的網站
+2. 查看 "Deploy to GitHub Pages" 工作流執行狀態
+3. 等待工作流完成（通常需要 1-2 分鐘）
 
-## 方法二：使用簡單部署工作流
+### 步驟 3：啟用 GitHub Pages
 
-如果方法一遇到問題，可以使用 `deploy-simple.yml` 工作流：
+部署完成後（`gh-pages` 分支已創建），需要啟用 Pages：
 
-1. 確保 `.github/workflows/deploy.yml` 被禁用或刪除
-2. 使用 `deploy-simple.yml`（會自動部署到 `gh-pages` 分支）
-3. 在 GitHub 設置中選擇 `gh-pages` 分支作為來源
+1. 前往 GitHub 倉庫的 **Settings** > **Pages**
+2. 在 **Source** 部分：
+   - 選擇 **Deploy from a branch**
+   - 分支選擇 `gh-pages`
+   - 目錄選擇 `/ (root)`
+3. 點擊 **Save**
+
+### 步驟 4：訪問網站
+
+等待 1-2 分鐘後，您的網站將在以下網址可用：
+```
+https://[您的用戶名].github.io/n8n_workflow-1/
+```
+
+## 手動觸發部署
+
+如果需要手動觸發部署：
+
+1. 前往倉庫的 **Actions** 標籤
+2. 選擇 "Deploy to GitHub Pages" 工作流
+3. 點擊 **Run workflow** 按鈕
+4. 選擇分支（通常是 `main`）
+5. 點擊 **Run workflow**
 
 ## 方法三：手動部署到 gh-pages 分支
 
@@ -68,22 +78,18 @@ git checkout main
 
 ## 常見問題
 
-### 錯誤：HttpError: Not Found
+### 錯誤：HttpError: Not Found 或 Get Pages site failed
 
-**原因**：GitHub Pages 尚未在倉庫設置中啟用
-
-**解決方法**：
-1. 前往 **Settings** > **Pages**
-2. 選擇一個部署來源（GitHub Actions 或分支）
-3. 保存設置
-
-### 錯誤：Get Pages site failed
-
-**原因**：Pages 環境尚未配置
+**原因**：這個錯誤通常出現在使用新的 GitHub Pages Actions 時，因為需要先在設置中啟用 Pages。
 
 **解決方法**：
-1. 確保在 **Settings** > **Pages** 中選擇了 **GitHub Actions** 作為來源
-2. 或者使用 `deploy-simple.yml` 工作流，它會自動創建 `gh-pages` 分支
+1. **先推送代碼**，讓工作流創建 `gh-pages` 分支
+2. 等待工作流完成（查看 Actions 標籤）
+3. 然後前往 **Settings** > **Pages**
+4. 選擇 **Deploy from a branch**，選擇 `gh-pages` 分支
+5. 保存設置
+
+**注意**：新的工作流使用 `gh-pages` 分支部署，不需要先在設置中啟用 Pages。先讓工作流運行完成，創建 `gh-pages` 分支後，再在設置中選擇該分支即可。
 
 ### 網站無法訪問
 

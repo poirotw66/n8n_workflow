@@ -17,21 +17,20 @@
 
 ### 快速開始
 
-1. **啟用 GitHub Pages**（必須先完成此步驟）：
-   - 前往 GitHub 倉庫的 **Settings** > **Pages**
-   - 在 **Source** 部分選擇 **GitHub Actions**
-   - 點擊 **Save**
-
-2. **推送代碼**：
+1. **推送代碼**（工作流會自動部署）：
    ```bash
    git add .
    git commit -m "Add GitHub Pages"
    git push origin main
    ```
 
-3. **等待部署**：
-   - 前往 **Actions** 標籤查看部署狀態
-   - 幾分鐘後即可訪問網站
+2. **啟用 GitHub Pages**（部署完成後）：
+   - 前往 GitHub 倉庫的 **Settings** > **Pages**
+   - 在 **Source** 部分選擇 **Deploy from a branch**
+   - 選擇 `gh-pages` 分支和 `/ (root)` 目錄
+   - 點擊 **Save**
+
+3. **等待幾分鐘**，網站即可訪問
 
 ### 訪問網站
 
@@ -40,9 +39,15 @@
 https://[您的用戶名].github.io/n8n_workflow-1/
 ```
 
+### 部署說明
+
+- 工作流會自動將網站部署到 `gh-pages` 分支
+- 首次部署後，需要在 GitHub 設置中選擇 `gh-pages` 分支作為來源
+- 之後每次推送代碼到 `main` 分支，網站會自動更新
+
 ### 遇到部署問題？
 
-如果遇到 `HttpError: Not Found` 或 `Get Pages site failed` 錯誤，請查看 [DEPLOY.md](./DEPLOY.md) 獲取詳細的故障排除指南。
+如果遇到任何問題，請查看 [DEPLOY.md](./DEPLOY.md) 獲取詳細的故障排除指南。
 
 ### 本地預覽
 
