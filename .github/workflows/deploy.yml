@@ -16,6 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Setup Git
         run: |
@@ -24,31 +27,35 @@ jobs:
       
       - name: Deploy to gh-pages
         run: |
-          # 創建一個臨時目錄來構建網站
-          mkdir -p _site
+          # 設置遠程 URL 使用 token
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          
+          # 嘗試切換到 gh-pages 分支，如果不存在則創建新的 orphan 分支
+          if git show-ref --verify --quiet refs/heads/gh-pages; then
+            git checkout gh-pages
+            git rm -rf . || true
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . || true
+          fi
           
           # 複製需要部署的文件
-          cp -r index.html styles.css _site/ 2>/dev/null || true
-          cp -r .nojekyll _site/ 2>/dev/null || true
+          git checkout main -- index.html styles.css .nojekyll 2>/dev/null || true
           
-          # 初始化 gh-pages 分支（如果不存在）
-          git checkout --orphan gh-pages || git checkout gh-pages
-          git rm -rf . || true
-          
-          # 複製文件到根目錄
-          cp -r _site/* . 2>/dev/null || true
-          cp index.html . 2>/dev/null || true
-          cp styles.css . 2>/dev/null || true
-          cp .nojekyll . 2>/dev/null || true
+          # 如果文件不存在，從工作目錄複製
+          if [ ! -f index.html ]; then
+            cp ../index.html . 2>/dev/null || true
+          fi
+          if [ ! -f styles.css ]; then
+            cp ../styles.css . 2>/dev/null || true
+          fi
+          if [ ! -f .nojekyll ]; then
+            touch .nojekyll
+          fi
           
           # 提交更改
-          git add .
+          git add -A
           git commit -m "Deploy GitHub Pages [$(date +%Y-%m-%d\ %H:%M:%S)]" || exit 0
           
           # 強制推送到 gh-pages 分支
           git push origin gh-pages --force
-          
-          # 切換回 main 分支
-          git checkout main || true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
