@@ -16,15 +16,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: gh-pages
-          force_orphan: true
-          keep_files: false
-          cname: false
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Deploy to gh-pages
+        run: |
+          # 創建一個臨時目錄來構建網站
+          mkdir -p _site
+          
+          # 複製需要部署的文件
+          cp -r index.html styles.css _site/ 2>/dev/null || true
+          cp -r .nojekyll _site/ 2>/dev/null || true
+          
+          # 初始化 gh-pages 分支（如果不存在）
+          git checkout --orphan gh-pages || git checkout gh-pages
+          git rm -rf . || true
+          
+          # 複製文件到根目錄
+          cp -r _site/* . 2>/dev/null || true
+          cp index.html . 2>/dev/null || true
+          cp styles.css . 2>/dev/null || true
+          cp .nojekyll . 2>/dev/null || true
+          
+          # 提交更改
+          git add .
+          git commit -m "Deploy GitHub Pages [$(date +%Y-%m-%d\ %H:%M:%S)]" || exit 0
+          
+          # 強制推送到 gh-pages 分支
+          git push origin gh-pages --force
+          
+          # 切換回 main 分支
+          git checkout main || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
