@@ -30,27 +30,37 @@ jobs:
           # 設置遠程 URL 使用 token
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           
+          # 保存當前文件
+          cp index.html index.html.bak 2>/dev/null || true
+          cp styles.css styles.css.bak 2>/dev/null || true
+          
           # 嘗試切換到 gh-pages 分支，如果不存在則創建新的 orphan 分支
-          if git show-ref --verify --quiet refs/heads/gh-pages; then
-            git checkout gh-pages
-            git rm -rf . || true
+          if git show-ref --verify --quiet refs/heads/gh-pages || git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git checkout gh-pages 2>/dev/null || git fetch origin gh-pages:gh-pages 2>/dev/null || true
+            git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
+            git rm -rf . 2>/dev/null || true
           else
             git checkout --orphan gh-pages
-            git rm -rf . || true
+            git rm -rf . 2>/dev/null || true
           fi
           
-          # 複製需要部署的文件
+          # 從 main 分支複製文件，如果失敗則從備份複製
           git checkout main -- index.html styles.css .nojekyll 2>/dev/null || true
           
-          # 如果文件不存在，從工作目錄複製
-          if [ ! -f index.html ]; then
-            cp ../index.html . 2>/dev/null || true
+          if [ ! -f index.html ] && [ -f ../index.html.bak ]; then
+            cp ../index.html.bak index.html
           fi
-          if [ ! -f styles.css ]; then
-            cp ../styles.css . 2>/dev/null || true
+          if [ ! -f styles.css ] && [ -f ../styles.css.bak ]; then
+            cp ../styles.css.bak styles.css
           fi
           if [ ! -f .nojekyll ]; then
             touch .nojekyll
+          fi
+          
+          # 確保文件存在
+          if [ ! -f index.html ]; then
+            echo "Error: index.html not found" >&2
+            exit 1
           fi
           
           # 提交更改
