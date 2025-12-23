@@ -30,14 +30,11 @@ jobs:
           # 設置遠程 URL 使用 token
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           
-          # 創建或切換到 gh-pages 分支
-          if git ls-remote --heads origin gh-pages | grep -q gh-pages; then
-            git fetch origin gh-pages:gh-pages || true
-            git checkout gh-pages
-            git reset --hard origin/gh-pages || true
-          else
-            git checkout --orphan gh-pages
-          fi
+          # 刪除遠程的 gh-pages 分支（如果存在）以解決引用不一致問題
+          git push origin :gh-pages 2>/dev/null || true
+          
+          # 創建新的 orphan 分支
+          git checkout --orphan gh-pages
           
           # 清理所有文件
           git rm -rf . 2>/dev/null || true
@@ -53,11 +50,7 @@ jobs:
           
           # 提交更改
           git add -A
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Deploy GitHub Pages [$(date +%Y-%m-%d\ %H:%M:%S)]"
-          fi
+          git commit -m "Deploy GitHub Pages [$(date +%Y-%m-%d\ %H:%M:%S)]"
           
-          # 推送到 gh-pages 分支
+          # 推送到 gh-pages 分支（創建新分支）
           git push origin gh-pages --force
