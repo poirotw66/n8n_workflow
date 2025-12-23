@@ -4,8 +4,44 @@
 
 ## 專案結構
 
-- LINE_CHATBOT.json: n8n 工作流的匯出檔案，包含了 Chatbot 的所有邏輯和節點配置。
-- LINE_CHATBOT.txt: 描述了 AI 語言模型的主要任務、內容判斷與處理邏輯、技術內容輸出規範等。
+- `LINEBOT/`: 包含所有 n8n 工作流 JSON 檔案
+  - `[MAIN]LINE CHATBOT.json`: 主要控制流程
+  - `[SUB] *.json`: 各種子流程模組
+- `LINE_CHATBOT.txt`: 描述了 AI 語言模型的主要任務、內容判斷與處理邏輯、技術內容輸出規範等
+- `index.html`: GitHub Pages 展示頁面
+- `styles.css`: 頁面樣式文件
+
+## 🌐 GitHub Pages 展示
+
+本專案包含一個 GitHub Pages 展示網站，用於展示 LINE Chatbot 的功能和架構。
+
+### 啟用 GitHub Pages
+
+1. 前往 GitHub 倉庫的 **Settings** > **Pages**
+2. 在 **Source** 部分選擇：
+   - **Deploy from a branch**: 選擇 `main` 或 `master` 分支，並選擇 `/ (root)` 目錄
+   - 或者使用 **GitHub Actions** 自動部署（已配置工作流）
+3. 點擊 **Save**，等待幾分鐘後即可訪問您的 GitHub Pages 網站
+
+### 訪問網站
+
+啟用後，您的網站將在以下網址可用：
+```
+https://[您的用戶名].github.io/n8n_workflow-1/
+```
+
+### 本地預覽
+
+您也可以在本地預覽網站：
+```bash
+# 使用 Python 簡單 HTTP 服務器
+python3 -m http.server 8000
+
+# 或使用 Node.js http-server
+npx http-server
+```
+
+然後在瀏覽器中訪問 `http://localhost:8000`
 
 ## 功能概述
 

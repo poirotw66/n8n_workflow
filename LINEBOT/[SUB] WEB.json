@@ -203,7 +203,7 @@
     },
     {
       "parameters": {
-        "language": "python",
+        "language": "pythonNative",
         "pythonCode": "# 有提供服務的網站\nwebsite_list = [i['website'] for i in items[1].json['website_list']]\nweb = items[0].json['website']\n\noutput = \"none\"\nif web in website_list:\n  output = web\n\nreturn {\n  \"website\": output\n}"
       },
       "type": "n8n-nodes-base.code",
@@ -330,19 +330,19 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "b73c6600-f3f4-4baa-be3c-ef48877fd03e",
+  "versionId": "01952bd1-9f1b-4cc7-8fcc-6d6355c9ee5e",
   "meta": {
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
   },
   "id": "RoVGba1IgSAfYGXG",
   "tags": [
     {
-      "createdAt": "2025-08-21T02:49:05.390Z",
       "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
       "id": "lygt6UVIOm5CiWbW",
       "name": "linebot"
     }

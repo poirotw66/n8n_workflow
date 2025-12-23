@@ -46,13 +46,27 @@
     {
       "parameters": {
         "toolDescription": "Call this tool to get a youtube  video summary.\n",
-        "url": "http://gemini-api:8000/summarize",
-        "sendQuery": true,
-        "queryParameters": {
+        "method": "POST",
+        "url": "http://gemini-api-standalone:8001/summarize",
+        "sendHeaders": true,
+        "headerParameters": {
           "parameters": [
             {
-              "name": "url",
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "youtube_url",
               "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            },
+            {
+              "name": "prompt",
+              "value": "Please summarize the video. 輸出繁體中文,輸出的token不可超過1048576"
             }
           ]
         },
@@ -120,14 +134,14 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.userInput }}」\n包含網址：「{{ $json.url }}」\n## 處理邏輯\n\n### 內容處理\n**處理方式**：\n  - 如內容包含網址，依序使用 \"Firecrawl\"、\"Crawl_json\"工具讀取完整內容，若沒有正確爬取內容嘗試下一個工具,都沒有正確爬取的話，請回覆錯誤訊息。內容依照要求輸出。\n- 如內容包含youtube網址，使用\"Gemini_video_understand\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n### 輸出樣板選擇\n- 一般情況依照「標準輸出模板」格式化回覆,\n- 若使用者要求詳細報告,則依照「詳細輸出模板」輸出\n- 內容與技術內容不相關，依照「非技術內容處理」輸出\n\n## 技術內容輸出規範\n\n### 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 500 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n\n### 標準輸出模板\n\n#### 標題區塊\n📋 {會議主題或內容標題}\n\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n### 詳細輸出模板\n\n#### 標題區塊\n```\n📋 {會議主題或內容標題}\n\n```\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n**📋 詳細內容**  \n- 整理重要討論點和關鍵資訊\n- 保持邏輯順序和完整脈絡\n\n**✅ 重要結論**\n- 歸納達成的共識和決議\n- 明確列出後續行動項目\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n\n## 執行提醒\n- 基於提供的原始內容進行分析總結\n- 確保回覆內容準確且具有實用價值\n- 保持專業性的同時兼顧易讀性",
+        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.userInput }}」\n包含網址：「{{ $json.url }}」\n## 處理邏輯\n\n### 內容處理\n**處理方式**：\n  - 如內容包含網址，依序使用 \"Firecrawl\"、\"Crawl_json\"工具讀取完整內容，若沒有正確爬取內容嘗試下一個工具,都沒有正確爬取的話，請回覆錯誤訊息。內容依照要求輸出。\n- 如內容包含youtube網址，使用\"Analyze video in Google Gemini\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n### 輸出樣板選擇\n- 一般情況依照「標準輸出模板」格式化回覆,\n- 若使用者要求詳細報告,則依照「詳細輸出模板」輸出\n- 內容與技術內容不相關，依照「非技術內容處理」輸出\n\n## 技術內容輸出規範\n\n### 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 500 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n\n### 標準輸出模板\n\n#### 標題區塊\n📋 {會議主題或內容標題}\n\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n### 詳細輸出模板\n\n#### 標題區塊\n```\n📋 {會議主題或內容標題}\n\n```\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n**📋 詳細內容**  \n- 整理重要討論點和關鍵資訊\n- 保持邏輯順序和完整脈絡\n\n**✅ 重要結論**\n- 歸納達成的共識和決議\n- 明確列出後續行動項目\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n\n## 執行提醒\n- 基於提供的原始內容進行分析總結\n- 確保回覆內容準確且具有實用價值\n- 保持專業性的同時兼顧易讀性",
         "hasOutputParser": true,
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        -128,
+        -64,
         16
       ],
       "id": "d6837506-2204-49eb-ae74-1d9289c2a787",
@@ -175,6 +189,35 @@
         "zepApi": {
           "id": "tR57ak8KfkLp9cPh",
           "name": "Zep Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Please summarize the video. 輸出繁體中文",
+        "videoUrls": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL_s_', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGeminiTool",
+      "typeVersion": 1,
+      "position": [
+        336,
+        240
+      ],
+      "id": "23c3f233-bad1-461c-91a1-4fa9b6f0fd0a",
+      "name": "Analyze video in Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     }
@@ -246,13 +289,24 @@
           }
         ]
       ]
+    },
+    "Analyze video in Google Gemini": {
+      "ai_tool": [
+        [
+          {
+            "node": "ITR Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "4fba8906-8004-4f53-8d7a-04d1bb09d705",
+  "versionId": "13e0b223-e575-4f7a-9ee4-51b85a44cc24",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
@@ -260,8 +314,8 @@
   "id": "vnIiG9PUf580bQC7",
   "tags": [
     {
-      "createdAt": "2025-08-21T02:49:05.390Z",
       "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
       "id": "lygt6UVIOm5CiWbW",
       "name": "linebot"
     }

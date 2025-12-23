@@ -1,5 +1,5 @@
 {
-  "name": "LINE CHATBOT_Crawl_json",
+  "name": "[SUB tool]LINE CHATBOT_Crawl_json",
   "nodes": [
     {
       "parameters": {
@@ -10,8 +10,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2,
       "position": [
-        300,
-        -120
+        304,
+        -128
       ],
       "id": "8de1d9d2-8948-4995-ae72-abcf8eeab799",
       "name": "AI Agent"
@@ -24,8 +24,8 @@
       "type": "n8n-nodes-crawl-and-scrape.crawleeNode",
       "typeVersion": 1,
       "position": [
-        100,
-        -120
+        112,
+        -128
       ],
       "id": "b075c671-2de3-4ce5-bffc-d547ed74823f",
       "name": "Crawl and Scrape"
@@ -38,8 +38,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        200,
-        100
+        208,
+        112
       ],
       "id": "c58f1aae-fe77-45e3-ad4e-13533549cd2b",
       "name": "Google Gemini Chat Model",
@@ -63,8 +63,8 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.1,
       "position": [
-        -120,
-        -120
+        -128,
+        -128
       ],
       "id": "edeb8c12-f22d-49ea-a36e-012d682cf109",
       "name": "When Executed by Another Workflow"
@@ -106,15 +106,22 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "029c6eb1-9cb7-407e-93cd-a505ef858a76",
+  "versionId": "efc2974d-5669-46d3-b20b-0630b8fa3c6a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
   },
   "id": "fuPMDOgf9FmrW7zB",
-  "tags": []
+  "tags": [
+    {
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
 }

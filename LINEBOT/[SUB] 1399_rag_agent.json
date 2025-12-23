@@ -1,0 +1,160 @@
+{
+  "name": "[SUB] 1399_rag_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        -96
+      ],
+      "id": "5805fb00-26e9-4db2-a8b0-ed225deee70e",
+      "name": "When chat message received",
+      "webhookId": "a8294503-8968-4718-9d88-cb28808b3e58",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.userInput }}",
+        "options": {
+          "systemMessage": "=你是一個專業助理，負責 **轉述並整理 MCP 工具 `1399_rag` 的回覆內容**。\n\n\n---\n\n## 🔧 **工具使用規範**\n\n**必須使用 MCP 工具：`1399_rag`**\n用來檢索並回答使用者問題。\n\n---\n\n## 🧾 **回覆格式要求（適合 LINE 輸出）**\n\n### ✔ **1. 主要回答區**\n\n* 清楚、精簡地回答使用者的問題。\n* 內容必須來自 `1399_rag` 的檢索結果。\n* **若沒有檢索到內容，請直接告知找不到相關資訊，不要自行生成答案。**\n\n---\n\n### ✔ **2. 參考文件區**\n\n* 如果 `1399_rag` 有回傳來源，結尾請加上：\n\n```\n📄 參考文件：\n- xxxx\n- xxxx\n```\n\n* 若無來源，不需要顯示此區塊。\n\n---\n\n### ✔ **3. 資源消耗資訊**\n\n如果有檢索結果，請在回答最後補上：\n\n```\n🔢 Token 使用：XX tokens  \n💰 預估費用：$0.00XX  \n⏱ 回覆時間：XXX ms\n```\n\n---\n\n## 📌 **其他注意事項**\n\n* 內容格式需符合 **LINE 的文字排版習慣**（段落清楚、適度使用符號）。\n* 不要加入多餘分析、個人意見或推測。\n* 回覆務必清楚、簡潔、好閱讀。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "83a1d130-1b8e-48fa-aa9a-dc8b90251414",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        176,
+        224
+      ],
+      "id": "e109e7f9-bb9d-4946-8c16-e43f93c03e6c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        96
+      ],
+      "id": "580ff69a-9613-4349-b07e-9945726003c3",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://agentic-rag-api-jt7pjdeeoa-de.a.run.app/mcp",
+        "include": "selected",
+        "includeTools": [
+          "query_rag"
+        ],
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        224
+      ],
+      "id": "e047171d-e0bd-487e-a38c-75f94f4ae002",
+      "name": "1399_rag"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1399_rag": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a811b305-1e55-463d-a082-2967a3b05da6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "wI0zwupdhGI69Rfj",
+  "tags": [
+    {
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}

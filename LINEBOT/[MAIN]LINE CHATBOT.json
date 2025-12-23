@@ -26,8 +26,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -96,
-        1888
+        352,
+        2320
       ],
       "id": "f6f40fa8-d92f-4b91-aba8-6eb4f0111d9d",
       "name": "發送回應給 LINE",
@@ -41,8 +41,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -320,
-        1984
+        128,
+        2272
       ],
       "id": "37bf9dfe-66f6-4ec4-b726-7b89e64f55da",
       "name": "Code"
@@ -290,6 +290,75 @@
                 },
                 "conditions": [
                   {
+                    "id": "4104a43d-0bed-4e1f-b06d-642dcb18076a",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "Help Handler",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "488cb5be-5fad-4e05-8b60-171206ee4508",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "Image Generating",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "078d4b59-ad49-4ae3-9fc6-5d7bf3d34265",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "Image Edit",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
                     "id": "7ed80fd4-aa27-463c-a51d-2b54d27e0497",
                     "leftValue": "={{ $('Webhook').item.json.body.events[0].message.type }}",
                     "rightValue": "image",
@@ -313,9 +382,78 @@
                 },
                 "conditions": [
                   {
-                    "id": "4104a43d-0bed-4e1f-b06d-642dcb18076a",
+                    "id": "8ca1561a-2ca8-4a3a-8c32-6dc8f09df9b6",
                     "leftValue": "={{ $json.route }}",
-                    "rightValue": "Help Handler",
+                    "rightValue": "=Shadow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f2f626fc-4a95-4dae-a132-ead088f69dc0",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "1399 Agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "30e537e2-02b1-4a85-b33f-2f811f1deea2",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "M365 Agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6b5cf92a-83a0-4b9f-802b-073625d05461",
+                    "leftValue": "={{ $json.route }}",
+                    "rightValue": "=ITR roadshow",
                     "operator": {
                       "type": "string",
                       "operation": "equals",
@@ -334,7 +472,7 @@
       "typeVersion": 3.2,
       "position": [
         -768,
-        1824
+        2304
       ],
       "id": "5fcf03b9-2829-448d-a389-aea51b4a1689",
       "name": "Switch"
@@ -349,7 +487,7 @@
       "typeVersion": 2,
       "position": [
         -1216,
-        1984
+        2560
       ],
       "id": "608f093a-2679-4cd3-a157-e07b7fea96a0",
       "name": "Webhook",
@@ -380,8 +518,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -96,
-        2080
+        352,
+        3600
       ],
       "id": "e690519b-4e95-4f93-a4bd-74f1d08dca6c",
       "name": "[TEST]發送回應給 LINE1",
@@ -391,13 +529,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// 取得使用者輸入的訊息\nlet text = $json.body.events[0].message.text || \"\";\n\n// 指令對應表\nconst mapping = {\n  \"@ITR\": \"ITR Agent\",\n  \"@FACT\": \"FACT Agent\",\n  \"@NEWS\": \"NEWS Agent\",\n  \"@DR\": \"DR Agent\",\n  \"@STOCK\": \"Stock Module\",\n  \"@CB\": \"CB Module\",\n  \"@WEB\": \"Web Module\",\n  \"@SUBS\": \"Subscription Module\",\n  \"@EAT\": \"Eat Module\",\n  \"@IMG\": \"Image Module\",\n  \"@help\": \"Help Handler\",\n};\n\n// 預設路由\nlet route = \"Default\";\n\n// 遍歷 mapping，找到符合的指令，並移除該關鍵字\nfor (const key of Object.keys(mapping)) {\n  if (text.includes(key)) {\n    route = mapping[key];\n    text = text.replace(key, \"\").trim();  // 移除關鍵字，但保留網址\n    break;\n  }\n}\n\n// 嘗試提取 URL（支援 http/https）\nlet url = null;\nconst urlRegex = /(https?:\\/\\/[^\\s]+)/g;\nconst match = text.match(urlRegex);\nif (match && match.length > 0) {\n  url = match[0];  // 取第一個網址\n  // ❌ 不要從 text 移除網址，避免 userInput 變空\n}\n\n// 回傳統一格式\nreturn [\n  {\n    json: {\n      userInput: text.trim(),\n      route: route,\n      url: url,\n      messageId: $input.first().json.body.events[0].message.id,\n    }\n  }\n];\n"
+        "jsCode": "// 取得使用者輸入的訊息\nlet text = $json.body.events[0].message.text || \"\";\n\n// 指令對應表\nconst mapping = {\n  \"@ITR\": \"ITR Agent\",\n  \"@FACT\": \"FACT Agent\",\n  \"@NEWS\": \"NEWS Agent\",\n  \"@DR\": \"DR Agent\",\n  \"@STOCK\": \"Stock Module\",\n  \"@CB\": \"CB Module\",\n  \"@WEB\": \"Web Module\",\n  \"@SUBS\": \"Subscription Module\",\n  \"@EAT\": \"Eat Module\",\n  \"@IMG\": \"Image Module\",\n  \"@help\": \"Help Handler\",\n  \"@GIMG\": \"Image Generating\",\n  \"@EIMG\": \"Image Edit\",\n  \"@SHD\": \"Shadow\",\n  \"@M365\": \"M365 Agent\",\n  \"@1399\": \"1399 Agent\",\n  \"@itr\": \"ITR roadshow\",\n  \"@HELP\": \"Help Handler\",\n};\n\n// 預設路由\nlet route = \"Default\";\n\n// 遍歷 mapping，找到符合的指令，並移除該關鍵字\nfor (const key of Object.keys(mapping)) {\n  if (text.includes(key)) {\n    route = mapping[key];\n    text = text.replace(key, \"\").trim();  // 移除關鍵字，但保留網址\n    break;\n  }\n}\n\n// 嘗試提取 URL（支援 http/https）\nlet url = null;\nconst urlRegex = /(https?:\\/\\/[^\\s]+)/g;\nconst match = text.match(urlRegex);\nif (match && match.length > 0) {\n  url = match[0];  // 取第一個網址\n  // ❌ 不要從 text 移除網址，避免 userInput 變空\n}\n\n// 回傳統一格式\nreturn [\n  {\n    json: {\n      userInput: text.trim(),\n      route: route,\n      url: url,\n      messageId: $input.first().json.body.events[0].message.id,\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         -992,
-        1984
+        2560
       ],
       "id": "946890e0-bd1d-43bb-9f69-8383b6a81673",
       "name": "Code-Switch"
@@ -408,6 +546,7 @@
           "__rl": true,
           "value": "vnIiG9PUf580bQC7",
           "mode": "list",
+          "cachedResultUrl": "/workflow/vnIiG9PUf580bQC7",
           "cachedResultName": "[SUB] ITR Agent"
         },
         "workflowInputs": {
@@ -458,7 +597,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         928
       ],
       "id": "4af8eb76-64f2-486f-adcf-6e5dc9440469",
@@ -518,7 +657,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         1120
       ],
       "id": "0b5ff98e-6ec6-4af9-97f0-5dbd3fa37597",
@@ -580,7 +719,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         1312
       ],
       "id": "ca7aa9d0-3b00-48ff-8f36-0f613779afa2",
@@ -639,7 +778,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         1504
       ],
       "id": "dcfb3172-b759-4d33-8716-e29df9138caa",
@@ -701,7 +840,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         1696
       ],
       "id": "6ac9622f-d745-4723-8cb9-4bc4ed5cfe71",
@@ -743,7 +882,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         2080
       ],
       "id": "946e6b64-2b82-4c5e-97e3-2873ba4ab228",
@@ -794,7 +933,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         1888
       ],
       "id": "a17f3bc1-fac0-421e-95f0-4f796795418f",
@@ -864,7 +1003,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
+        -96,
         2272
       ],
       "id": "4c942d61-8681-40ec-8e4b-c3c4baafd067",
@@ -873,14 +1012,14 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "{\n  \"output\": [\n    \"@ITR - 技術趨勢內容整理\",\n    \"@FACT - 內容真實性、情緒傾向與客觀分析\",\n    \"@NEWS - 新聞查詢與整理\",\n    \"@DR - 深度研究與多來源整合\",\n    \"@STOCK - 股票即時/歷史查詢\",\n    \"@WEB - 網頁爬取與摘要\",\n    \"@SUBS - 訂閱網站更新通知\",\n    \"@EAT - 作燴午餐小助手\",\n    \"@IMG 後上傳圖片 - 食物分析\",\n    \"@GPT20 - 體驗gpt-oss-20b\",\n    \"@GPT120 - 體驗gpt-oss-120b\",\n    \"@CB - C_Booking助手\"\n  ]\n}",
+        "jsonOutput": "{\n  \"output\": [\n    \"@ITR - 技術趨勢內容整理\",\n    \"@FACT - 內容真實性、情緒傾向與客觀分析\",\n    \"@NEWS - 新聞查詢與整理\",\n    \"@DR - 深度研究與多來源整合\",\n    \"@STOCK - 股票即時/歷史查詢\",\n    \"@WEB - 網頁爬取與摘要\",\n    \"@SUBS - 訂閱網站更新通知\",\n    \"@EAT - 作燴午餐小助手\",\n    \"@IMG 後上傳圖片 - 食物分析\",\n    \"@CB - C_Booking助手\",\n    \"@M365 - M365知識助手\",\n    \"@1399 - 1399知識助手\"\n  ]\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -544,
-        3040
+        -96,
+        3456
       ],
       "id": "bf308f7b-01a3-4979-8208-adcfec6d8a79",
       "name": "Help Form"
@@ -910,8 +1049,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -544,
-        2848
+        -96,
+        3264
       ],
       "id": "6ad68055-b241-49ae-bf22-ac375f85eec9",
       "name": "EAT Ask"
@@ -927,7 +1066,7 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "messageId": "={{ $json.messageId }}",
+            "messageId": "={{ $('Webhook').item.json.body.events[0].message.id }}",
             "userId": "={{ $('Webhook').item.json.body.events[0].source.userId }}"
           },
           "matchingColumns": [
@@ -963,8 +1102,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
-        2464
+        -96,
+        2656
       ],
       "id": "eb7ca0e6-bccc-43ce-9304-221e2965de2b",
       "name": "Food Image"
@@ -1005,11 +1144,385 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.2,
       "position": [
-        -544,
-        2656
+        -96,
+        2464
       ],
       "id": "da961529-8c52-4d81-8f28-3f14a8b85f86",
       "name": "Image Module"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "v9WGn1gHxod1TV4T",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/v9WGn1gHxod1TV4T",
+          "cachedResultName": "[SUB] IMAGE Generator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userInput": "={{ $('Code-Switch').item.json.userInput }}"
+          },
+          "matchingColumns": [
+            "userInput"
+          ],
+          "schema": [
+            {
+              "id": "userInput",
+              "displayName": "userInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        3648
+      ],
+      "id": "e2e276ea-62b8-4641-9737-60fd5d233e5d",
+      "name": "Image Generating"
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  // 1️⃣ 取得 replyToken\n  const replyToken = $('Webhook').first().json?.body?.events?.[0]?.replyToken;\n  if (!replyToken) throw new Error('找不到 replyToken');\n\n  // 2️⃣ 取得輸入資料\n  const input = $input.first().json;\n\n  let messages = [];\n\n  // 2a️⃣ 如果有 image_url，回傳 LINE 圖片訊息\n  if (input.image_url) {\n    messages.push({\n      type: 'image',\n      originalContentUrl: input.image_url,\n      previewImageUrl: input.image_url\n    });\n  }\n\n  // 2b️⃣ 如果有文字內容 (output / answer / result)\n  const outputContent = input.output || input.answer || input.result;\n  if (outputContent) {\n    let text = '';\n\n    if (typeof outputContent === 'string') {\n      text = outputContent;\n\n    } else if (Array.isArray(outputContent)) {\n      if (outputContent.every(item => typeof item === 'string')) {\n        text = outputContent.join('\\n');\n      } else if (outputContent.every(item => typeof item === 'object' && item?.type === 'text' && item?.text)) {\n        text = outputContent.map(item => item.text).join('');\n      } else if (outputContent.length > 0 && outputContent[0]?.output) {\n        const inner = outputContent[0].output;\n        text = Array.isArray(inner) ? inner.join('\\n') : (typeof inner === 'string' ? inner : '');\n      }\n    }\n\n    if (text && text.trim().length > 0) {\n      // 分段處理\n      const segments = [];\n      let remaining = text.trim();\n      const MAX_LENGTH = 4950;\n\n      while (remaining.length > 0) {\n        if (remaining.length <= MAX_LENGTH) {\n          segments.push(remaining);\n          break;\n        }\n        let segment = remaining.substring(0, MAX_LENGTH);\n        const cutPoint = Math.max(segment.lastIndexOf('\\n'), segment.lastIndexOf(' '));\n        segment = (cutPoint > 0) ? segment.substring(0, cutPoint) : segment;\n        segments.push(segment);\n        remaining = remaining.substring(segment.length).trim();\n      }\n\n      messages.push(...segments.map(seg => ({\n        type: 'text',\n        text: seg.length > 0 ? seg : '...(內容已截斷)'\n      })));\n    }\n  }\n\n  if (messages.length === 0) throw new Error('沒有可用的輸出內容');\n\n  // 限制 LINE Reply API 一次最多 5 則訊息\n  const finalMessages = messages.slice(0, 5);\n\n  return [{\n    json: {\n      replyToken: replyToken,\n      messages: finalMessages\n    }\n  }];\n\n} catch (error) {\n  console.error('處理數據時發生錯誤:', error.message);\n  const replyToken = $('Webhook').first().json?.body?.events?.[0]?.replyToken || 'unknown';\n\n  return [{\n    json: {\n      replyToken: replyToken,\n      messages: [{\n        type: 'text',\n        text: `抱歉，系統在處理您的訊息時發生錯誤，請稍後再試。\\n錯誤資訊：${error.message}`\n      }]\n    }\n  }];\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        3648
+      ],
+      "id": "b9c63da5-8963-4467-a934-8cb237a8a0b2",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "content": "    \"@GIMG - 圖片生成\",\n    \"@EIMG - 圖片編輯\" \n\n步驟１@EIMG開啟編輯模式,\n步驟２上傳圖片,\n步驟３@EIMG輸入修改需求\"",
+        "height": 272,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1312,
+        3072
+      ],
+      "typeVersion": 1,
+      "id": "745aefc7-893e-4789-b0f5-7fcb4333bed2",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "QjGBCpDqE4oNWG3a",
+          "mode": "list",
+          "cachedResultName": "[SUB] Image Editing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userId": "={{ $('Webhook').item.json.body.events[0].source.userId }}",
+            "messageId": "={{ $('Webhook').item.json.body.events[0].message.id }}",
+            "userInput": "={{ $('Code-Switch').item.json.userInput }}",
+            "type": "={{ $('Webhook').item.json.body.events[0].message.type }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "messageId",
+              "displayName": "messageId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "userInput",
+              "displayName": "userInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        2880
+      ],
+      "id": "c9bead81-692e-463a-a1b7-088e2c5d60f6",
+      "name": "Image Editing"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "CFH-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT\n  status\nFROM\n  `itr-aimasteryhub-lab.n8n.image_state`\nWHERE\n  userID = '{{ $('Webhook').item.json.body.events[0].source.userId }}'\nORDER BY\n  createdAt DESC\nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        2688
+      ],
+      "id": "6fe4aa2a-0cd1-486f-8b5d-e00313610753",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "flag_set",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ac9b833e-9ef7-490e-87e3-1dca31fbeb18"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "96c9c25f-6eeb-4b43-8efe-c3087749e673",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "edit",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -320,
+        2688
+      ],
+      "id": "ad5326df-b307-4818-906c-c9543973cf6b",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": [\n    \"Shadow Mode\",\n    \"@GIMG - 圖片生成\",\n\"步驟：@GIMG 描述生成的圖片\",\n\"@EIMG - 圖片編輯\",\n\"步驟１@EIMG開啟編輯模式\",\n\"步驟２上傳圖片\",\n\"步驟３@EIMG輸入修改需求\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        3840
+      ],
+      "id": "aa2b3c53-c5bb-4773-b8e1-861f0b8dc30a",
+      "name": "Help Form1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ylGZhvVAhKz9Yj4B",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ylGZhvVAhKz9Yj4B",
+          "cachedResultName": "[SUB] mcp_rag_agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userInput": "={{ $('Code-Switch').item.json.userInput }}"
+          },
+          "matchingColumns": [
+            "userInput"
+          ],
+          "schema": [
+            {
+              "id": "userInput",
+              "displayName": "userInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        4032
+      ],
+      "id": "e79e9e8f-de92-4ebe-9d70-5018799f84a5",
+      "name": "MCP-RAG-AGENT"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "y9lXXOs5Q39LtAbn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/y9lXXOs5Q39LtAbn",
+          "cachedResultName": "[SUB]RAG Pipeline"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userInput": "={{ $('Code-Switch').item.json.userInput }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "userInput",
+              "displayName": "userInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        3072
+      ],
+      "id": "4072282e-570b-4599-ac43-7dd95448c10e",
+      "name": "ITR roadshow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wI0zwupdhGI69Rfj",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wI0zwupdhGI69Rfj",
+          "cachedResultName": "[SUB] 1399_rag_agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userInput": "={{ $('Code-Switch').item.json.userInput }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "userInput",
+              "displayName": "userInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        4224
+      ],
+      "id": "38285309-7582-4ab5-b37d-ccf00385b0b3",
+      "name": "1399_RAG_Agent"
     }
   ],
   "pinData": {},
@@ -1104,14 +1617,56 @@
         ],
         [
           {
-            "node": "Food Image",
+            "node": "Help Form",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Help Form",
+            "node": "Image Generating",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Image Editing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Help Form1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "1399_RAG_Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MCP-RAG-AGENT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ITR roadshow",
             "type": "main",
             "index": 0
           }
@@ -1276,13 +1831,124 @@
           }
         ]
       ]
+    },
+    "Image Generating": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "[TEST]發送回應給 LINE1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "發送回應給 LINE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Editing": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Food Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Image Editing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Help Form1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP-RAG-AGENT": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ITR roadshow": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1399_RAG_Agent": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "7a577054-f5a4-4de8-a4ac-23608f02edf8",
+  "versionId": "cdd4f911-8d1c-4187-b8e9-342caf62f65d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
@@ -1290,8 +1956,8 @@
   "id": "ZeW1WKuDcgsGWnoo",
   "tags": [
     {
-      "createdAt": "2025-08-21T02:49:05.390Z",
       "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
       "id": "lygt6UVIOm5CiWbW",
       "name": "linebot"
     }

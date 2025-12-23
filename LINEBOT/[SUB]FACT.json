@@ -4,13 +4,13 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=# 請你根據以下格式，**全面分析這段內容的真實性、情緒傾向與客觀程度**。請特別注意是否存在潛在偏見、誤導、誇大或虛假訊息。內容如下：\n##  使用者輸入「{{ $json.userInput }}」\n##  包含網址「{{ $json.url }}」\n\n  - 若{{ $json.url }}不為空，嘗試使用 \"Firecrawl\"工具讀取完整內容，若沒有正確爬取內容請回覆錯誤訊息。內容依照要求輸出。\n\n  - 如內容包含youtube網址，使用\"Gemini_video_understand\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n## 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 300 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n- ✅ 僅輸出：最終整理完成的內容總結\n\n## 🔍 請根據以下格式輸出分析結果：\n\n📊 **客觀分析**  \n分析內容是否以事實為基礎，是否引用可信來源，語句是否中立。指出其中陳述的事實與意見分別為何。\n\n🎭 **情緒傾向分析**  \n分析語氣是否具煽動性、憤怒、悲傷、樂觀等情緒傾向。判斷這些情緒是否會影響閱聽人判斷。\n\n🚨 **潛在的虛假信息或偏見，以及可疑點**  \n指出內容中是否出現不實、誤導性敘述、單方面觀點、刻板印象等。請列舉具體語句或段落，並說明為何值得懷疑。\n\n🔍 **建議查證的事實**  \n列出需要進一步查證的具體資訊（如人名、數字、事件、引用、圖片、來源、影片等），以釐清其真實性。\n\n📝 **總結**  \n請簡要概括以上欄位的主旨與要傳達的核心訊息。\n\n✅ **補充建議**\n- 若原始內容為圖片、影片、社群貼文，請說明是否存在篡改或斷章取義的可能性。\n- 若你能引用具公信力來源（如官方、學術、主流媒體）來佐證或反駁，也請列出。",
+        "text": "=# 請你根據以下格式，**全面分析這段內容的真實性、情緒傾向與客觀程度**。請特別注意是否存在潛在偏見、誤導、誇大或虛假訊息。內容如下：\n##  使用者輸入「{{ $json.userInput }}」\n##  包含網址「{{ $json.url }}」\n\n  - 若{{ $json.url }}不為空，嘗試使用 \"Firecrawl\"工具讀取完整內容，若沒有正確爬取內容請回覆錯誤訊息。內容依照要求輸出。\n\n  - 如內容包含youtube網址，使用\"Analyze video in Google Gemini\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n## 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 300 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n- ✅ 僅輸出：最終整理完成的內容總結\n\n## 🔍 請根據以下格式輸出分析結果：\n\n📊 **客觀分析**  \n分析內容是否以事實為基礎，是否引用可信來源，語句是否中立。指出其中陳述的事實與意見分別為何。\n\n🎭 **情緒傾向分析**  \n分析語氣是否具煽動性、憤怒、悲傷、樂觀等情緒傾向。判斷這些情緒是否會影響閱聽人判斷。\n\n🚨 **潛在的虛假信息或偏見，以及可疑點**  \n指出內容中是否出現不實、誤導性敘述、單方面觀點、刻板印象等。請列舉具體語句或段落，並說明為何值得懷疑。\n\n🔍 **建議查證的事實**  \n列出需要進一步查證的具體資訊（如人名、數字、事件、引用、圖片、來源、影片等），以釐清其真實性。\n\n📝 **總結**  \n請簡要概括以上欄位的主旨與要傳達的核心訊息。\n\n✅ **補充建議**\n- 若原始內容為圖片、影片、社群貼文，請說明是否存在篡改或斷章取義的可能性。\n- 若你能引用具公信力來源（如官方、學術、主流媒體）來佐證或反駁，也請列出。",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 2,
       "position": [
-        -240,
+        -176,
         -80
       ],
       "id": "1ee040b6-f104-4189-bb5c-bc28074a52ab",
@@ -39,7 +39,7 @@
     {
       "parameters": {
         "toolDescription": "Call this tool to get a youtube  video summary.\n",
-        "url": "http://gemini-api:8000/summarize",
+        "url": "http://gemini-api-standalone:8001/summarize",
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
@@ -133,6 +133,35 @@
           "name": "Zep Api account"
         }
       }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Please summarize the video. 輸出繁體中文",
+        "videoUrls": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL_s_', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGeminiTool",
+      "typeVersion": 1,
+      "position": [
+        208,
+        128
+      ],
+      "id": "860e9629-f802-4e80-b2ae-992974b3ba84",
+      "name": "Analyze video in Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -191,13 +220,24 @@
           }
         ]
       ]
+    },
+    "Analyze video in Google Gemini": {
+      "ai_tool": [
+        [
+          {
+            "node": "FACT Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "8ded457c-27ef-42ad-8eff-8d80ea8bd140",
+  "versionId": "1f20e108-2345-4353-bddf-fba77b05236a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
@@ -205,8 +245,8 @@
   "id": "162mADlvuCibUju0",
   "tags": [
     {
-      "createdAt": "2025-08-21T02:49:05.390Z",
       "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
       "id": "lygt6UVIOm5CiWbW",
       "name": "linebot"
     }

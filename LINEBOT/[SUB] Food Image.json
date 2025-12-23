@@ -118,8 +118,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        1088,
-        112
+        1232,
+        128
       ],
       "id": "f85afd7e-ef4c-456d-9a6f-fab579dc3b97",
       "name": "Google Gemini Chat Model6",
@@ -461,19 +461,19 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "e8ebbdc9-e111-408e-b25f-88a8ca7dd016",
+  "versionId": "d5a7ad93-41fd-45cb-8cec-10a5de0284a3",
   "meta": {
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
   },
   "id": "0PE3toWgEbBJhKWd",
   "tags": [
     {
-      "createdAt": "2025-08-21T02:49:05.390Z",
       "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
       "id": "lygt6UVIOm5CiWbW",
       "name": "linebot"
     }

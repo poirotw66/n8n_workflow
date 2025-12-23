@@ -26,7 +26,7 @@
     },
     {
       "parameters": {
-        "language": "python",
+        "language": "pythonNative",
         "pythonCode": "import json\ndef execute(input):\n  try:\n    # 從 js 物件轉 python\n    py_input = input.to_py()\n    # 將 dict 轉成 json\n    raw_data = json.loads(py_input['json']['data'])\n    # 取得 msgArray 中的第一筆資料\n    msg = raw_data[\"msgArray\"][0]\n    \n    # 擷取所需欄位\n    stock_code = msg.get(\"c\", \"N/A\")\n    stock_name = msg.get(\"n\", \"N/A\")\n    current_price = msg.get(\"z\", \"N/A\")\n    open_price = msg.get(\"o\", \"N/A\")\n    high_price = msg.get(\"h\", \"N/A\")\n    low_price = msg.get(\"l\", \"N/A\")\n    volumn = msg.get(\"v\", \"N/A\")\n    last_time = msg.get(\"t\", \"N/A\")\n    \n    return [{\n        \"json\": {\n            \"stock_code\": stock_code,\n            \"stock_name\": stock_name,\n            \"current_price\": current_price,\n            \"open_price\":open_price,\n            \"high_price\":high_price,\n            \"low_price\":low_price,\n            \"volumn\":volumn,\n            \"last_time\":last_time\n        }\n    }]\n    \n  except Exception as e:\n    return [{\n        \"json\": {\n            \"error\": f\"解析失敗: {str(e)}\"\n        }\n    }]\nprint(_input.first())\nr = execute(_input.first())\nreturn r"
       },
       "type": "n8n-nodes-base.code",
@@ -262,19 +262,19 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "186461fe-e50d-4410-b331-3796aa10a1fe",
+  "versionId": "5d495051-e587-4500-9d1d-119378adf307",
   "meta": {
     "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
   },
   "id": "PaQ43QCGzFQWzCS6",
   "tags": [
     {
-      "createdAt": "2025-08-21T02:49:05.390Z",
       "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
       "id": "lygt6UVIOm5CiWbW",
       "name": "linebot"
     }
