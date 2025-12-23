@@ -15,20 +15,34 @@
 
 本專案包含一個 GitHub Pages 展示網站，用於展示 LINE Chatbot 的功能和架構。
 
-### 啟用 GitHub Pages
+### 快速開始
 
-1. 前往 GitHub 倉庫的 **Settings** > **Pages**
-2. 在 **Source** 部分選擇：
-   - **Deploy from a branch**: 選擇 `main` 或 `master` 分支，並選擇 `/ (root)` 目錄
-   - 或者使用 **GitHub Actions** 自動部署（已配置工作流）
-3. 點擊 **Save**，等待幾分鐘後即可訪問您的 GitHub Pages 網站
+1. **啟用 GitHub Pages**（必須先完成此步驟）：
+   - 前往 GitHub 倉庫的 **Settings** > **Pages**
+   - 在 **Source** 部分選擇 **GitHub Actions**
+   - 點擊 **Save**
+
+2. **推送代碼**：
+   ```bash
+   git add .
+   git commit -m "Add GitHub Pages"
+   git push origin main
+   ```
+
+3. **等待部署**：
+   - 前往 **Actions** 標籤查看部署狀態
+   - 幾分鐘後即可訪問網站
 
 ### 訪問網站
 
-啟用後，您的網站將在以下網址可用：
+部署成功後，您的網站將在以下網址可用：
 ```
 https://[您的用戶名].github.io/n8n_workflow-1/
 ```
+
+### 遇到部署問題？
+
+如果遇到 `HttpError: Not Found` 或 `Get Pages site failed` 錯誤，請查看 [DEPLOY.md](./DEPLOY.md) 獲取詳細的故障排除指南。
 
 ### 本地預覽
 
