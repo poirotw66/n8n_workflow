@@ -1,0 +1,28 @@
+# 敏感信息
+*.env
+.env
+.env.local
+.env.*.local
+
+# n8n 憑證（如果導出時包含敏感信息）
+# 注意：LINEBOT/*.json 文件可能包含 API tokens，請確保在提交前移除敏感信息
+
+# 系統文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日誌
+*.log
+logs/
+
+# 臨時文件
+tmp/
+temp/
+

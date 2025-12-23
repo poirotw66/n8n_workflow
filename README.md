@@ -2,6 +2,16 @@
 
 這是一個基於 n8n 平台建構的 LINE Chatbot 專案，旨在提供智能化的自動回覆功能。它利用 AI 語言模型（如 Google Gemini）來分析用戶輸入，並根據內容類型（技術相關或非技術相關）生成適當的回應。
 
+## ⚠️ 安全警告
+
+**重要**：本倉庫中的工作流文件可能包含硬編碼的 API tokens 和敏感信息。在推送到 GitHub 之前，請務必：
+
+1. 檢查所有 JSON 文件，移除硬編碼的 API tokens
+2. 使用 n8n Credentials 或環境變數來管理敏感信息
+3. 如果 token 已暴露，請立即在 LINE Developers Console 中撤銷並重新生成
+
+詳細的安全指南請參考 [SECURITY.md](./SECURITY.md)
+
 ## 專案結構
 
 - `LINEBOT/`: 包含所有 n8n 工作流 JSON 檔案
