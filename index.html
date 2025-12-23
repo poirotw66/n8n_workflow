@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE Chatbot - n8n 工作流專案</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="hero">
+        <div class="container">
+            <h1 class="hero-title">🤖 LINE Chatbot 智能助手</h1>
+            <p class="hero-subtitle">基於 n8n 平台建構的智能 LINE 聊天機器人</p>
+            <p class="hero-description">整合 AI 語言模型、圖像生成、RAG 檢索等多種功能，提供專業且個性化的自動回覆服務</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro-section">
+            <h2>專案概述</h2>
+            <div class="intro-content">
+                <p>這是一個功能豐富的 LINE 聊天機器人系統，採用 n8n 工作流平台建構。系統通過主流程接收 LINE 訊息，並根據訊息內容智能路由到對應的子流程進行處理，提供多樣化的 AI 服務。</p>
+                <div class="features-highlight">
+                    <div class="feature-item">
+                        <span class="icon">🎯</span>
+                        <span>智能路由</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="icon">🤖</span>
+                        <span>AI 驅動</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="icon">🖼️</span>
+                        <span>圖像生成</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="icon">📚</span>
+                        <span>知識檢索</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="main-workflow-section">
+            <h2>主要流程</h2>
+            <div class="workflow-card main-card">
+                <div class="card-header">
+                    <h3>📋 [MAIN] LINE CHATBOT</h3>
+                    <span class="badge badge-primary">主流程</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">核心控制流程，負責接收 LINE Webhook 訊息，分析用戶輸入，並智能路由到對應的子流程進行處理。</p>
+                    <div class="workflow-features">
+                        <div class="feature-tag">Webhook 接收</div>
+                        <div class="feature-tag">訊息分析</div>
+                        <div class="feature-tag">智能路由</div>
+                        <div class="feature-tag">回應發送</div>
+                    </div>
+                    <div class="workflow-details">
+                        <h4>主要功能：</h4>
+                        <ul>
+                            <li>監聽 LINE Webhook 事件，接收用戶訊息</li>
+                            <li>整合 AI 語言模型（Google Gemini）進行內容分析</li>
+                            <li>根據訊息類型智能判斷並路由到對應子流程</li>
+                            <li>處理 AI 回應並格式化輸出</li>
+                            <li>自動分段處理超長訊息（支援最多 5 則訊息）</li>
+                            <li>發送回應回 LINE 用戶</li>
+                        </ul>
+                    </div>
+                    <div class="workflow-details">
+                        <h4>技術內容處理：</h4>
+                        <ul>
+                            <li>自動識別技術文件、會議記錄、專業討論等內容</li>
+                            <li>支援網址內容爬取（HTTP Request / Jina AI）</li>
+                            <li>支援 YouTube 影片逐字稿提取</li>
+                            <li>提供標準輸出和詳細報告兩種模式</li>
+                            <li>優化 LINE 平台顯示格式（繁體中文，500 字以內）</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="sub-workflows-section">
+            <h2>子流程模組</h2>
+            <div class="workflows-grid">
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🎨 IMAGE Generator</h3>
+                        <span class="badge badge-image">圖像</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">使用 AI 模型進行文字轉圖像生成，支援自訂提示詞和參數設定。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">文字轉圖像</div>
+                            <div class="feature-tag">AI 生成</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🔍 1399 RAG Agent</h3>
+                        <span class="badge badge-rag">RAG</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">檢索增強生成代理，結合知識庫檢索和 AI 生成能力，提供準確的資訊回答。</p>
+                        <div class="workflow-image-container">
+                            <img src="image/[SUB] 1399_rag_agent.png" 
+                                 alt="1399 RAG Agent 工作流圖" 
+                                 class="workflow-image"
+                                 onclick="openImageModal('image/[SUB] 1399_rag_agent.png', '1399 RAG Agent 工作流')">
+                            <div class="image-overlay">
+                                <span class="image-hint">點擊查看大圖</span>
+                            </div>
+                        </div>
+                        <div class="workflow-features">
+                            <div class="feature-tag">知識檢索</div>
+                            <div class="feature-tag">智能問答</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🔍 MCP RAG Agent</h3>
+                        <span class="badge badge-rag">RAG</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">基於 MCP 協議的 RAG 代理，提供更強大的知識檢索和生成能力。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">MCP 協議</div>
+                            <div class="feature-tag">知識庫</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>📰 NEWS Agent</h3>
+                        <span class="badge badge-news">新聞</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">新聞資訊代理，提供最新新聞資訊和新聞摘要服務。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">新聞抓取</div>
+                            <div class="feature-tag">資訊摘要</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>📰 News Agent Scrape</h3>
+                        <span class="badge badge-news">新聞</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">新聞爬蟲代理，自動抓取和整理網路新聞內容。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">網頁爬取</div>
+                            <div class="feature-tag">內容整理</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>📈 STOCK Agent</h3>
+                        <span class="badge badge-stock">股票</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">股票資訊代理，提供股票價格、市場資訊等金融數據查詢。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">股票查詢</div>
+                            <div class="feature-tag">市場資訊</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>💼 ITR Agent</h3>
+                        <span class="badge badge-agent">代理</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">ITR 專業代理，處理特定領域的專業查詢和任務。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">專業查詢</div>
+                            <div class="feature-tag">任務處理</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>✅ FACT Agent</h3>
+                        <span class="badge badge-fact">事實</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">事實查證代理，驗證資訊的真實性和準確性。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">事實查證</div>
+                            <div class="feature-tag">資訊驗證</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>💬 CB Agent</h3>
+                        <span class="badge badge-agent">代理</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">CB 對話代理，提供個性化的對話和互動服務。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">對話互動</div>
+                            <div class="feature-tag">個性化</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>💬 DR Agent</h3>
+                        <span class="badge badge-agent">代理</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">DR 專業代理，處理特定領域的專業任務。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">專業服務</div>
+                            <div class="feature-tag">任務處理</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🍔 Food Image</h3>
+                        <span class="badge badge-image">圖像</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">食物圖像生成模組，專門生成美食相關的圖像內容。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">食物圖像</div>
+                            <div class="feature-tag">AI 生成</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>✂️ Image Editing</h3>
+                        <span class="badge badge-image">圖像</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">圖像編輯模組，提供圖像處理和編輯功能。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">圖像處理</div>
+                            <div class="feature-tag">編輯功能</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🖼️ Image Module</h3>
+                        <span class="badge badge-image">圖像</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">圖像處理模組，整合多種圖像相關功能。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">圖像處理</div>
+                            <div class="feature-tag">功能整合</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🌐 WEB</h3>
+                        <span class="badge badge-web">網頁</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">網頁內容處理模組，處理網頁爬取和內容提取。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">網頁爬取</div>
+                            <div class="feature-tag">內容提取</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>📚 RAG Pipeline</h3>
+                        <span class="badge badge-rag">RAG</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">RAG 處理管道，整合檢索和生成的完整流程。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">檢索生成</div>
+                            <div class="feature-tag">流程整合</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>📦 SUBS Module</h3>
+                        <span class="badge badge-module">模組</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">子模組整合，管理多個子流程的協調和調用。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">模組管理</div>
+                            <div class="feature-tag">流程協調</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🔧 Database Query Tool</h3>
+                        <span class="badge badge-tool">工具</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">資料庫查詢工具，提供資料庫查詢和數據檢索功能。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">資料庫查詢</div>
+                            <div class="feature-tag">數據檢索</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-card">
+                    <div class="card-header">
+                        <h3>🕷️ LINE CHATBOT Crawl</h3>
+                        <span class="badge badge-tool">工具</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-description">網頁爬取工具，專門用於 LINE Chatbot 的內容爬取需求。</p>
+                        <div class="workflow-features">
+                            <div class="feature-tag">網頁爬取</div>
+                            <div class="feature-tag">內容提取</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tech-section">
+            <h2>技術架構</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon">🔌</div>
+                    <h3>n8n 工作流</h3>
+                    <p>使用 n8n 作為核心工作流引擎，提供可視化的流程設計和自動化執行</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🤖</div>
+                    <h3>Google Gemini</h3>
+                    <p>整合 Google Gemini AI 模型，提供強大的自然語言理解和生成能力</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">📱</div>
+                    <h3>LINE Messaging API</h3>
+                    <p>透過 LINE Messaging API 實現與用戶的即時通訊互動</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🔍</div>
+                    <h3>RAG 技術</h3>
+                    <p>採用檢索增強生成技術，結合知識庫檢索和 AI 生成，提供準確回答</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🖼️</div>
+                    <h3>圖像生成 API</h3>
+                    <p>整合圖像生成服務，支援文字轉圖像和圖像編輯功能</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon">🌐</div>
+                    <h3>網頁爬取</h3>
+                    <p>支援網頁內容爬取、YouTube 逐字稿提取等多種內容獲取方式</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <h2>核心功能</h2>
+            <div class="features-list">
+                <div class="feature-box">
+                    <div class="feature-icon">🎯</div>
+                    <h3>智能路由</h3>
+                    <p>根據用戶訊息內容自動判斷並路由到最適合的子流程處理</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">💬</div>
+                    <h3>多樣化對話</h3>
+                    <p>支援技術內容處理和一般對話，提供個性化的互動體驗</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">📄</div>
+                    <h3>內容分析</h3>
+                    <p>自動分析技術文件、會議記錄等內容，生成結構化的摘要報告</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">🔗</div>
+                    <h3>網址處理</h3>
+                    <p>自動識別並處理訊息中的網址，提取網頁內容或 YouTube 逐字稿</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">📊</div>
+                    <h3>格式化輸出</h3>
+                    <p>針對 LINE 平台優化輸出格式，使用表情符號和分隔線提升可讀性</p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-icon">⚡</div>
+                    <h3>自動分段</h3>
+                    <p>智能處理超長訊息，自動分段發送，確保內容完整傳達</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 LINE Chatbot Project. Built with n8n.</p>
+            <p class="footer-links">
+                <a href="https://github.com" target="_blank">GitHub</a>
+                <span>•</span>
+                <a href="https://n8n.io" target="_blank">n8n</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 圖片燈箱模態框 -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImage" alt="工作流圖">
+        <div class="modal-caption" id="modalCaption"></div>
+    </div>
+
+    <script>
+        // 打開圖片燈箱
+        function openImageModal(imageSrc, caption) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const captionText = document.getElementById('modalCaption');
+            
+            modal.style.display = 'block';
+            modalImg.src = imageSrc;
+            captionText.innerHTML = caption;
+            
+            // 防止點擊圖片時關閉
+            modalImg.onclick = function(e) {
+                e.stopPropagation();
+            };
+        }
+
+        // 關閉圖片燈箱
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // 按 ESC 鍵關閉
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+    </script>
+</body>
+</html>
+
