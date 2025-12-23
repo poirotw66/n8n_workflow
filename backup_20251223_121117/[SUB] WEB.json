@@ -1,0 +1,350 @@
+{
+  "name": "[SUB] WEB",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "website"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT *\nFROM `itr-aimasteryhub-lab.Update_Notifier.update_info`\nWHERE website = \"{{$json.website}}\"\nORDER BY create_date DESC\nLIMIT 1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        1840,
+        48
+      ],
+      "id": "3f96211a-2ebd-4f21-b9b8-da313df3ebe8",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        272
+      ],
+      "id": "5a8c4022-91e9-4780-93f9-21a12e33981d",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"output\":\"summarize content\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2208,
+        272
+      ],
+      "id": "7e1a695f-7f9b-49f8-9d18-6adf49a300eb",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=處理指示\n你是一位負責產品更新通知的助理，請根據以下資訊，請依照以下步驟處理我提供的「更新內容」，並遵循所有格式要求：\n\n1. 內部理解（不輸出）\n- 仔細閱讀提供的「content」更新說明。\n- 不需輸出任何閱讀過程或解釋。\n\n2. 輸出版本更新摘要（僅輸出此部分）\n請根據「更新內容」來撰寫「更新重點摘要」，條列重要的改動，具體結構如下：\n- 請先輸出標題：\n  - 第一行輸出 您好，以下是 {{$json.website}} 版本資訊！\n  - 第二行輸出 網站名稱：{{$json.website}} \n  - 第三行輸出 最新版本：{{$json.version}}\n- 輸出更新內容摘要 (請摘要並條列本段內容)\n\t完整更新內容：{{ $json.content }}\n\n\t輸出範例:\n\t---\n  您好，以下是 Cursor 版本資訊：\n\n\t● 網站名稱：Cursor  \n\t● 最新版本：0.48.9\n\n\t本次更新重點包括：\n\t- 引入 Chat Tabs，可同時進行多個對話  \n\t- 全新「自訂模式（Custom Modes）」支援鍵盤快速鍵  \n\t- 索引效能大幅提升，大型專案處理更迅速  \n\t- 聊天完成時新增音效通知（Beta）  \n\t- 可查看每次聊天的模型使用成本\n\t---\n\n3. 輸出限制\n- 請僅輸出步驟2的「版本更新摘要」。\n- 禁止使用：Markdown 語法（#、**、[]()等）\n- 禁止使用：HTML 標籤\n- 禁止輸出：處理過程說明或額外註解\n- 全文必須使用繁體中文。",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2064,
+        48
+      ],
+      "id": "f31a7cf0-1e74-4836-9ad4-627f700cc314",
+      "name": "Basic LLM Chain2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a570f00a-acca-4eda-aa3f-f08ede6842ed",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "none",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1616,
+        144
+      ],
+      "id": "9eec342e-0aa8-4070-b46a-14ab94698820",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": \"無該網站版本資訊\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1840,
+        240
+      ],
+      "id": "1c0c519d-47bf-49dc-bf25-51d848be5e4d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT DISTINCT website FROM `itr-aimasteryhub-lab.Update_Notifier.website_list`;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        224
+      ],
+      "id": "7c7b2723-3793-4bdc-8525-cb0380703da0",
+      "name": "Execute a SQL query2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "website_list",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        944,
+        224
+      ],
+      "id": "2de1b4f1-4c4b-45c6-b884-d6676e616ace",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1168,
+        144
+      ],
+      "id": "70db9dc0-50ac-46f4-b00b-73b33ead8999",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "# 有提供服務的網站\nwebsite_list = [i['website'] for i in items[1].json['website_list']]\nweb = items[0].json['website']\n\noutput = \"none\"\nif web in website_list:\n  output = web\n\nreturn {\n  \"website\": output\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        144
+      ],
+      "id": "d9cb4715-d3b6-4623-936d-71f5cd139443",
+      "name": "Code5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "01952bd1-9f1b-4cc7-8fcc-6d6355c9ee5e",
+  "meta": {
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "RoVGba1IgSAfYGXG",
+  "tags": [
+    {
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}

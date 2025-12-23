@@ -1,0 +1,327 @@
+{
+  "name": "[SUB] SUBS Module",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "Update_Notifier",
+          "mode": "list",
+          "cachedResultName": "Update_Notifier"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "Subscriber",
+          "mode": "list",
+          "cachedResultName": "Subscriber"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        16
+      ],
+      "id": "bfe46436-b61e-41a5-8452-dfaa4670e507",
+      "name": "Insert rows in a table",
+      "retryOnFail": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "outputFieldName": "create_date",
+        "options": {
+          "includeInputFields": true
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        -64
+      ],
+      "id": "03fc5328-de50-481c-a704-0ff6b00b6cf4",
+      "name": "Date & Time1"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "# 有提供服務的網站\nwebsite_list = [i['website'] for i in items[1].json['website_list']]\n\n# 找出要訂閱的網站\nquery = items[0].json['userInput']\n\nsubs_website = []\nif \"ALL\" in query:\n  subs_website = website_list\nelse:\n  # 移除 @SUBS 並取後面的字串\n  parts = query.replace('@SUBS', '').strip().split()\n  # 抓有提供服務的網站名稱\n  subs_website = [i for i in parts if i in website_list]\n\n# 使用者類型, user/group\nuser_type = items[0].json[\"userType\"]\nuser_type_list = {'user': 0, 'group': 1}\nuser_type = user_type_list[user_type]\n\n# 抓 userId\nuserId = \"\"\nif user_type == 0:\n  userId = items[0].json[\"userId\"]\nelse:\n  userId = items[0].json[\"groupId\"]\n\n# 現在時間\ncreate_date = items[0].json['create_date']\n\nreturn {\n  \"subs_website\": subs_website,\n  \"user_type\": user_type,\n  \"userId\": userId,\n  \"website_list\": website_list,\n  \"create_date\": create_date\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -64
+      ],
+      "id": "7ba602d0-f395-44e4-8006-2e7fbdc704f1",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "subs_website = items[0].json['subs_website']\nwebs = ' '.join(subs_website)\noutput = f\"已訂閱 {webs} 更新通知！\"\n\nreturn {\n  \"output\": output\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        -64
+      ],
+      "id": "d24997eb-db49-4c1b-994a-4606c64868ca",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "subs_website = items[0].json['subs_website']\ncreate_date = items[0].json['create_date']\nuserId = items[0].json['userId']\nuser_type = items[0].json['user_type']\n\nreturn [{\n  \"create_date\": create_date,\n  \"user_type\": user_type,\n  \"userId\": userId,\n  \"website\": website\n} for website in subs_website]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        16
+      ],
+      "id": "7a77a72c-9eba-401f-b00a-f11e89e328cc",
+      "name": "Code4",
+      "notesInFlow": true,
+      "notes": "FOR INSERT DB"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1504,
+        -64
+      ],
+      "id": "c799ca83-e8a7-4985-be87-8ad58703f1e3",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "ITR-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT DISTINCT website FROM `itr-aimasteryhub-lab.Update_Notifier.website_list`;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        16
+      ],
+      "id": "15e4944a-903f-4893-bfd0-535e4048109d",
+      "name": "Execute a SQL query1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleBigQueryOAuth2Api": {
+          "id": "7y1khtJIgFs3bnp8",
+          "name": "Google BigQuery account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        608,
+        -64
+      ],
+      "id": "ec2c5e7f-0360-4459-9acd-fd0fae3c0c4d",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "website_list",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        384,
+        16
+      ],
+      "id": "8e5413e6-9054-4bf0-9aae-87a8b209b3da",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            },
+            {
+              "name": "userId"
+            },
+            {
+              "name": "groupId"
+            },
+            {
+              "name": "userType"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        -64
+      ],
+      "id": "bee8ecc9-8af5-48dc-898e-0295ae1ec749",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Date & Time1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Date & Time1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9c4d91f1-c676-40f3-9d06-01da388b26b7",
+  "meta": {
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "UTVTundxgsW7Lhly",
+  "tags": [
+    {
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}

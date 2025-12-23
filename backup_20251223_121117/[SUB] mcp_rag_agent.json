@@ -1,0 +1,190 @@
+{
+  "name": "[SUB] mcp_rag_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        -96
+      ],
+      "id": "215940de-d5d7-48ce-b159-74f5a2ec0f93",
+      "name": "When chat message received",
+      "webhookId": "d7395f2c-c339-4d26-a574-6ce868f5bad2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.userInput }}",
+        "options": {
+          "systemMessage": "你是一個助理，專門負責轉述 ask_m365_expert 所回覆的內容。\n\n- ask_m365_expert: 請另一個 agent 幫忙回答關於 M365 軟體使用、功能和操作流程的問題。\n\n請根據不同的問題類型，回覆不同的格式(問題類型、回答所需資訊都包含在工具回應內容中)\n因此每則回覆須包含：【問題類型】、【不同類型所需格式】、【資料來源】\n\n問題分類及所需格式：\n    ## 1. 操作教學類\n    - 用戶意圖: 使用者通常已知要做什麼，但不確定怎麼做。期待的是「具體步驟」與「操作路徑」。\n    - 範例: 如何設定Outlook 自動回覆？如何在Teams 建立投票？\n    - 回答結構:\n        1.  【開場說明】：簡要說明此功能的用途或常見情境。\n        2.  【操作步驟】：使用條列式 (1., 2., 3., ...) 詳細說明每一步，清楚標示工具位置與按鈕名稱。\n        3.  【延伸資源】：(如果檢索內容有提供) 附上相關的教學影片或官方文件連結。\n\n    ## 2. 問題解惑類\n    - 用戶意圖: 遇到錯誤或限制，想知道「為什麼」與「怎麼解」。\n    - 範例: 為什麼檔案被DLP 擋住？分享連結失效了是正常的嗎？\n    - 回答結構:\n        1.  【問題解析】：根據檢索資料，解釋問題發生的可能原因。\n        2.  【解決方法】：提供具體的排除方式或替代方案。\n        3.  【回報管道】：(如果檢索內容有提及) 指引使用者如果無法解決，應該聯繫哪個單位或透過什麼管道回報（例如：小樹知）。\n\n    ## 3. 工具釐清類\n    - 用戶意圖: 不確定該用哪個工具，或想了解差異與定位。\n    - 範例: OneDrive 跟 SharePoint 有什麼差別？\n    - 回答結構:\n        1.  【工具定位說明】：簡述各工具的核心用途與適用對象。\n        2.  【差異比較表】：(如果資訊充足) 盡量以表格或清晰的條列式對比功能、權限、適用情境。\n        3.  【選擇建議】：根據使用者的潛在需求，給出選擇建議。\n\n    ## 4. 情境應用建議類\n    - 用戶意圖: 提出一個「需求」而非「功能」，希望獲得整合式建議。\n    - 範例: 客服團隊要同時@多人，有什麼方法？想讓同仁上傳檔案，有什麼工具可以用？\n    - 回答結構:\n        1.  【情境解析】：釐清需求與確認目標。\n        2.  【工具建議】：推薦一個或多個適合的工具組合。\n        3.  【操作方式】：簡要說明如何使用推薦的工具來實現該需求。\n        4.  【延伸補充】：(可選) 提醒相關的注意事項或權限設定。\n\n    ## 5. 制度流程說明類\n    - 用戶意圖: 詢問公司內部的特定政策、申請流程或權限規定。\n    - 範例: 如何申請 SharePoint 空間調升？是否能分享檔案給外部成員\n    - 回答結構:\n        1.  【制度說明】：清晰說明相關的規定、權限或政策。\n        2.  【申請流程】：如果涉及申請，提供詳細的步驟。\n        3.  【權責單位】：指明此流程的負責人或負責單位是誰。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "106dba44-0446-4fe9-a124-20bd375f6f92",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        176
+      ],
+      "id": "7fed42cd-64c3-4d4f-8edf-6610b8242c0c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bmQtF6LTFzuCRm0S",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://172.30.157.145:8002/mcp",
+        "serverTransport": "httpStreamable",
+        "include": "selected",
+        "includeTools": [
+          "ask_m365_expert"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "32b52a6a-577e-4113-8ca8-67e62228f720",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        704,
+        208
+      ],
+      "id": "d15b2a2f-1253-4905-a79d-2886adba236a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        144
+      ],
+      "id": "e2c92576-a839-4683-b3c6-671d29ffab92",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://172.30.132.96:8000/mcp",
+        "serverTransport": "httpStreamable",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        704,
+        32
+      ],
+      "id": "6e6caf7b-11ec-417d-b5fd-bc222a631cfb",
+      "name": "[dup]MCP Client1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "29a3c9c2-eacb-4dca-8fb8-8f82965be3d2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "ylGZhvVAhKz9Yj4B",
+  "tags": [
+    {
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}

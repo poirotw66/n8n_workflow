@@ -1,0 +1,922 @@
+{
+  "name": "[SUB] Image Editing",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userId"
+            },
+            {
+              "name": "messageId"
+            },
+            {
+              "name": "userInput"
+            },
+            {
+              "name": "type"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -336,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "edit"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "name": "Check Image Message",
+      "typeVersion": 1,
+      "position": [
+        112,
+        1344
+      ],
+      "id": "1cfda0e3-7289-453f-b98c-0d67a82a3398"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "CFH-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SELECT\n  status\nFROM\n  `itr-aimasteryhub-lab.n8n.image_state`\nWHERE\n  userID = '{{ $json[\"userId\"] }}'\nORDER BY\n  createdAt DESC\nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        1344
+      ],
+      "id": "828219a7-1344-430f-a135-f7972c1474f4",
+      "name": "Execute a SQL query",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// 設定使用者 flag\nconst userId = $item(0).$node[\"When Executed by Another Workflow\"].json.userId;\nif (!globalThis.foodFlags) globalThis.foodFlags = {};\nglobalThis.foodFlags[userId] = true;\nreturn [{json:{status:'edit', userId:userId}}];\n"
+      },
+      "type": "n8n-nodes-base.function",
+      "name": "Set User /food Flag",
+      "typeVersion": 1,
+      "position": [
+        336,
+        1632
+      ],
+      "id": "7862a804-f40e-49ef-974b-267ce53206ad"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        560,
+        1632
+      ],
+      "id": "6c6ff04b-2d20-47e9-aeea-ccea513bea78",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "CFH-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "image_state",
+          "mode": "list",
+          "cachedResultName": "image_state"
+        },
+        "dataMode": "define",
+        "fieldsUi": {
+          "values": [
+            {
+              "fieldId": "=userId",
+              "fieldValue": "={{ $('Set User /food Flag').item.json.userId }}"
+            },
+            {
+              "fieldId": "=status",
+              "fieldValue": "={{ $('Set User /food Flag').item.json.status }}"
+            },
+            {
+              "fieldId": "=createdAt",
+              "fieldValue": "={{ $json.currentDate }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        784,
+        1632
+      ],
+      "id": "0196a4c6-a072-444c-bedd-fada2769a118",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": [\n    \"🎨✨ 藝術家模式覺醒\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        1632
+      ],
+      "id": "da8c2ff9-2441-4290-8e7f-1230866266e3",
+      "name": "output Form"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5e33ca28-0c14-47ef-b3f1-c4780e78a42f",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.type }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        1248
+      ],
+      "id": "6704af75-03aa-4efa-b673-203da06bd6e3",
+      "name": "If type==image"
+    },
+    {
+      "parameters": {
+        "resource": "object",
+        "operation": "create",
+        "bucketName": "=n8n-itr-lab-files",
+        "objectName": "={{ $item(\"0\").$node[\"When Executed by Another Workflow\"].json[\"userId\"] }}",
+        "createData": {},
+        "createQuery": {},
+        "encryptionHeaders": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "typeVersion": 1,
+      "position": [
+        784,
+        1056
+      ],
+      "id": "b3637d87-43cd-40ba-9c9c-70d6efd3a811",
+      "name": "Create an object",
+      "credentials": {
+        "googleCloudStorageOAuth2Api": {
+          "id": "QxoOtiiG9GV8Mdpa",
+          "name": "Google Cloud Storage account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "CFH-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "picture_editing",
+          "mode": "list",
+          "cachedResultName": "picture_editing"
+        },
+        "dataMode": "define",
+        "fieldsUi": {
+          "values": [
+            {
+              "fieldId": "userId",
+              "fieldValue": "={{ $('When Executed by Another Workflow').item.json.userId }}"
+            },
+            {
+              "fieldId": "image_url",
+              "fieldValue": "={{ $json.selfLink }}"
+            },
+            {
+              "fieldId": "createdAt",
+              "fieldValue": "={{ $now }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        1008,
+        1056
+      ],
+      "id": "c867da85-a127-4cbe-9560-6797b3066e9f",
+      "name": "Insert rows in a table1",
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": [\n    \"圖片已經上傳👌\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        1056
+      ],
+      "id": "69776795-2a4a-43a0-90b2-60f75ba374bc",
+      "name": "output Form1"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "CFH-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "sqlQuery": "SElECT *\nFROM `itr-aimasteryhub-lab.n8n.picture_editing`\nWHERE userId = '{{ $('When Executed by Another Workflow').item.json.userId }}'\nORDER BY createdAt DESC\nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        1344
+      ],
+      "id": "740cb7e0-89c0-4fc9-bd38-aaec4032d746",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c2ef9500-20a5-4b4c-b9aa-8a603336d7b6",
+              "leftValue": "= {{ $('Execute a SQL query1').item.json.image_url\n }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "5e85c83d-deb6-4b6a-be8e-043558736720",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.userInput }}",
+              "rightValue": "=null",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        1344
+      ],
+      "id": "0174951e-432d-4afc-8bac-d00470e28008",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "object",
+        "operation": "get",
+        "bucketName": "n8n-itr-lab-files",
+        "objectName": "={{ $('When Executed by Another Workflow').item.json.userId }}",
+        "alt": "media",
+        "getParameters": {},
+        "encryptionHeaders": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.googleCloudStorage",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        1248
+      ],
+      "id": "935db02b-08f5-433b-984a-c470a02fa023",
+      "name": "Get object data or metadata",
+      "credentials": {
+        "googleCloudStorageOAuth2Api": {
+          "id": "QxoOtiiG9GV8Mdpa",
+          "name": "Google Cloud Storage account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const name = $input.first().json.filename;\nreturn [\n  {\n    json: {\n      image_url: 'https://gemini.itr-lab.cloud/images/' + name,\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        1344
+      ],
+      "id": "ffce084a-e8e8-4078-adff-e616b332b13a",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "content": "const binaryKey = 'data'; // 這是 GCS 節點預設的 binary key，通常是 'data'\n\nconst binaryData = $binary[binaryKey];\n\nif (!binaryData || !binaryData.data) {\n  throw new Error(`Binary data not found for key \"${binaryKey}\"`);\n}\n\n// $json.userInput 是你傳進來的 prompt，記得要確認來源正確\nreturn [\n  {\n    json: {\n      image_base64: binaryData.data, // 已經是 base64\n      message: $json.userInput || \"Default message\", // 改成 message（根據你的 API 定義）\n      filename: binaryData.fileName || \"image.png\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        560
+      ],
+      "typeVersion": 1,
+      "id": "4c29de8d-e123-4382-bb95-7eacab275473",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gemini-api-standalone:8001/images/edit-image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $('When Executed by Another Workflow').item.json.userInput }}"
+            },
+            {
+              "name": "return_base64",
+              "value": "false"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1232,
+        1248
+      ],
+      "id": "2c05ca06-2bb7-4b91-84d1-d5955bb6b0be",
+      "name": "HTTP Request2",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3765149c-f2dc-42e6-a691-cfc36bbdd4c5",
+              "leftValue": "={{ $json.filename }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        1248
+      ],
+      "id": "9df9d03f-8b98-4cd7-bb38-6fb70137a8e0",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        1152
+      ],
+      "id": "37fe3ada-a95b-46f7-af41-d3b434248b30",
+      "name": "Date & Time1"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "insert",
+        "projectId": {
+          "__rl": true,
+          "value": "itr-aimasteryhub-lab",
+          "mode": "list",
+          "cachedResultName": "CFH-AIMasteryHub-LAB",
+          "cachedResultUrl": "https://console.cloud.google.com/bigquery?project=itr-aimasteryhub-lab"
+        },
+        "datasetId": {
+          "__rl": true,
+          "value": "n8n",
+          "mode": "list",
+          "cachedResultName": "n8n"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "image_state",
+          "mode": "list",
+          "cachedResultName": "image_state"
+        },
+        "dataMode": "define",
+        "fieldsUi": {
+          "values": [
+            {
+              "fieldId": "=userId",
+              "fieldValue": "={{ $('Code2').item.json.userId }}"
+            },
+            {
+              "fieldId": "=status",
+              "fieldValue": "={{ $('Code2').item.json.status }}"
+            },
+            {
+              "fieldId": "=createdAt",
+              "fieldValue": "={{ $json.currentDate }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleBigQuery",
+      "typeVersion": 2.1,
+      "position": [
+        2128,
+        1152
+      ],
+      "id": "92469a73-0c6d-48b8-b6cf-d1b44c999457",
+      "name": "Insert rows in a table2",
+      "credentials": {
+        "googleApi": {
+          "id": "nK6hRyaZZvXYmW4X",
+          "name": "Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 從上一個 node 取出 userId\nconst userId = $item(0).$node[\"When Executed by Another Workflow\"].json.userId;\n\n// 初始化 global flags\nif (!globalThis.foodFlags) globalThis.foodFlags = {};\n\n// 設定 flag\nglobalThis.foodFlags[userId] = true;\n\nreturn [\n  {\n    json: {\n      status: '0',\n      userId: userId,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        1152
+      ],
+      "id": "8d4cdaf1-8f5b-4683-987b-99b32df5e34d",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "url": "=https://api-data.line.me/v2/bot/message/{{ $item(\"0\").$node[\"When Executed by Another Workflow\"].json[\"messageId\"] }}/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer DyXvqj45gHCUtdYt2KAiifG/gFQOfgyrUpXQO/sE9OEry2GqY4o/sistConAkr53tEKIQF9xYbn1BFE9G4EdEEfMOXZoZLMI0JJv25vnEn0GUENP3O9ZkpKNkqe59uQKPhxeqotW/5EgIvqdEC2yhgdB04t89/1O/w1cDnyilFU="
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -336,
+        832
+      ],
+      "id": "cc81240d-96d2-49a9-a50f-42319b69b725",
+      "name": "[TEST]接收圖片1"
+    },
+    {
+      "parameters": {
+        "content": ""
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        832
+      ],
+      "typeVersion": 1,
+      "id": "929cb427-7721-499a-9418-b36ceb7a2dac",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api-data.line.me/v2/bot/message/{{ $item(\"0\").$node[\"When Executed by Another Workflow\"].json[\"messageId\"] }}/content",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer uRqMFQ1KdVU79IOYm3svDPEctOSxF3ud1hDocb+tIw5D2w7nbEVEoUGSeQhQHf1h69pl2RP47ekJuLsHURRv7iRSvBJaT41Spm3gUKIZvWlHKOhA9EJZgzSal/c50gz3NPY+X1L19fKUL1q77I0dLgdB04t89/1O/w1cDnyilFU="
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        1056
+      ],
+      "id": "1882bc03-d0c4-4654-9aed-37be7b47302c",
+      "name": "[LINEBOT]接收圖片"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"output\": [\n    \"請上傳圖片或是prompt!!\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        1440
+      ],
+      "id": "05fe4b2e-90e9-4550-aac1-e8752c1e22f1",
+      "name": "output Form2"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "userId": "Udf3d230fe023ddb3908ed9bd7a47e48d",
+          "messageId": "577092762445546200",
+          "userInput": "白皮膚版本，在街上慢跑穿著清涼",
+          "type": "text"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Image Message": {
+      "main": [
+        [
+          {
+            "node": "If type==image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set User /food Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Check Image Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set User /food Flag": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "output Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If type==image": {
+      "main": [
+        [
+          {
+            "node": "[LINEBOT]接收圖片",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an object": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table1": {
+      "main": [
+        [
+          {
+            "node": "output Form1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get object data or metadata",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "output Form2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get object data or metadata": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time1": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Date & Time1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[LINEBOT]接收圖片": {
+      "main": [
+        [
+          {
+            "node": "Create an object",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e12fb210-3bc0-434c-a5ce-5ec86d25b959",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "QjGBCpDqE4oNWG3a",
+  "tags": []
+}

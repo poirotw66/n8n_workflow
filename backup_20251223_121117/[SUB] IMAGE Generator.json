@@ -1,0 +1,179 @@
+{
+  "name": "[SUB] IMAGE Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "http://gemini-api:8000/summarize\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "868d46d5-07e2-46d5-aa9f-42c19b0cd8bd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "url": "http://gemini-api-standalone:8001/health",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -848,
+        -240
+      ],
+      "id": "9c068e60-8759-4b28-bef7-8182e32e57f2",
+      "name": "health"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gemini-api-standalone:8001/images/text-to-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $json.userInput }}"
+            },
+            {
+              "name": "return_base64",
+              "value": "=false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -624,
+        -16
+      ],
+      "id": "76c40cad-ce43-4383-90ff-2993f8a6658d",
+      "name": "Gen Image"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -848,
+        -16
+      ],
+      "id": "ba24d2d1-babb-4db7-bf87-2bc019e83564",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const name = $input.first().json.filename;\nreturn [\n  {\n    json: {\n      image_url: 'https://gemini.itr-lab.cloud/images/' + name,\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -16
+      ],
+      "id": "f6c86b53-a557-438c-b822-8fd6e7a7c906",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User description: \"{{ $json.userInput }}\"\n\nExpand and refine this description into a single, precise prompt for image generation. \nInclude:\n- Character appearance (age, gender, hairstyle, clothing, facial expression, pose)\n- Scene and environment (background, lighting, mood, style)\n- Camera details (angle, distance, focus, composition)\n- Artistic style (realistic, anime, cinematic, digital art, etc.)\n- Extra details for realism and clarity\n\nReturn only the final optimized prompt as one continuous sentence.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -848,
+        320
+      ],
+      "id": "66103738-e13b-4dc8-9a09-65ac5582c4dd",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        544
+      ],
+      "id": "159c5e10-bbf9-4e89-a37f-8afb445a7f1f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Gen Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gen Image": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e19debc4-a677-4ed7-9938-e5f9c80ef06f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "v9WGn1gHxod1TV4T",
+  "tags": []
+}
