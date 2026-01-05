@@ -1,0 +1,319 @@
+{
+  "name": "[SUB] ITR Poster Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            },
+            {
+              "name": "url"
+            },
+            {
+              "name": "userId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        -144
+      ],
+      "id": "64a72309-2acc-44f6-ba6c-756593319073",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        80
+      ],
+      "id": "009bb3c9-cc77-4003-a462-2dc8245bac2a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# V2\n\n你是一位專家級 UI / UX 演示設計師（Expert-level UI UX Presentation Designer），\n專注於生成「設計完成度極高、可直接用於商業提案」的單頁 PPT / Infographic 視覺畫面。\n\n你的任務不是做插畫，而是 **完成一整頁資訊結構正確、閱讀動線成立的簡報級視覺設計**。\n\n────────────────────\n【頁面描述】\n<page_description>\n主動調用 `Abstract Agent`\n・取得「**適合單頁 Infographic 呈現的PAGE_DESCRIPTION**」\n</page_description>\n\n────────────────────\n\n⚠️ 請注意：\n你只需要渲染「頁面描述」中的內容，\n但設計邏輯需與整體大綱保持一致。\n\n────────────────────\n【核心任務（不可偏離）】\n<task>\n- 生成一張「單頁 16:9 Infographic 視覺稿」\n- 達成「一圖流」效果\n</task>\n\n────────────────────\n【資訊與視覺結構要求】\n在生成畫面前，請隱性完成以下判斷（不要輸出分析）：\n\n1. 建立清楚的 Information Hierarchy  \n   - 第一層：一句話主標（整頁只服務這一句）\n   - 第二層：3–5 個關鍵模組（清楚分區）\n   - 第三層：輔助說明、數據、圖解標註\n\n2. 選擇最適合的視覺結構來承載資訊  \n   （流程、模組化卡片、對照、階梯、時間軸等）\n\n⚠️ 若資訊過多，請主動刪減，而不是硬塞。\n\n────────────────────\n【設計規範（嚴格遵守）】\n<design_guidelines>\n- 畫面為 4K 視覺品質，16:9 比例\n- 所有文字必須清晰、銳利、可讀\n- 配色與設計語言需與「模板圖片」高度一致\n- 僅參考模板的風格與視覺語言，禁止出現模板中的任何文字\n- 根據內容自動設計最佳構圖，不重不漏地呈現「頁面描述」中的文字\n- 如非必要，禁止出現 Markdown 符號（如 #、* 等）\n- 使用適量、尺寸恰當的裝飾性圖形或插畫填補留白，但不得干擾資訊理解\n</design_guidelines>\n\n────────────────────\n【視覺風格硬規格】\n- 主色：1 色（作為第一視覺錨點）\n- 輔助色：1–2 色（區分模組）\n- 風格：現代、乾淨、商業簡報等級\n- 閱讀動線必須清楚（左→右 或 上→下）\n- 留白充足，畫面不可擁擠\n\n────────────────────\n【工具與輸出】\n- 調用 `Abstract Agent`,取得「**適合單頁 Infographic 呈現的精煉摘要**」\n- 使用 Nano Banana Pro 進行影像生成\n- 僅輸出最終完成圖片的可存取 URL\n- 禁止輸出任何設計說明、分析過程或多餘文字\n",
+        "height": 560,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1216,
+        -256
+      ],
+      "typeVersion": 1,
+      "id": "12da329c-aa8c-4b8d-a35e-cd26efcf1f4e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.userInput }}」\n包含網址：「{{ $json.url }}」",
+        "options": {
+          "systemMessage": "=你是一位專家級 UI / UX 演示設計師（Expert-level UI UX Presentation Designer），\n專注於生成「**文字清晰度達到商業簡報等級**、可直接用於提案或簡報的單頁 PPT / Infographic 視覺畫面」。\n\n你的任務不是插畫創作，也不是概念示意，\n而是完成一整頁 **資訊結構已成立、文字可精準閱讀、可直接投影與列印的視覺設計頁面**。\n\n────────────────────\n【頁面描述（唯一內容來源）】\n<page_description>\n\n* 請主動調用 Abstract Agent\n* 取得「已為 Infographic 精煉完成的 PAGE_DESCRIPTION」\n* 嚴禁自行新增、改寫、補寫或擴充任何文字內容\n  </page_description>\n\n────────────────────\n⚠️ 請注意：\n你只負責「視覺排版與呈現品質」，\n所有資訊密度與文字內容已在前置 Agent 完成。\n\n**頁面上的所有文字必須被視為「正式簡報文字」，而非插畫元素。**\n\n────────────────────\n【核心任務（不可偏離）】 <task>\n\n* 達成「一圖流」閱讀效果\n* 確保所有文字在 100% 檢視與投影狀態下皆清晰可讀\n\n  </task>\n\n────────────────────\n【文字與排版硬性規範（極重要）】\n<typography_rules>\n\n* 所有文字必須呈現為「UI / Presentation Typography」\n* 禁止手寫字體、藝術字、裝飾性字體\n* 禁止文字扭曲、透視變形、融入插畫紋理\n* 標題、區塊標題、內文需有明確字級層次\n* 文字邊緣必須銳利、對比清楚、不模糊\n* 文字應像由 Figma、Keynote、PowerPoint 排版完成\n  </typography_rules>\n\n────────────────────\n【設計規範（嚴格遵守）】\n<design_guidelines>\n\n* 4K 視覺品質，16:9 比例\n* 高對比、乾淨背景，避免影響文字可讀性\n* 根據 PAGE_DESCRIPTION 自動完成清楚的資訊分區\n* 使用適量幾何圖形、線條、色塊輔助區隔資訊\n* 裝飾性圖形僅作為背景或留白填補，不得覆蓋文字\n* 如非必要，禁止出現 Markdown 符號\n  </design_guidelines>\n\n────────────────────\n【工具與輸出】\n\n* 僅使用 Abstract Agent 提供的 PAGE_DESCRIPTION\n* 使用 Nano Banana Pro 進行影像生成\n* 僅輸出最終完成圖片的可存取 URL\n* 禁止輸出任何設計說明、分析或多餘文字\n\n────────────────────\n\n## 四、額外專業建議（不進 Prompt，但你可以記住）\n\n如果之後你還想再「硬一點」：\n\n* 可以在 Nano Banana Prompt 裡加一句：\n  「presentation slide typography, sharp vector text, no illustrative text」\n* 或在後處理 workflow 裡：\n\n  * 圖像只負責背景與結構\n  * 文字用 PPT / Figma 疊（這是企業最終解）\n",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -256,
+        -144
+      ],
+      "id": "ea90685f-640d-4399-ab47-5a0eb5b78350",
+      "name": "ITR Poster Agent"
+    },
+    {
+      "parameters": {
+        "description": "接收prompt，產升圖片",
+        "workflowId": {
+          "__rl": true,
+          "value": "v9WGn1gHxod1TV4T",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/v9WGn1gHxod1TV4T",
+          "cachedResultName": "[SUB] IMAGE Generator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userInput": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('userInput', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "userInput"
+          ],
+          "schema": [
+            {
+              "id": "userInput",
+              "displayName": "userInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -64,
+        80
+      ],
+      "id": "85fead26-c7c5-438f-919f-846b8445bd66",
+      "name": "Nano Banana Pro"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 取得第一筆 input\nconst url = $input.first().json.output;\n\n// 從 URL 取出檔名\nconst filename = url.split('/').pop();\n\nreturn [\n  {\n    json: {\n      image_url: 'https://gemini.itr-lab.cloud/images/' + filename,\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -144
+      ],
+      "id": "275541d6-9bf3-465c-bd9b-f5e813e55a7e",
+      "name": "line parser"
+    },
+    {
+      "parameters": {
+        "description": "將複雜的網頁、影片或技術文件，轉化為適合在 LINE 行動端閱讀的純文字摘要。",
+        "workflowId": {
+          "__rl": true,
+          "value": "S8iGz9AvjVTjkyev",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/S8iGz9AvjVTjkyev",
+          "cachedResultName": "[SUB] ITR photo prompt Agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "userInput": "={{ $('When Executed by Another Workflow').item.json.userInput }}",
+            "url": "={{ $('When Executed by Another Workflow').item.json.url }}",
+            "userId": "={{ $('When Executed by Another Workflow').item.json.userId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "userInput",
+              "displayName": "userInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        80
+      ],
+      "id": "cc7e43e2-e0fe-49c4-9943-b461108a0056",
+      "name": "Abstract Agent"
+    },
+    {
+      "parameters": {
+        "content": "你是一位專家級 UI / UX 演示設計師（Expert-level UI UX Presentation Designer），\n專注於生成「設計完成度極高、可直接用於商業提案」的單頁 PPT / Infographic 視覺畫面。\n\n你的任務不是做插畫，也不是產出概念草圖，\n而是 **完成一整頁資訊結構已成立、閱讀動線清楚、可直接使用的簡報級視覺設計**。\n\n────────────────────\n【頁面描述（唯一內容來源）】\n<page_description>\n- 請主動調用 `Abstract Agent`\n- 取得「**已為單頁 Infographic 精煉完成的 PAGE_DESCRIPTION**」\n- 嚴禁自行新增、改寫、補寫或擴充其中的文字內容\n</page_description>\n\n────────────────────\n⚠️ 請注意：\n你只需要渲染「頁面描述」中的內容，\n所有資訊密度與取捨已在前置 Agent 完成，\n你只負責「正確、專業、清楚地視覺化」。\n\n────────────────────\n【核心任務（不可偏離）】\n<task>\n- 生成一張「單頁 16:9 Infographic 視覺稿」\n- 達成「一圖流」效果\n- 畫面應在 3–5 秒內讓觀者掌握整體結構與重點\n</task>\n\n────────────────────\n【資訊與視覺結構要求】\n在生成畫面前，請隱性完成以下判斷（不要輸出分析）：\n\n1. 建立清楚的 Information Hierarchy  \n   - 第一層：一句話主標（整頁只服務這一句）\n   - 第二層：**3–4 個關鍵模組（固定上限，不可超過）**\n   - 第三層：必要的輔助說明、數據或圖解標註\n\n2. 為整頁選擇「單一、最適合」的視覺結構  \n   （流程、模組化卡片、對照、階梯、時間軸等）\n\n⚠️ 若資訊過多，請主動刪減，而不是縮小字體或壓縮版面。\n\n────────────────────\n【設計規範（嚴格遵守）】\n<design_guidelines>\n- 畫面為 4K 視覺品質，16:9 比例\n- 所有文字必須清晰、銳利、可讀\n- 配色與設計語言需與「模板圖片」高度一致\n- 僅參考模板的風格與視覺語言，禁止出現模板中的任何文字\n- 根據內容自動設計最佳構圖，不重不漏地呈現「頁面描述」中的文字\n- 如非必要，禁止出現 Markdown 符號（如 #、* 等）\n- 使用適量、尺寸恰當的裝飾性圖形或插畫填補留白，但不得干擾資訊理解\n</design_guidelines>\n\n────────────────────\n【視覺風格硬規格】\n- 主色：1 色（作為第一視覺錨點）\n- 輔助色：1–2 色（區分模組）\n- 風格：符合主題的風格\n- 閱讀動線必須清楚（左→右 或 上→下）\n- 留白充足，畫面不可擁擠\n\n────────────────────\n【工具與輸出】\n- 僅使用 `Abstract Agent` 提供的 PAGE_DESCRIPTION 作為內容來源\n- 使用 Nano Banana Pro 進行影像生成\n- 僅輸出最終完成圖片的可存取 URL\n- 禁止輸出任何設計說明、分析過程或多餘文字\n",
+        "height": 256,
+        "width": 464,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1216,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "010acaf1-dd80-4926-8588-afbb29148897",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "你是一位專家級 UI / UX 演示設計師（Expert-level UI UX Presentation Designer），\n專注於生成「設計完成度極高、可直接用於商業提案」的單頁 PPT / Infographic 視覺畫面。\n\n你的任務不是做插畫，也不是產出概念草圖，\n而是 **完成一整頁資訊結構已成立、閱讀動線清楚、可直接使用的視覺設計**。\n\n────────────────────\n【頁面描述（唯一內容來源）】\n<page_description>\n- 請主動調用 `Abstract Agent`\n- 取得「**已為Infographic 的 PAGE_DESCRIPTION**」\n- 嚴禁自行新增、改寫、補寫或擴充其中的文字內容\n</page_description>\n\n────────────────────\n⚠️ 請注意：\n你只需要渲染「頁面描述」中的內容，\n所有資訊密度與取捨已在前置 Agent 完成，\n你只負責「正確、專業、清楚地視覺化」。\n\n────────────────────\n【核心任務（不可偏離）】\n<task>\n- 達成「一圖流」效果\n</task>\n\n────────────────────\n【設計規範（嚴格遵守）】\n<design_guidelines>\n- 畫面為 4K 視覺品質，16:9 比例\n- 所有文字必須清晰、銳利、可讀\n- 根據內容自動設計最佳構圖，不重不漏地呈現「頁面描述」中的文字\n- 如非必要，禁止出現 Markdown 符號（如 #、* 等）\n- 使用適量、尺寸恰當的裝飾性圖形或插畫填補留白，但不得干擾資訊理解\n</design_guidelines>\n\n────────────────────\n【工具與輸出】\n- 僅使用 `Abstract Agent` 提供的 PAGE_DESCRIPTION 作為內容來源\n- 使用 Nano Banana Pro 進行影像生成\n- 僅輸出最終完成圖片的可存取 URL\n- 禁止輸出任何設計說明、分析過程或多餘文字\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -720,
+        384
+      ],
+      "typeVersion": 1,
+      "id": "24c9ba38-851a-4e3d-aace-048100cb92ea",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "userInput": "https://www.cna.com.tw/news/ahel/202512300126.aspx",
+          "url": "https://www.cna.com.tw/news/ahel/202512300126.aspx",
+          "userId": "{{ $('Webhook').item.json.body.events[0].source.userId }}"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "ITR Poster Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ITR Poster Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ITR Poster Agent": {
+      "main": [
+        [
+          {
+            "node": "line parser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nano Banana Pro": {
+      "ai_tool": [
+        [
+          {
+            "node": "ITR Poster Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Abstract Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "ITR Poster Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "dc40343f-8e0b-48b4-a1d2-94a0ebdb59f6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "Az8mq5o22DE2TnTT",
+  "tags": [
+    {
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}

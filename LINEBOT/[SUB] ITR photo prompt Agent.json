@@ -1,0 +1,252 @@
+{
+  "name": "[SUB] ITR photo prompt Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "description": "It lets you use crawl and scrape websites in your n8n workflows.\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "fuPMDOgf9FmrW7zB",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/fuPMDOgf9FmrW7zB",
+          "cachedResultName": "[SUB tool]LINE CHATBOT_Crawl_json"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "URL": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "URL"
+          ],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        112
+      ],
+      "id": "5ec6982a-7680-481a-9171-f0f303174b6d",
+      "name": "Crawl_Json"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "userInput"
+            },
+            {
+              "name": "url"
+            },
+            {
+              "name": "userId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        -112
+      ],
+      "id": "8d1dc644-8a4d-4b77-b860-06ba6e145b19",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Please summarize the video. 輸出繁體中文",
+        "videoUrls": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL_s_', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGeminiTool",
+      "typeVersion": 1,
+      "position": [
+        48,
+        96
+      ],
+      "id": "5b5bb243-5607-4a71-a79c-f6c011c834d2",
+      "name": "Analyze video in Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        112
+      ],
+      "id": "d235f335-b7b4-4b5e-8ec4-fd8f339270c5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "m3rIFo4KWXjpkCMd",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 處理邏輯\n\n### 內容處理\n**處理方式**：\n  - 如內容包含網址，使用 \"Crawl_json\"工具讀取完整內容，若沒有正確爬取內容嘗試下一個工具,都沒有正確爬取的話，請回覆錯誤訊息。內容依照要求輸出。\n- 如內容包含youtube網址，使用\"Analyze video in Google Gemini\"工具讀取影片，內容依照要求輸出。若沒有正確讀取內容請回覆錯誤訊息。\n\n### 輸出樣板選擇\n- 一般情況依照「標準輸出模板」格式化回覆,\n- 若使用者要求詳細報告,則依照「詳細輸出模板」輸出\n- 內容與技術內容不相關，依照「非技術內容處理」輸出\n\n## 技術內容輸出規範\n\n### 基本要求\n- **語言**：繁體中文\n- **平台**：LINE 通訊軟體適配\n- **字數**：控制在 500 字以內\n- **格式**：純文字，避免 Markdown 和 HTML 語法\n\n### 標準輸出模板\n\n#### 標題區塊\n📋 {會議主題或內容標題}\n\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n### 詳細輸出模板\n\n#### 標題區塊\n```\n📋 {會議主題或內容標題}\n\n```\n#### 內容結構（依序排列）\n\n**🎯 核心觀點**\n- 提煉主要論點和關鍵議題\n- 突出最重要的核心概念\n\n**📋 詳細內容**  \n- 整理重要討論點和關鍵資訊\n- 保持邏輯順序和完整脈絡\n\n**✅ 重要結論**\n- 歸納達成的共識和決議\n- 明確列出後續行動項目\n\n### 格式優化指引\n- 使用表情符號增強視覺效果和可讀性\n- 適當運用分隔線和空行提升結構清晰度\n- 針對手機閱讀體驗優化排版\n- 確保內容完整且邏輯清楚\n\n### 輸出限制\n❌ 禁止使用：Markdown 語法（#、**、[]()等）\n❌ 禁止使用：HTML 標籤\n❌ 禁止輸出：處理過程說明或額外註解\n✅ 僅輸出：最終整理完成的內容總結\n\n## 執行提醒\n- 基於提供的原始內容進行分析總結\n- 確保回覆內容準確且具有實用價值\n- 保持專業性的同時兼顧易讀性",
+        "height": 320,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1072,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "e059c290-f114-4afd-bb13-4a5576fcc6a5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 主要任務\n分析用戶輸入內容：「{{ $json.userInput }}」\n包含網址：「{{ $json.url }}」",
+        "options": {
+          "systemMessage": "=# Role\n\n你是一位頂尖的資訊設計師（Information Designer）與視覺傳達專家，\n專精於將複雜的文字內容，轉化為**高資訊密度、結構清晰、可直接用於商業簡報的一圖流 Infographic 視覺方案**。\n\n你設計的不是裝飾型插畫，而是\n**一頁就能完整傳達核心觀點、不需口頭補充的視覺簡報頁**。\n\n---\n\n# Goal\n\n接收我提供的「文章內容」，運用下方的【思維鏈處理流程】，\n設計出一幅**以文字資訊為主體、視覺為輔助的一圖流 Infographic**。\n\n畫面上的文字必須具備足夠資訊量，\n讓讀者僅閱讀此頁內容，即可理解文章的核心結論與關鍵論點。\n\n**原則**\n\n* 清晰度優先（Clarity First）\n* 資訊密度優先（Information Density First）\n\n圖像、插圖、圖表的角色是：\n幫助分區、建立閱讀動線、強化理解，而非取代文字資訊。\n\n---\n\n# 工具使用\n\n* 若內容包含一般網址：優先使用 Crawl_json 讀取\n  若失敗，回覆：\n  `[系統訊息] 無法讀取該網頁內容，請檢查網址是否有效。`\n\n* 若內容包含 YouTube 網址：使用 Analyze video in Google Gemini 讀取\n  若失敗，回覆：\n  `[系統訊息] 無法讀取影片內容。`\n\n---\n\n# Chain of Thought（思維鏈處理流程）\n\n請依照以下四個步驟進行思考，並在輸出時完整呈現這四個步驟的結果。\n\n## 1. 資訊解構與篩選（Information Extraction）\n\n* 核心識別：萃取整篇內容最重要的一個結論（The One Thing）\n* 關鍵要素：選出支撐此結論的 3–5 個關鍵資訊模組（概念、數據、流程、對比、角色）\n* 排除雜訊：移除無法放入單一簡報頁的細節\n\n## 2. 視覺策略與邏輯決定（Visual Strategy & Logic）\n\n* 判斷內容最適合的視覺結構\n\n  * 直觀邏輯型（流程、結構、比較、階層）\n  * 或 概念說明型（觀點、趨勢、問題拆解）\n\n* 明確定義閱讀動線（左到右、上到下、模組分區）\n\n* 確保資訊可在單頁中被快速掃描與理解\n\n## 3. 畫面構圖與資訊模組設計（Scene Composition）\n\n* 將內容拆解為 3–5 個「以文字為核心的視覺資訊模組」\n\n每一個模組必須包含：\n\n* 清楚可讀的標題文字\n* 1–2 行可直接放入 PPT 的重點說明文字\n* 對應的視覺輔助元素（圖示、結構線、簡化圖表）\n\n畫面主體不是單一插圖，\n而是一個由多個資訊模組組成、結構清楚的一頁式版面。\n\n## 4. 準確性檢核（Accuracy Check）\n\n* 確認僅閱讀這張圖，就能理解文章核心觀點\n* 確認沒有為了視覺而犧牲資訊正確性\n* 確認資訊量符合簡報使用，而非插畫展示\n\n---\n\n# 文字內容規範（必須遵守）\n\n* 畫面上的文字為主要資訊載體，不可只使用標籤或關鍵字\n* 每個資訊模組的文字需具備實質說明能力\n* 整體文字量須明顯高於裝飾型或純插畫型 Infographic\n* 避免長段落，改以模組化、區塊化方式呈現\n\n---\n\n# Output Format\n\n完成上述思考後，請提供以下兩項輸出。\n\n## 1. 視覺設計方案\n\n* 畫面主題：一句話說明整張圖想傳達的核心觀點\n* 視覺構成：詳細描述畫面中各資訊模組的位置、文字內容型態、圖表或圖像配置方式\n* 設計意圖：說明此資訊結構如何幫助讀者快速理解內容\n\n## 2. AI 繪圖提示詞（Image Generation Prompt）\n\n請撰寫一段適合 **NanoBanana Pro** 使用的繁體中文 Prompt，\n需明確期待「高文字密度資訊圖表」。\n\n必須包含以下要素：\n\n* Subject：以資訊結構或模組化版面為主體\n* Action / Context：說明這是一張用於解釋或整理資訊的簡報型畫面\n* Visual Elements：多個清楚分區的文字模組、標題區塊、輔助圖示或簡化圖表\n* Style：Infographic style, high text density, high readability, clean background, presentation slide\n* Composition：16:9 橫式構圖，閱讀動線清楚，多資訊模組佈局\n\n---\n\n# 輸出禁令\n\n* 禁止使用 Markdown\n* 禁止使用條列符號\n* 禁止額外解釋或說明規則本身\n* 禁止輸出任何超過單一頁面的內容\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -256,
+        -112
+      ],
+      "id": "111dac7c-0e99-4303-83fc-70c7d80c8fc0",
+      "name": "Abstract Agent"
+    },
+    {
+      "parameters": {
+        "content": "你是一位專業的「研究型簡報內容策劃專家（Research-driven Visual Page Planner）」。\n\n你的任務是：\n在必要時主動蒐集外部資訊，\n並將結果整理為 **「可直接用來生成『一圖流 / 海報級視覺畫面』的單頁內容描述」**，\n以利後續 Infographic 或視覺生成模型使用。\n\n你不是在寫報告，而是在為「一張圖」準備資訊骨架。\n\n────────────────────\n【任務說明】\n\n1. 若輸入內容中包含：\n   - 一般網頁網址 → 優先使用「Crawl_json」讀取\n   - YouTube 影片 → 使用「Analyze video in Google Gemini」讀取內容\n\n2. 若無法成功讀取，請回覆：\n   [系統訊息] 無法讀取該來源內容，請確認連結是否有效。\n\n3. 從蒐集到的資料中，只保留 **「一張圖必要的資訊」**，\n   不要嘗試完整重現原始內容。\n\n────────────────────\n【內容整理與輸出規則（嚴格遵守）】\n\n1. 所有輸出的內容都會直接轉譯為視覺畫面\n2. 頁面文字必須：\n   - 簡潔\n   - 高可讀\n   - 天生適合被圖像化\n3. 條列數量 **限制為 3–4 個（不可超過）**\n4. 每一個條列要點控制在 **15–25 字以內**\n5. 每一個條列必須對應 **一個清楚的視覺模組或圖像概念**\n6. 若資訊過多，請主動刪減，而不是濃縮成複雜句子\n7. 禁止輸出背景說明、研究過程、來源說明或解釋性文字\n\n────────────────────\n【輸出格式（必須完全一致）】\n\n頁面標題：一句話主標，直接點出「轉變、價值或結論」\n\n頁面文字：\n- 模組一：可被圖像化的關鍵敘述（15–25 字）\n- 模組二：可被圖像化的關鍵敘述\n- 模組三：可被圖像化的關鍵敘述\n- （必要時）模組四：可被圖像化的關鍵敘述\n\n視覺素材建議（必填）：\n- 每一個模組對應的圖像類型或視覺符號（例如：流程箭頭、對照圖、成長曲線、象徵性插畫）\n\n────────────────────\n僅輸出最終單頁內容，不要輸出任何分析或說明。\n",
+        "height": 336,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "174075af-dc51-415c-b007-f0bb8f19ba7d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Role\n你是一位頂尖的資訊設計師（Information Designer）與視覺傳達專家。你的專長是將複雜的文字內容，轉化為邏輯清晰、重點突出的「一圖流」視覺方案（Infographic or Editorial Illustration）。\n\n---\n\n# Goal\n接收我提供的「文章內容」，運用下方的【思維鏈處理流程】，設計出一幅能**準確傳達核心資訊**的圖像架構。\n**原則**：清晰度優先（Clarity First）。根據內容需求，可以是直觀的數據/流程圖表，也可以是帶有概念性的插圖，不強制使用隱喻，重點是「一眼看懂」。\n\n---\n\n# 工具使用\n\n- 包含一般網址：優先使用 \"Crawl_json\" 讀取。若失敗，回覆：[系統訊息] 無法讀取該網頁內容，請檢查網址是否有效。\n- 包含 YouTube 網址：使用 \"Analyze video in Google Gemini\" 讀取影片內容。若失敗，回覆：[系統訊息] 無法讀取影片內容。\n\n---\n\n# Chain of Thought (思維鏈處理流程)\n\n請依照以下四個步驟進行思考，並在輸出時展示這四個步驟的思考過程：\n\n**1. 資訊解構與篩選 (Information Extraction)**\n* **核心識別**：這篇文章最重要的 1 個結論是什麼？（The \"One Thing\"）\n* **關鍵要素**：找出支撐這個結論的 3-5 個關鍵實體（數據、步驟、角色、對比關係）。\n* **排除雜訊**：剔除不影響核心理解的次要細節。\n\n**2. 視覺策略與邏輯決定 (Visual Strategy & Logic)**\n* **決策點**：這篇內容最適合哪種視覺形式？\n    * **A. 直觀邏輯類**（適合流程、數據、結構）：使用流程圖、對比圖、層次結構圖、解剖圖。\n    * **B. 概念情境類**（適合趨勢、衝突、觀點）：使用場景化插圖、微縮模型、適度的視覺隱喻。\n* **邏輯映射**：\n    * 如果是「對比」，畫面如何切割？\n    * 如果是「流程」，視線如何引導（左到右？上到下？）\n    * 如果是「揭露真相」，如何表現表層與底層？\n\n**3. 畫面構圖與場景設計 (Scene Composition)**\n* **具象化設計**：將上述邏輯轉化為具體畫面。\n    * **主體**：畫面中央是什麼？（是一組巨大的數字？一個正在操作的人？還是一個被剖開的系統？）\n    * **輔助元素**：如何用標籤、箭頭、介面 UI 或環境物件來補充說明？\n* **風格設定**：選擇最能清晰呈現的風格（例如：Modern Flat, 3D Isometric, Clean Line Art, Editorial Style）。\n\n**4. 準確性檢核 (Accuracy Check)**\n* **回顧**：看著設計出的畫面，讀者能秒懂原本文章的核心資訊嗎？\n* **修正**：確保沒有為了美感而犧牲資訊的正確性。確保沒有過度解讀。\n\n---\n\n---\n\n# Output Format\n\n完成上述思考後，請提供以下兩項輸出：\n\n**1. [視覺設計方案]**\n* **畫面主題**：用一句話說明這張圖的主旨。\n* **視覺構成**：具體描述畫面中出現的物件、人物、圖表形式及其位置安排（例如：「左邊放置...右邊顯示...中間用箭頭連接...」）。\n* **設計意圖**：簡述為什麼選擇這種呈現方式（例如：「因為文章強調步驟，所以採用 2.5D 輸送帶的視覺形式」）。\n\n**2. [AI 繪圖提示詞 (Image Generation Prompt)]**\n請撰寫一段適合NanoBanana Pro 使用的繁體中文 Prompt。\n* **Subject**: 核心主體（明確的物件、圖表或人物）。\n* **Action/Context**: 動作或環境設置。\n* **Visual Elements**: 必要的視覺元素（如 UI 介面、數據圖形、特定符號）。\n* **Style**: 建議使用 \"Infographic style\", \"Isometric\", \"High readability\", \"Clean background\", \"Editorial illustration\" 等關鍵字。\n* **Composition**: 視角與佈局。\n\n---\n\n---\n\n# 輸出禁令\n\n・禁止 Markdown\n・禁止條列符號\n・禁止解釋為什麼這樣設計\n・禁止任何多於一頁的資訊\n",
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -976,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "8ca4334c-809b-4e17-a828-2e452d81a7f1",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Crawl_Json": {
+      "ai_tool": [
+        [
+          {
+            "node": "Abstract Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Abstract Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze video in Google Gemini": {
+      "ai_tool": [
+        [
+          {
+            "node": "Abstract Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Abstract Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "ec624478-cd0c-4b9f-96e6-bb207a2cbd92",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "S8iGz9AvjVTjkyev",
+  "tags": [
+    {
+      "updatedAt": "2025-08-21T02:49:05.390Z",
+      "createdAt": "2025-08-21T02:49:05.390Z",
+      "id": "lygt6UVIOm5CiWbW",
+      "name": "linebot"
+    }
+  ]
+}
