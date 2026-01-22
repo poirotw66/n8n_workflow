@@ -1,0 +1,434 @@
+{
+  "name": "n8n_lv2_workflow2",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        96
+      ],
+      "id": "92b4b8d4-a959-4678-b338-70df64c204fd",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "customerID",
+              "field2": "customerID"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        96
+      ],
+      "id": "686850da-f342-4e86-adbf-6918c245d281",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "https://learn.app.n8n.cloud/webhook/level2-erp",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "name,region,subregion"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "unique_id",
+              "value": "0d02bf7e98c59c525c2c0cd56d097313"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        192
+      ],
+      "id": "38830de1-fffa-47d4-8a97-a094154771ff",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "3rhwi8bxrU0qyayW",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app1bSMp8f1E6Y1zL",
+          "mode": "list",
+          "cachedResultName": "n8n_lv2",
+          "cachedResultUrl": "https://airtable.com/app1bSMp8f1E6Y1zL"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxoJinBHFzhfaHv",
+          "mode": "list",
+          "cachedResultName": "table1",
+          "cachedResultUrl": "https://airtable.com/app1bSMp8f1E6Y1zL/tblxoJinBHFzhfaHv"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "30ba7c3b-4bb7-4107-82e0-6b46eda65b92",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HGtEbkWeEBwzP7dq",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "orderPrice",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        672,
+        96
+      ],
+      "id": "607b8d18-c639-4164-b0a9-bfb0545ee53e",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d7faea7f-8712-4d0b-9583-67cc7a0160b9",
+              "leftValue": "={{ $json.region }}",
+              "rightValue": "Americas",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        -224
+      ],
+      "id": "cdec7c5a-9575-4a20-91f4-7ed7dd81030b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {
+          "fileName": "=order_{{$json[\"orderID\"]}}.json"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        -224
+      ],
+      "id": "c0f0acbe-a443-4743-9f41-7c0fca0f052b",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "batchSize": 5,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        896,
+        96
+      ],
+      "id": "21002579-77ab-4b90-afab-7224a0ce9056",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "16bc01e0-5191-4771-9aac-abe93118e68f",
+              "name": "customerEmail",
+              "value": "={{ $('Sort').item.json.customerEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "a8c2e061-cca4-4f8d-9073-18f5185fd853",
+              "name": "customerRegion",
+              "value": "={{ $('Sort').item.json.region }}",
+              "type": "string"
+            },
+            {
+              "id": "998635e5-51ae-4c89-a352-096026c5c965",
+              "name": "customerSince",
+              "value": "={{ $('Sort').item.json.customerSince }}",
+              "type": "string"
+            },
+            {
+              "id": "0ef58c87-4a58-449a-9ddf-b8f64e0eb70d",
+              "name": "orderPrice",
+              "value": "={{ $('Sort').item.json.orderPrice }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        32
+      ],
+      "id": "0ae8f0af-ac5b-4348-95ec-aa7bc2dfbf8d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{$json[\"customerSince\"]}}",
+        "options": {
+          "includeInputFields": true
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        32
+      ],
+      "id": "4a6924cf-f3a5-4244-ac7b-f55ef4fef903",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "options": {
+          "fileName": "={{$runIndex > 0 ? 'file_low_orders':'file_high_orders'}}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        32
+      ],
+      "id": "567b50e6-2482-4e97-83e2-184d15213ddb",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "=I created the spreadsheet {{$binary.data.fileName}}. My ID: 0d02bf7e98c59c525c2c0cd56d097313",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        96
+      ],
+      "id": "8a2697f7-be4c-4ff5-b461-660914bc3bff",
+      "name": "Discord",
+      "webhookId": "6e00a899-8127-424c-8c3d-1ee5740cd402",
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "HMk4S7EpHA0l9rML",
+          "name": "Discord Webhook account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "8bf7d56b-48f3-4d64-8dc2-2ca04c19e74f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fe071ad636e45e06fef1442bb4b3138ea8056f3019d720e9410a8f0ea42951a8"
+  },
+  "id": "9Jsxzifrh5dtiX8X",
+  "tags": []
+}
