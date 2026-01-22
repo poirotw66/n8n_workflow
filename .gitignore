@@ -25,4 +25,5 @@ logs/
 # 臨時文件
 tmp/
 temp/
-
+.shared/
+.cursor/
