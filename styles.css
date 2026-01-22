@@ -1,4 +1,5 @@
-/* 全局樣式 */
+/* Portfolio Website Styles - Light Mode */
+
 * {
     margin: 0;
     padding: 0;
@@ -6,481 +7,60 @@
 }
 
 :root {
-    /* 自然色調 - 參考海邊風景 */
-    --ocean-blue: #4A90A4;
-    --deep-blue: #2C5F7A;
-    --sand-beige: #F5F1E8;
-    --warm-tan: #D4C5B9;
-    --stone-brown: #8B7355;
-    --soft-gray: #E8E3DB;
-    
-    /* 文字顏色 */
-    --text-primary: #2C3E50;
-    --text-secondary: #6B7A8A;
-    --text-light: #8B9AAB;
-    
-    /* 背景 */
-    --bg-primary: #FAF9F6;
-    --bg-white: #FFFFFF;
-    --bg-card: #FFFFFF;
-    
-    /* 邊框和陰影 */
-    --border-color: #E8E3DB;
-    --shadow-soft: 0 2px 8px rgba(44, 95, 122, 0.08);
-    --shadow-medium: 0 4px 16px rgba(44, 95, 122, 0.12);
-    --shadow-strong: 0 8px 24px rgba(44, 95, 122, 0.16);
+    --primary: #18181B;
+    --secondary: #3F3F46;
+    --accent: #2563EB;
+    --background: #FAFAFA;
+    --text: #09090B;
 }
 
 body {
-    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    line-height: 1.7;
-    color: var(--text-primary);
-    background: linear-gradient(180deg, #FAF9F6 0%, #F5F1E8 100%);
-    background-attachment: fixed;
-    min-height: 100vh;
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
 }
 
-/* Header / Hero Section - 簡約優雅 */
-.hero {
-    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--ocean-blue) 100%);
-    color: white;
-    padding: 100px 20px 80px;
-    text-align: center;
-    margin-bottom: 80px;
-    position: relative;
-    overflow: hidden;
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-    opacity: 0.3;
-}
-
-.hero .container {
-    position: relative;
-    z-index: 1;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 300;
-    margin-bottom: 20px;
-    letter-spacing: -0.02em;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-}
-
-.hero-subtitle {
-    font-size: 1.4rem;
-    font-weight: 400;
-    margin-bottom: 16px;
-    opacity: 0.95;
-    letter-spacing: 0.01em;
-}
-
-.hero-description {
-    font-size: 1.05rem;
-    max-width: 700px;
-    margin: 0 auto;
-    opacity: 0.9;
-    line-height: 1.8;
-    font-weight: 300;
-}
-
-/* Section Styles - 增加留白 */
-section {
-    margin-bottom: 80px;
-}
-
-section h2 {
-    font-size: 2rem;
-    font-weight: 400;
-    margin-bottom: 40px;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-    position: relative;
-    padding-bottom: 16px;
-}
-
-section h2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(90deg, var(--ocean-blue), var(--warm-tan));
-    border-radius: 2px;
-}
-
-/* Intro Section - 簡約卡片 */
-.intro-section {
-    background: var(--bg-white);
-    padding: 60px 50px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-soft);
-    margin-bottom: 60px;
-    border: 1px solid var(--border-color);
-}
-
-.intro-content p {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    margin-bottom: 40px;
-    line-height: 1.9;
-    font-weight: 300;
-}
-
-.features-highlight {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    justify-content: center;
-}
-
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 24px;
-    background: var(--sand-beige);
-    border-radius: 50px;
-    font-weight: 400;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-}
-
-.feature-item:hover {
-    background: var(--bg-white);
-    border-color: var(--border-color);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-soft);
-}
-
-.feature-item .icon {
-    font-size: 1.3rem;
-}
-
-/* Workflow Cards - 簡約優雅 */
-.workflow-card {
-    background: var(--bg-white);
-    border-radius: 16px;
-    box-shadow: var(--shadow-soft);
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-}
-
-.workflow-card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-medium);
-    border-color: var(--ocean-blue);
-}
-
-.main-card {
-    border: 2px solid var(--ocean-blue);
-    box-shadow: var(--shadow-medium);
-}
-
-.card-header {
-    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--ocean-blue) 100%);
-    color: white;
-    padding: 24px 28px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.main-card .card-header {
-    background: linear-gradient(135deg, var(--deep-blue) 0%, var(--ocean-blue) 100%);
-}
-
-.card-header h3 {
-    font-size: 1.3rem;
-    font-weight: 400;
-    margin: 0;
-    letter-spacing: -0.01em;
-}
-
-.badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 400;
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    letter-spacing: 0.02em;
-}
-
-.badge-primary {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.badge-image {
-    background: rgba(212, 197, 185, 0.4);
-}
-
-.badge-rag {
-    background: rgba(139, 115, 85, 0.4);
-}
-
-.badge-news {
-    background: rgba(74, 144, 164, 0.4);
-}
-
-.badge-stock {
-    background: rgba(139, 115, 85, 0.4);
-}
-
-.badge-agent {
-    background: rgba(212, 197, 185, 0.4);
-}
-
-.badge-fact {
-    background: rgba(139, 115, 85, 0.4);
-}
-
-.badge-web {
-    background: rgba(74, 144, 164, 0.4);
-}
-
-.badge-module {
-    background: rgba(212, 197, 185, 0.4);
-}
-
-.badge-tool {
-    background: rgba(139, 115, 85, 0.4);
-}
-
-.card-body {
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.card-description {
-    color: var(--text-secondary);
-    margin-bottom: 24px;
-    line-height: 1.8;
-    font-weight: 300;
-    font-size: 0.98rem;
-}
-
-.workflow-features {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: auto;
-    padding-top: 20px;
-}
-
-.feature-tag {
-    padding: 6px 14px;
-    background: var(--sand-beige);
-    border-radius: 20px;
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    font-weight: 300;
-}
-
-.workflow-details {
-    margin-top: 28px;
-    padding-top: 28px;
-    border-top: 1px solid var(--border-color);
-}
-
-.workflow-details h4 {
-    font-size: 1.05rem;
-    font-weight: 500;
-    margin-bottom: 16px;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-}
-
-.workflow-details ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-.workflow-details li {
-    padding: 10px 0;
-    padding-left: 28px;
-    position: relative;
-    color: var(--text-secondary);
-    line-height: 1.7;
-    font-weight: 300;
-}
-
-.workflow-details li::before {
-    content: "•";
-    position: absolute;
-    left: 8px;
-    color: var(--ocean-blue);
-    font-size: 1.2rem;
-    font-weight: 300;
-}
-
-/* Workflows Grid - 優雅間距 */
-.workflows-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 28px;
-}
-
-.main-workflow-section {
-    margin-bottom: 80px;
-}
-
-/* Tech Section - 簡約設計 */
-.tech-section {
-    background: var(--bg-white);
-    padding: 60px 50px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-color);
-}
-
-.tech-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 28px;
-}
-
-.tech-card {
-    text-align: center;
-    padding: 40px 24px;
-    background: var(--sand-beige);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    border: 1px solid var(--border-color);
-}
-
-.tech-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-soft);
-    background: var(--bg-white);
-}
-
-.tech-icon {
-    font-size: 3rem;
-    margin-bottom: 20px;
-}
-
-.tech-card h3 {
-    font-size: 1.15rem;
-    font-weight: 500;
-    margin-bottom: 12px;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-}
-
-.tech-card p {
-    color: var(--text-secondary);
-    line-height: 1.7;
-    font-weight: 300;
-    font-size: 0.95rem;
-}
-
-/* Features Section */
-.features-section {
-    background: var(--bg-white);
-    padding: 60px 50px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-color);
-}
-
-.features-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 28px;
-}
-
-.feature-box {
-    text-align: center;
-    padding: 40px 24px;
-    background: var(--sand-beige);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    border: 1px solid var(--border-color);
-}
-
-.feature-box:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-soft);
-    background: var(--bg-white);
-}
-
-.feature-icon {
-    font-size: 3rem;
-    margin-bottom: 20px;
-}
-
-.feature-box h3 {
-    font-size: 1.15rem;
-    font-weight: 500;
-    margin-bottom: 12px;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-}
-
-.feature-box p {
-    color: var(--text-secondary);
-    line-height: 1.7;
-    font-weight: 300;
-    font-size: 0.95rem;
-}
-
-/* 工作流圖片展示 - 優雅設計 */
+/* Workflow Image Container */
 .workflow-image-container {
     position: relative;
     width: 100%;
-    margin: 24px 0;
-    border-radius: 12px;
     overflow: hidden;
-    background: var(--sand-beige);
+    border-radius: 0.75rem;
+    background: #F5F5F5;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid var(--border-color);
-    max-height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .workflow-image-container:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-medium);
-    border-color: var(--ocean-blue);
-}
-
-.workflow-image-container:hover .image-overlay {
-    opacity: 1;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .workflow-image {
     width: 100%;
     height: auto;
-    max-height: 300px;
-    object-fit: contain;
     display: block;
+    object-fit: contain;
     transition: transform 0.4s ease;
 }
 
@@ -494,24 +74,30 @@ section h2::after {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(44, 95, 122, 0.7);
+    background: rgba(37, 99, 235, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
+    border-radius: 0.75rem;
+}
+
+.workflow-image-container:hover .image-overlay {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .image-hint {
     color: white;
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: 500;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     letter-spacing: 0.02em;
 }
 
-/* 圖片燈箱模態框 - 優雅設計 */
+/* Image Modal */
 .image-modal {
     display: none;
     position: fixed;
@@ -520,7 +106,7 @@ section h2::after {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(44, 95, 122, 0.95);
+    background-color: rgba(24, 24, 27, 0.95);
     backdrop-filter: blur(8px);
     animation: fadeIn 0.3s ease;
     cursor: pointer;
@@ -543,7 +129,7 @@ section h2::after {
     margin-top: 5%;
     animation: zoomIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: default;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
@@ -576,6 +162,7 @@ section h2::after {
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
+    line-height: 1;
 }
 
 .modal-close:hover {
@@ -597,103 +184,8 @@ section h2::after {
     letter-spacing: 0.01em;
 }
 
-/* Footer - 簡約設計 */
-.footer {
-    background: var(--deep-blue);
-    color: rgba(255, 255, 255, 0.9);
-    padding: 50px 20px;
-    text-align: center;
-    margin-top: 100px;
-}
-
-.footer p {
-    margin-bottom: 12px;
-    font-weight: 300;
-    font-size: 0.95rem;
-}
-
-.footer-links {
-    margin-top: 20px;
-}
-
-.footer-links a {
-    color: rgba(255, 255, 255, 0.9);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-weight: 300;
-}
-
-.footer-links a:hover {
-    color: white;
-    opacity: 1;
-}
-
-.footer-links span {
-    margin: 0 16px;
-    opacity: 0.4;
-}
-
-/* Responsive Design */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .hero {
-        padding: 80px 20px 60px;
-    }
-
-    .hero-title {
-        font-size: 2.2rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
-
-    .hero-description {
-        font-size: 0.95rem;
-    }
-
-    section {
-        margin-bottom: 60px;
-    }
-
-    section h2 {
-        font-size: 1.6rem;
-        margin-bottom: 32px;
-    }
-
-    .workflows-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .tech-grid,
-    .features-list {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .intro-section,
-    .tech-section,
-    .features-section {
-        padding: 40px 32px;
-    }
-
-    .card-body {
-        padding: 24px;
-    }
-
-    .features-highlight {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .feature-item {
-        justify-content: center;
-    }
-
-    .workflow-image-container {
-        margin: 20px 0;
-    }
-
     .modal-content {
         max-width: 95%;
         max-height: 85%;
@@ -711,31 +203,22 @@ section h2::after {
         font-size: 0.95rem;
         padding: 20px 0;
     }
+
+    .workflow-image-container {
+        margin-bottom: 1rem;
+    }
 }
 
-@media (max-width: 480px) {
-    .hero {
-        padding: 60px 20px 50px;
-    }
+/* Additional utility classes for portfolio */
+.portfolio-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .hero-title {
-        font-size: 1.9rem;
-    }
+.portfolio-card:hover {
+    transform: translateY(-8px);
+}
 
-    .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-        padding: 20px;
-    }
-
-    .card-header h3 {
-        font-size: 1.1rem;
-    }
-
-    .intro-section,
-    .tech-section,
-    .features-section {
-        padding: 32px 24px;
-    }
+/* Ensure proper spacing for fixed nav */
+section {
+    scroll-margin-top: 100px;
 }

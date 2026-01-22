@@ -3,769 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LINE Chatbot - n8n 工作流專案</title>
+    <title>Portfolio - n8n Workflow Designer</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#18181B',
+                        secondary: '#3F3F46',
+                        accent: '#2563EB',
+                        background: '#FAFAFA',
+                        text: '#09090B',
+                    },
+                    fontFamily: {
+                        heading: ['Archivo', 'sans-serif'],
+                        body: ['Space Grotesk', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <header class="hero">
-        <div class="container">
-            <h1 class="hero-title">LINE Chatbot 智能助手</h1>
-            <p class="hero-subtitle">基於 n8n 平台建構的智能聊天機器人</p>
-            <p class="hero-description">整合 AI 語言模型、圖像生成、RAG 檢索等多種功能，提供專業且個性化的自動回覆服務</p>
+<body class="bg-background text-text font-body antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto">
+        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="#home" class="text-xl font-heading font-semibold text-primary hover:text-accent transition-colors duration-200 cursor-pointer">Portfolio</a>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#work" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Work</a>
+                    <a href="#about" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">About</a>
+                    <a href="#contact" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Contact</a>
+                </div>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <main class="container">
-        <section class="intro-section">
-            <h2>專案概述</h2>
-            <div class="intro-content">
-                <p>這是一個功能豐富的 LINE 聊天機器人系統，採用 n8n 工作流平台建構。系統通過主流程接收 LINE 訊息，並根據訊息內容智能路由到對應的子流程進行處理，提供多樣化的 AI 服務。</p>
-                <div class="features-highlight">
-                    <div class="feature-item">
-                        <span class="icon">🎯</span>
-                        <span>智能路由</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">🤖</span>
-                        <span>AI 驅動</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">🖼️</span>
-                        <span>圖像生成</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="icon">📚</span>
-                        <span>知識檢索</span>
-                    </div>
-                </div>
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-6xl md:text-8xl font-heading font-light text-primary mb-6 tracking-tight">
+                n8n Workflow
+                <span class="block text-accent">Designer</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-secondary font-light max-w-2xl mx-auto mb-8 leading-relaxed">
+                Crafting intelligent automation solutions with n8n. Building LINE chatbots, AI agents, and workflow systems that transform business processes.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#work" class="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer">
+                    View Work
+                </a>
+                <a href="#contact" class="border-2 border-primary text-primary px-8 py-3 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
+                    Get in Touch
+                </a>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="main-workflow-section">
-            <h2>主要流程</h2>
-            <div class="workflow-card main-card">
-                <div class="card-header">
-                    <h3>📋 [MAIN] LINE CHATBOT</h3>
-                    <span class="badge badge-primary">主流程</span>
-                </div>
-                <div class="card-body">
-                    <p class="card-description">核心控制流程，負責接收 LINE Webhook 訊息，分析用戶輸入，並智能路由到對應的子流程進行處理。</p>
-                    <div class="workflow-image-container">
-                        <img src="image/[MAIN]LINE CHATBOT.png" 
-                             alt="LINE CHATBOT 主流程圖" 
-                             class="workflow-image"
-                             onclick="openImageModal('image/[MAIN]LINE CHATBOT.png', 'LINE CHATBOT 主流程')">
-                        <div class="image-overlay">
-                            <span class="image-hint">點擊查看大圖</span>
+    <!-- Work Section -->
+    <section id="work" class="py-24 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-4">Featured Projects</h2>
+                <p class="text-lg text-secondary max-w-2xl mx-auto">A collection of intelligent automation workflows and AI-powered solutions</p>
+            </div>
+
+            <!-- Main Workflow - Hero Project -->
+            <div class="mb-16">
+                <div class="bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group">
+                    <div class="p-8 md:p-12">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="bg-accent/10 text-accent px-4 py-1.5 rounded-full text-sm font-medium">Main Workflow</span>
+                        </div>
+                        <h3 class="text-3xl md:text-4xl font-heading font-medium text-primary mb-4">LINE Chatbot System</h3>
+                        <p class="text-lg text-secondary mb-6 leading-relaxed">
+                            Core control workflow that receives LINE Webhook messages, analyzes user input with AI, and intelligently routes to specialized sub-workflows for processing.
+                        </p>
+                        <div class="workflow-image-container mb-6">
+                            <img src="image/[MAIN]LINE CHATBOT.png" 
+                                 alt="LINE CHATBOT Main Workflow" 
+                                 class="workflow-image rounded-xl"
+                                 onclick="openImageModal('image/[MAIN]LINE CHATBOT.png', 'LINE CHATBOT Main Workflow')">
+                            <div class="image-overlay rounded-xl">
+                                <span class="image-hint">Click to view full size</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">Webhook</span>
+                            <span class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">AI Analysis</span>
+                            <span class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">Smart Routing</span>
+                            <span class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm">LINE API</span>
                         </div>
                     </div>
-                    <div class="workflow-features">
-                        <div class="feature-tag">Webhook 接收</div>
-                        <div class="feature-tag">訊息分析</div>
-                        <div class="feature-tag">智能路由</div>
-                        <div class="feature-tag">回應發送</div>
-                    </div>
-                    <div class="workflow-details">
-                        <h4>主要功能：</h4>
-                        <ul>
-                            <li>監聽 LINE Webhook 事件，接收用戶訊息</li>
-                            <li>整合 AI 語言模型（Google Gemini）進行內容分析</li>
-                            <li>根據訊息類型智能判斷並路由到對應子流程</li>
-                            <li>處理 AI 回應並格式化輸出</li>
-                            <li>自動分段處理超長訊息（支援最多 5 則訊息）</li>
-                            <li>發送回應回 LINE 用戶</li>
-                        </ul>
-                    </div>
-                    <div class="workflow-details">
-                        <h4>技術內容處理：</h4>
-                        <ul>
-                            <li>自動識別技術文件、會議記錄、專業討論等內容</li>
-                            <li>支援網址內容爬取（HTTP Request / Jina AI）</li>
-                            <li>支援 YouTube 影片逐字稿提取</li>
-                            <li>提供標準輸出和詳細報告兩種模式</li>
-                            <li>優化 LINE 平台顯示格式（繁體中文，500 字以內）</li>
-                        </ul>
-                    </div>
                 </div>
             </div>
-        </section>
 
-        <section class="sub-workflows-section">
-            <h2>子流程模組</h2>
-            <div class="workflows-grid">
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🎨 IMAGE Generator</h3>
-                        <span class="badge badge-image">圖像</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">使用 AI 模型進行文字轉圖像生成，支援自訂提示詞和參數設定。</p>
-                        <div class="workflow-image-container">
+            <!-- Sub Workflows Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                <!-- AI Agents -->
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] IMAGE Generator.png" 
-                                 alt="IMAGE Generator 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] IMAGE Generator.png', 'IMAGE Generator 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="IMAGE Generator" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] IMAGE Generator.png', 'IMAGE Generator Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">文字轉圖像</div>
-                            <div class="feature-tag">AI 生成</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">IMAGE Generator</h3>
+                        <p class="text-sm text-secondary mb-4">AI-powered text-to-image generation with custom prompts</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Image</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🔍 1399 RAG Agent</h3>
-                        <span class="badge badge-rag">RAG</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">檢索增強生成代理，結合知識庫檢索和 AI 生成能力，提供準確的資訊回答。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] 1399_rag_agent.png" 
-                                 alt="1399 RAG Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] 1399_rag_agent.png', '1399 RAG Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="1399 RAG Agent" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] 1399_rag_agent.png', '1399 RAG Agent Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">知識檢索</div>
-                            <div class="feature-tag">智能問答</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">1399 RAG Agent</h3>
+                        <p class="text-sm text-secondary mb-4">Retrieval-augmented generation for accurate information</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">RAG</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🔍 MCP RAG Agent</h3>
-                        <span class="badge badge-rag">RAG</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">基於 MCP 協議的 RAG 代理，提供更強大的知識檢索和生成能力。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] mcp_rag_agent.png" 
-                                 alt="MCP RAG Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] mcp_rag_agent.png', 'MCP RAG Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="MCP RAG Agent" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] mcp_rag_agent.png', 'MCP RAG Agent Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">MCP 協議</div>
-                            <div class="feature-tag">知識庫</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">MCP RAG Agent</h3>
+                        <p class="text-sm text-secondary mb-4">MCP protocol-based RAG with enhanced capabilities</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">RAG</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">MCP</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📰 NEWS Agent</h3>
-                        <span class="badge badge-news">新聞</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">新聞資訊代理，提供最新新聞資訊和新聞摘要服務。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] NEWS Agent.png" 
-                                 alt="NEWS Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] NEWS Agent.png', 'NEWS Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="NEWS Agent" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] NEWS Agent.png', 'NEWS Agent Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">新聞抓取</div>
-                            <div class="feature-tag">資訊摘要</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">NEWS Agent</h3>
+                        <p class="text-sm text-secondary mb-4">Latest news and summaries service</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">News</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📰 News Agent Scrape</h3>
-                        <span class="badge badge-news">新聞</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">新聞爬蟲代理，自動抓取和整理網路新聞內容。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB] News Agent Scrape.png" 
-                                 alt="News Agent Scrape 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] News Agent Scrape.png', 'News Agent Scrape 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">網頁爬取</div>
-                            <div class="feature-tag">內容整理</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📈 STOCK Agent</h3>
-                        <span class="badge badge-stock">股票</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">股票資訊代理，提供股票價格、市場資訊等金融數據查詢。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] STOCK Agent.png" 
-                                 alt="STOCK Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] STOCK Agent.png', 'STOCK Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="STOCK Agent" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] STOCK Agent.png', 'STOCK Agent Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">股票查詢</div>
-                            <div class="feature-tag">市場資訊</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">STOCK Agent</h3>
+                        <p class="text-sm text-secondary mb-4">Stock prices and market information queries</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Finance</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Data</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>💼 ITR Agent</h3>
-                        <span class="badge badge-agent">代理</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">ITR 專業代理，處理特定領域的專業查詢和任務。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB] ITR Agent.png" 
-                                 alt="ITR Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] ITR Agent.png', 'ITR Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">專業查詢</div>
-                            <div class="feature-tag">任務處理</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📝 ITR photo prompt Agent</h3>
-                        <span class="badge badge-agent">AI 提示詞</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">專業的資訊設計師代理，將複雜文字內容轉化為高資訊密度、結構清晰的 Infographic 視覺方案。支援網頁和 YouTube 影片內容分析，生成適合 AI 繪圖的專業提示詞。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] ITR photo prompt Agent.png" 
-                                 alt="ITR photo prompt Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] ITR photo prompt Agent.png', 'ITR photo prompt Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="ITR photo prompt Agent" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] ITR photo prompt Agent.png', 'ITR photo prompt Agent Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">資訊設計</div>
-                            <div class="feature-tag">視覺方案</div>
-                            <div class="feature-tag">內容分析</div>
-                            <div class="feature-tag">AI 繪圖提示</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">ITR Photo Prompt</h3>
+                        <p class="text-sm text-secondary mb-4">Professional infographic design with AI prompts</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Design</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🎨 ITR Poster Agent</h3>
-                        <span class="badge badge-image">海報生成</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">專家級 UI/UX 演示設計師，生成設計完成度極高、可直接用於商業提案的單頁 PPT/Infographic 視覺畫面。整合 Abstract Agent 和 Nano Banana Pro，實現一圖流效果。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] ITR Poster Agent.png" 
-                                 alt="ITR Poster Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] ITR Poster Agent.png', 'ITR Poster Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="ITR Poster Agent" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] ITR Poster Agent.png', 'ITR Poster Agent Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">視覺設計</div>
-                            <div class="feature-tag">簡報生成</div>
-                            <div class="feature-tag">一圖流</div>
-                            <div class="feature-tag">商業提案</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">ITR Poster Agent</h3>
+                        <p class="text-sm text-secondary mb-4">UI/UX presentation designer for business proposals</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Design</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">UI/UX</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>✅ FACT Agent</h3>
-                        <span class="badge badge-fact">事實</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">事實查證代理，驗證資訊的真實性和準確性。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB]FACT.png" 
-                                 alt="FACT Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB]FACT.png', 'FACT Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">事實查證</div>
-                            <div class="feature-tag">資訊驗證</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>💬 CB Agent</h3>
-                        <span class="badge badge-agent">代理</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">C-Booking會議室預訂系統Agent預定工作流</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB] CB Agent.png" 
-                                 alt="CB Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] CB Agent.png', 'CB Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">對話互動</div>
-                            <div class="feature-tag">個性化</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>💬 DR Agent</h3>
-                        <span class="badge badge-agent">代理</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">Deep learning 專業代理，處理特定領域的專業任務。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB] DR Agent.png" 
-                                 alt="DR Agent 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] DR Agent.png', 'DR Agent 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">專業服務</div>
-                            <div class="feature-tag">任務處理</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🍔 Food Image</h3>
-                        <span class="badge badge-image">圖像</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">食物圖像生成模組，專門生成美食相關的圖像內容。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] Food Image.png" 
-                                 alt="Food Image 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] Food Image.png', 'Food Image 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="Food Image" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] Food Image.png', 'Food Image Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">食物圖像</div>
-                            <div class="feature-tag">AI 生成</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">Food Image</h3>
+                        <p class="text-sm text-secondary mb-4">Specialized food image generation module</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Image</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>✂️ Image Editing</h3>
-                        <span class="badge badge-image">圖像</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">圖像編輯模組，提供圖像處理和編輯功能。</p>
-                        <div class="workflow-image-container">
+                <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <div class="p-6">
+                        <div class="workflow-image-container mb-4">
                             <img src="image/[SUB] Image Editing.png" 
-                                 alt="Image Editing 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] Image Editing.png', 'Image Editing 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
+                                 alt="Image Editing" 
+                                 class="workflow-image rounded-lg"
+                                 onclick="openImageModal('image/[SUB] Image Editing.png', 'Image Editing Workflow')">
+                            <div class="image-overlay rounded-lg">
+                                <span class="image-hint">View</span>
                             </div>
                         </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">圖像處理</div>
-                            <div class="feature-tag">編輯功能</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🖼️ Image Module</h3>
-                        <span class="badge badge-image">圖像</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">圖像處理模組，整合多種圖像相關功能。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB] Image Module.png" 
-                                 alt="Image Module 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] Image Module.png', 'Image Module 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">圖像處理</div>
-                            <div class="feature-tag">功能整合</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🌐 WEB</h3>
-                        <span class="badge badge-web">網頁</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">網頁內容處理模組，處理網頁爬取和內容提取。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB] WEB.png" 
-                                 alt="WEB 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] WEB.png', 'WEB 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">網頁爬取</div>
-                            <div class="feature-tag">內容提取</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📚 RAG Pipeline</h3>
-                        <span class="badge badge-rag">RAG</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">RAG 處理管道，整合檢索和生成的完整流程。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB]RAG Pipeline.png" 
-                                 alt="RAG Pipeline 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB]RAG Pipeline.png', 'RAG Pipeline 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">檢索生成</div>
-                            <div class="feature-tag">流程整合</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📦 SUBS Module</h3>
-                        <span class="badge badge-module">模組</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">子模組整合，管理多個子流程的協調和調用。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB] SUBS Module.png" 
-                                 alt="SUBS Module 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB] SUBS Module.png', 'SUBS Module 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">模組管理</div>
-                            <div class="feature-tag">流程協調</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🔧 Database Query Tool</h3>
-                        <span class="badge badge-tool">工具</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">資料庫查詢工具，提供資料庫查詢和數據檢索功能。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/[SUB tool]LINE_CHATBOT_database_query_tool.png" 
-                                 alt="Database Query Tool 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/[SUB tool]LINE_CHATBOT_database_query_tool.png', 'Database Query Tool 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">資料庫查詢</div>
-                            <div class="feature-tag">數據檢索</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>🕷️ LINE CHATBOT Crawl</h3>
-                        <span class="badge badge-tool">工具</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">網頁爬取工具，專門用於 LINE Chatbot 的內容爬取需求。</p>
-                        <div class="workflow-features">
-                            <div class="feature-tag">網頁爬取</div>
-                            <div class="feature-tag">內容提取</div>
+                        <h3 class="text-xl font-heading font-medium text-primary mb-2">Image Editing</h3>
+                        <p class="text-sm text-secondary mb-4">Image processing and editing capabilities</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Image</span>
+                            <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Edit</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <section class="tech-section">
-            <h2>技術架構</h2>
-            <div class="tech-grid">
-                <div class="tech-card">
-                    <div class="tech-icon">🔌</div>
-                    <h3>n8n 工作流</h3>
-                    <p>使用 n8n 作為核心工作流引擎，提供可視化的流程設計和自動化執行</p>
+            <!-- Courses Section -->
+            <div class="mt-24">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-heading font-light text-primary mb-4">n8n Course Workflows</h2>
+                    <p class="text-lg text-secondary max-w-2xl mx-auto">Educational workflows demonstrating n8n capabilities across different skill levels</p>
                 </div>
-                <div class="tech-card">
-                    <div class="tech-icon">🤖</div>
-                    <h3>Google Gemini</h3>
-                    <p>整合 Google Gemini AI 模型，提供強大的自然語言理解和生成能力</p>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">📱</div>
-                    <h3>LINE Messaging API</h3>
-                    <p>透過 LINE Messaging API 實現與用戶的即時通訊互動</p>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">🔍</div>
-                    <h3>RAG 技術</h3>
-                    <p>採用檢索增強生成技術，結合知識庫檢索和 AI 生成，提供準確回答</p>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">🖼️</div>
-                    <h3>圖像生成 API</h3>
-                    <p>整合圖像生成服務，支援文字轉圖像和圖像編輯功能</p>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-icon">🌐</div>
-                    <h3>網頁爬取</h3>
-                    <p>支援網頁內容爬取、YouTube 逐字稿提取等多種內容獲取方式</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                        <div class="p-6">
+                            <div class="workflow-image-container mb-4">
+                                <img src="image/n8n_lv1.png" 
+                                     alt="n8n Level 1" 
+                                     class="workflow-image rounded-lg"
+                                     onclick="openImageModal('image/n8n_lv1.png', 'n8n Level 1 Course')">
+                                <div class="image-overlay rounded-lg">
+                                    <span class="image-hint">View</span>
+                                </div>
+                            </div>
+                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">Beginner</span>
+                            <h3 class="text-xl font-heading font-medium text-primary mb-2">Level 1</h3>
+                            <p class="text-sm text-secondary mb-4">Basic webhook, HTTP requests, and Airtable operations</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                        <div class="p-6">
+                            <div class="workflow-image-container mb-4">
+                                <img src="image/n8n_lv2_workflow1.png" 
+                                     alt="n8n Level 2 Workflow 1" 
+                                     class="workflow-image rounded-lg"
+                                     onclick="openImageModal('image/n8n_lv2_workflow1.png', 'n8n Level 2 Workflow 1')">
+                                <div class="image-overlay rounded-lg">
+                                    <span class="image-hint">View</span>
+                                </div>
+                            </div>
+                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">Intermediate</span>
+                            <h3 class="text-xl font-heading font-medium text-primary mb-2">Level 2 - Workflow 1</h3>
+                            <p class="text-sm text-secondary mb-4">Data merging, API calls, and record updates</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                        <div class="p-6">
+                            <div class="workflow-image-container mb-4">
+                                <img src="image/n8n_lv2_workflow2.png" 
+                                     alt="n8n Level 2 Workflow 2" 
+                                     class="workflow-image rounded-lg"
+                                     onclick="openImageModal('image/n8n_lv2_workflow2.png', 'n8n Level 2 Workflow 2')">
+                                <div class="image-overlay rounded-lg">
+                                    <span class="image-hint">View</span>
+                                </div>
+                            </div>
+                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">Intermediate</span>
+                            <h3 class="text-xl font-heading font-medium text-primary mb-2">Level 2 - Workflow 2</h3>
+                            <p class="text-sm text-secondary mb-4">Advanced data processing, loops, and file conversion</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="courses-section">
-            <h2>n8n 課程工作流</h2>
-            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px; font-weight: 300;">
-                這些工作流展示了 n8n 平台在不同難度級別下的應用實例，從基礎的 Webhook 處理到進階的數據整合與自動化流程。
+    <!-- About Section -->
+    <section id="about" class="py-24 px-4 bg-white">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8">About</h2>
+            <p class="text-lg text-secondary leading-relaxed mb-8">
+                I specialize in building intelligent automation solutions using n8n, creating workflows that seamlessly integrate AI, APIs, and business logic. My work focuses on creating systems that are both powerful and maintainable.
             </p>
-            <div class="workflows-grid">
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📚 n8n Level 1</h3>
-                        <span class="badge badge-module">初級課程</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">初級 n8n 工作流範例，展示基本的 Webhook 接收、HTTP Request 處理、Airtable 數據操作和條件判斷等核心功能。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/n8n_lv1.png" 
-                                 alt="n8n Level 1 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/n8n_lv1.png', 'n8n Level 1 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">Webhook</div>
-                            <div class="feature-tag">HTTP Request</div>
-                            <div class="feature-tag">Airtable</div>
-                            <div class="feature-tag">條件判斷</div>
-                            <div class="feature-tag">Discord</div>
-                        </div>
-                        <div class="workflow-details">
-                            <h4>主要功能：</h4>
-                            <ul>
-                                <li>接收自訂 Webhook 請求</li>
-                                <li>HTTP Request 數據獲取</li>
-                                <li>Airtable 數據庫操作（創建記錄）</li>
-                                <li>條件判斷與數據處理</li>
-                                <li>Discord 通知發送</li>
-                                <li>定時觸發執行</li>
-                            </ul>
-                        </div>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+                <div>
+                    <h3 class="text-xl font-heading font-medium text-primary mb-3">Automation</h3>
+                    <p class="text-sm text-secondary">Complex workflow orchestration and process automation</p>
                 </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📖 n8n Level 2 - Workflow 1</h3>
-                        <span class="badge badge-module">中級課程</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">中級工作流範例，展示數據合併、外部 API 調用、數據更新和記錄查詢等進階功能。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/n8n_lv2_workflow1.png" 
-                                 alt="n8n Level 2 Workflow 1 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/n8n_lv2_workflow1.png', 'n8n Level 2 Workflow 1 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">數據合併</div>
-                            <div class="feature-tag">REST API</div>
-                            <div class="feature-tag">Airtable</div>
-                            <div class="feature-tag">數據更新</div>
-                            <div class="feature-tag">記錄查詢</div>
-                        </div>
-                        <div class="workflow-details">
-                            <h4>主要功能：</h4>
-                            <ul>
-                                <li>手動觸發工作流執行</li>
-                                <li>多數據源合併處理</li>
-                                <li>調用外部 REST API（如 RestCountries API）</li>
-                                <li>Airtable 記錄更新</li>
-                                <li>條件查詢與數據篩選</li>
-                            </ul>
-                        </div>
-                    </div>
+                <div>
+                    <h3 class="text-xl font-heading font-medium text-primary mb-3">AI Integration</h3>
+                    <p class="text-sm text-secondary">Seamless AI model integration for intelligent responses</p>
                 </div>
-
-                <div class="workflow-card">
-                    <div class="card-header">
-                        <h3>📘 n8n Level 2 - Workflow 2</h3>
-                        <span class="badge badge-module">中級課程</span>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-description">進階中級工作流，展示複雜的數據處理、循環操作、文件轉換、字段編輯和多平台通知等功能。</p>
-                        <div class="workflow-image-container">
-                            <img src="image/n8n_lv2_workflow2.png" 
-                                 alt="n8n Level 2 Workflow 2 工作流圖" 
-                                 class="workflow-image"
-                                 onclick="openImageModal('image/n8n_lv2_workflow2.png', 'n8n Level 2 Workflow 2 工作流')">
-                            <div class="image-overlay">
-                                <span class="image-hint">點擊查看大圖</span>
-                            </div>
-                        </div>
-                        <div class="workflow-features">
-                            <div class="feature-tag">數據合併</div>
-                            <div class="feature-tag">循環處理</div>
-                            <div class="feature-tag">文件轉換</div>
-                            <div class="feature-tag">字段編輯</div>
-                            <div class="feature-tag">日期時間</div>
-                            <div class="feature-tag">Discord</div>
-                        </div>
-                        <div class="workflow-details">
-                            <h4>主要功能：</h4>
-                            <ul>
-                                <li>多數據源智能合併</li>
-                                <li>循環遍歷數據項目</li>
-                                <li>數據格式轉換（JSON/CSV）</li>
-                                <li>字段編輯與數據重構</li>
-                                <li>日期時間格式化處理</li>
-                                <li>數據排序與條件判斷</li>
-                                <li>Discord Webhook 通知</li>
-                            </ul>
-                        </div>
-                    </div>
+                <div>
+                    <h3 class="text-xl font-heading font-medium text-primary mb-3">System Design</h3>
+                    <p class="text-sm text-secondary">Scalable architecture and modular workflow design</p>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="features-section">
-            <h2>核心功能</h2>
-            <div class="features-list">
-                <div class="feature-box">
-                    <div class="feature-icon">🎯</div>
-                    <h3>智能路由</h3>
-                    <p>根據用戶訊息內容自動判斷並路由到最適合的子流程處理</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">💬</div>
-                    <h3>多樣化對話</h3>
-                    <p>支援技術內容處理和一般對話，提供個性化的互動體驗</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">📄</div>
-                    <h3>內容分析</h3>
-                    <p>自動分析技術文件、會議記錄等內容，生成結構化的摘要報告</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">🔗</div>
-                    <h3>網址處理</h3>
-                    <p>自動識別並處理訊息中的網址，提取網頁內容或 YouTube 逐字稿</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">📊</div>
-                    <h3>格式化輸出</h3>
-                    <p>針對 LINE 平台優化輸出格式，使用表情符號和分隔線提升可讀性</p>
-                </div>
-                <div class="feature-box">
-                    <div class="feature-icon">⚡</div>
-                    <h3>自動分段</h3>
-                    <p>智能處理超長訊息，自動分段發送，確保內容完整傳達</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <p>© 2024 LINE Chatbot Project. Built with n8n.</p>
-            <p class="footer-links">
-                <a href="https://github.com" target="_blank">GitHub</a>
-                <span>•</span>
-                <a href="https://n8n.io" target="_blank">n8n</a>
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 px-4">
+        <div class="max-w-2xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8">Get in Touch</h2>
+            <p class="text-lg text-secondary mb-12">
+                Interested in collaborating or learning more about my work? Let's connect.
             </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="https://github.com" target="_blank" class="bg-primary text-white px-8 py-4 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer">
+                    View on GitHub
+                </a>
+                <a href="https://n8n.io" target="_blank" class="border-2 border-primary text-primary px-8 py-4 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
+                    Learn about n8n
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-sm text-secondary">© 2024 Portfolio. Built with n8n and modern web technologies.</p>
         </div>
     </footer>
 
-    <!-- 圖片燈箱模態框 -->
+    <!-- Image Modal -->
     <div id="imageModal" class="image-modal" onclick="closeImageModal()">
         <span class="modal-close">&times;</span>
-        <img class="modal-content" id="modalImage" alt="工作流圖">
+        <img class="modal-content" id="modalImage" alt="Workflow">
         <div class="modal-caption" id="modalCaption"></div>
     </div>
 
     <script>
-        // 打開圖片燈箱
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Image modal
         function openImageModal(imageSrc, caption) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
@@ -775,24 +430,51 @@
             modalImg.src = imageSrc;
             captionText.innerHTML = caption;
             
-            // 防止點擊圖片時關閉
             modalImg.onclick = function(e) {
                 e.stopPropagation();
             };
         }
 
-        // 關閉圖片燈箱
         function closeImageModal() {
             document.getElementById('imageModal').style.display = 'none';
         }
 
-        // 按 ESC 鍵關閉
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeImageModal();
             }
         });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all project cards
+        document.querySelectorAll('.bg-white.rounded').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Respect prefers-reduced-motion
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.querySelectorAll('*').forEach(el => {
+                el.style.transition = 'none';
+                el.style.animation = 'none';
+            });
+        }
     </script>
 </body>
 </html>
-
