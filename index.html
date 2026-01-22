@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" id="htmlLang">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,11 +34,14 @@
     <nav class="fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto">
         <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 px-6 py-4">
             <div class="flex items-center justify-between">
-                <a href="#home" class="text-xl font-heading font-semibold text-primary hover:text-accent transition-colors duration-200 cursor-pointer">Portfolio</a>
+                <a href="#home" class="text-xl font-heading font-semibold text-primary hover:text-accent transition-colors duration-200 cursor-pointer" data-i18n="nav.portfolio">Portfolio</a>
                 <div class="hidden md:flex items-center gap-8">
-                    <a href="#work" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Work</a>
-                    <a href="#about" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">About</a>
-                    <a href="#contact" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer">Contact</a>
+                    <a href="#work" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer" data-i18n="nav.work">Work</a>
+                    <a href="#about" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer" data-i18n="nav.about">About</a>
+                    <a href="#contact" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer" data-i18n="nav.contact">Contact</a>
+                    <button id="langToggle" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-gray-100" onclick="toggleLanguage()">
+                        <span id="langText">EN</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -48,19 +51,15 @@
     <section id="home" class="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
         <div class="max-w-7xl mx-auto text-center">
             <h1 class="text-6xl md:text-8xl font-heading font-light text-primary mb-6 tracking-tight">
-                n8n Workflow
-                <span class="block text-accent">Designer</span>
+                <span data-i18n="hero.title1">n8n Workflow</span>
+                <span class="block text-accent" data-i18n="hero.title2">Designer</span>
             </h1>
-            <p class="text-xl md:text-2xl text-secondary font-light max-w-2xl mx-auto mb-8 leading-relaxed">
+            <p class="text-xl md:text-2xl text-secondary font-light max-w-2xl mx-auto mb-8 leading-relaxed" data-i18n="hero.description">
                 Crafting intelligent automation solutions with n8n. Building LINE chatbots, AI agents, and workflow systems that transform business processes.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="#work" class="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer">
-                    View Work
-                </a>
-                <a href="#contact" class="border-2 border-primary text-primary px-8 py-3 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
-                    Get in Touch
-                </a>
+                <a href="#work" class="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer" data-i18n="hero.viewWork">View Work</a>
+                <a href="#contact" class="border-2 border-primary text-primary px-8 py-3 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer" data-i18n="hero.getInTouch">Get in Touch</a>
             </div>
         </div>
     </section>
@@ -69,8 +68,8 @@
     <section id="work" class="py-24 px-4">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-4">Featured Projects</h2>
-                <p class="text-lg text-secondary max-w-2xl mx-auto">A collection of intelligent automation workflows and AI-powered solutions</p>
+                <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-4" data-i18n="work.title">Featured Projects</h2>
+                <p class="text-lg text-secondary max-w-2xl mx-auto" data-i18n="work.subtitle">A collection of intelligent automation workflows and AI-powered solutions</p>
             </div>
 
             <!-- Main Workflow - Hero Project -->
@@ -78,10 +77,10 @@
                 <div class="bg-white rounded-3xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer group">
                     <div class="p-8 md:p-12">
                         <div class="flex items-center gap-3 mb-4">
-                            <span class="bg-accent/10 text-accent px-4 py-1.5 rounded-full text-sm font-medium">Main Workflow</span>
+                            <span class="bg-accent/10 text-accent px-4 py-1.5 rounded-full text-sm font-medium" data-i18n="work.main.badge">Main Workflow</span>
                         </div>
-                        <h3 class="text-3xl md:text-4xl font-heading font-medium text-primary mb-4">LINE Chatbot System</h3>
-                        <p class="text-lg text-secondary mb-6 leading-relaxed">
+                        <h3 class="text-3xl md:text-4xl font-heading font-medium text-primary mb-4" data-i18n="work.main.title">LINE Chatbot System</h3>
+                        <p class="text-lg text-secondary mb-6 leading-relaxed" data-i18n="work.main.description">
                             Core control workflow that receives LINE Webhook messages, analyzes user input with AI, and intelligently routes to specialized sub-workflows for processing.
                         </p>
                         <div class="workflow-image-container mb-6">
@@ -90,7 +89,7 @@
                                  class="workflow-image rounded-xl"
                                  onclick="openImageModal('image/[MAIN]LINE CHATBOT.png', 'LINE CHATBOT Main Workflow')">
                             <div class="image-overlay rounded-xl">
-                                <span class="image-hint">Click to view full size</span>
+                                <span class="image-hint" data-i18n="common.clickToView">Click to view full size</span>
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-2 mb-6">
@@ -114,11 +113,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] IMAGE Generator.png', 'IMAGE Generator Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">IMAGE Generator</h3>
-                        <p class="text-sm text-secondary mb-4">AI-powered text-to-image generation with custom prompts</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.imageGenerator.description">AI-powered text-to-image generation with custom prompts</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Image</span>
@@ -134,11 +133,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] 1399_rag_agent.png', '1399 RAG Agent Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">1399 RAG Agent</h3>
-                        <p class="text-sm text-secondary mb-4">Retrieval-augmented generation for accurate information</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.rag1399.description">Retrieval-augmented generation for accurate information</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">RAG</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
@@ -154,11 +153,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] mcp_rag_agent.png', 'MCP RAG Agent Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">MCP RAG Agent</h3>
-                        <p class="text-sm text-secondary mb-4">MCP protocol-based RAG with enhanced capabilities</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.mcpRag.description">MCP protocol-based RAG with enhanced capabilities</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">RAG</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">MCP</span>
@@ -174,11 +173,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] NEWS Agent.png', 'NEWS Agent Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">NEWS Agent</h3>
-                        <p class="text-sm text-secondary mb-4">Latest news and summaries service</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.newsAgent.description">Latest news and summaries service</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">News</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
@@ -194,11 +193,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] STOCK Agent.png', 'STOCK Agent Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">STOCK Agent</h3>
-                        <p class="text-sm text-secondary mb-4">Stock prices and market information queries</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.stockAgent.description">Stock prices and market information queries</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Finance</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Data</span>
@@ -214,11 +213,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] ITR photo prompt Agent.png', 'ITR photo prompt Agent Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">ITR Photo Prompt</h3>
-                        <p class="text-sm text-secondary mb-4">Professional infographic design with AI prompts</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.itrPhoto.description">Professional infographic design with AI prompts</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Design</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
@@ -234,11 +233,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] ITR Poster Agent.png', 'ITR Poster Agent Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">ITR Poster Agent</h3>
-                        <p class="text-sm text-secondary mb-4">UI/UX presentation designer for business proposals</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.itrPoster.description">UI/UX presentation designer for business proposals</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Design</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">UI/UX</span>
@@ -254,11 +253,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] Food Image.png', 'Food Image Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">Food Image</h3>
-                        <p class="text-sm text-secondary mb-4">Specialized food image generation module</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.foodImage.description">Specialized food image generation module</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Image</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">AI</span>
@@ -274,11 +273,11 @@
                                  class="workflow-image rounded-lg"
                                  onclick="openImageModal('image/[SUB] Image Editing.png', 'Image Editing Workflow')">
                             <div class="image-overlay rounded-lg">
-                                <span class="image-hint">View</span>
+                                <span class="image-hint" data-i18n="common.view">View</span>
                             </div>
                         </div>
                         <h3 class="text-xl font-heading font-medium text-primary mb-2">Image Editing</h3>
-                        <p class="text-sm text-secondary mb-4">Image processing and editing capabilities</p>
+                        <p class="text-sm text-secondary mb-4" data-i18n="work.imageEditing.description">Image processing and editing capabilities</p>
                         <div class="flex flex-wrap gap-2">
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Image</span>
                             <span class="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs">Edit</span>
@@ -290,8 +289,8 @@
             <!-- Courses Section -->
             <div class="mt-24">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-heading font-light text-primary mb-4">n8n Course Workflows</h2>
-                    <p class="text-lg text-secondary max-w-2xl mx-auto">Educational workflows demonstrating n8n capabilities across different skill levels</p>
+                    <h2 class="text-3xl md:text-4xl font-heading font-light text-primary mb-4" data-i18n="courses.title">n8n Course Workflows</h2>
+                    <p class="text-lg text-secondary max-w-2xl mx-auto" data-i18n="courses.subtitle">Educational workflows demonstrating n8n capabilities across different skill levels</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
@@ -305,9 +304,9 @@
                                     <span class="image-hint">View</span>
                                 </div>
                             </div>
-                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">Beginner</span>
-                            <h3 class="text-xl font-heading font-medium text-primary mb-2">Level 1</h3>
-                            <p class="text-sm text-secondary mb-4">Basic webhook, HTTP requests, and Airtable operations</p>
+                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block" data-i18n="courses.beginner">Beginner</span>
+                            <h3 class="text-xl font-heading font-medium text-primary mb-2" data-i18n="courses.lv1.title">Level 1</h3>
+                            <p class="text-sm text-secondary mb-4" data-i18n="courses.lv1.description">Basic webhook, HTTP requests, and Airtable operations</p>
                         </div>
                     </div>
 
@@ -322,9 +321,9 @@
                                     <span class="image-hint">View</span>
                                 </div>
                             </div>
-                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">Intermediate</span>
-                            <h3 class="text-xl font-heading font-medium text-primary mb-2">Level 2 - Workflow 1</h3>
-                            <p class="text-sm text-secondary mb-4">Data merging, API calls, and record updates</p>
+                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block" data-i18n="courses.intermediate">Intermediate</span>
+                            <h3 class="text-xl font-heading font-medium text-primary mb-2" data-i18n="courses.lv2w1.title">Level 2 - Workflow 1</h3>
+                            <p class="text-sm text-secondary mb-4" data-i18n="courses.lv2w1.description">Data merging, API calls, and record updates</p>
                         </div>
                     </div>
 
@@ -339,9 +338,9 @@
                                     <span class="image-hint">View</span>
                                 </div>
                             </div>
-                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block">Intermediate</span>
-                            <h3 class="text-xl font-heading font-medium text-primary mb-2">Level 2 - Workflow 2</h3>
-                            <p class="text-sm text-secondary mb-4">Advanced data processing, loops, and file conversion</p>
+                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-xs font-medium mb-3 inline-block" data-i18n="courses.intermediate">Intermediate</span>
+                            <h3 class="text-xl font-heading font-medium text-primary mb-2" data-i18n="courses.lv2w2.title">Level 2 - Workflow 2</h3>
+                            <p class="text-sm text-secondary mb-4" data-i18n="courses.lv2w2.description">Advanced data processing, loops, and file conversion</p>
                         </div>
                     </div>
                 </div>
@@ -352,22 +351,22 @@
     <!-- About Section -->
     <section id="about" class="py-24 px-4 bg-white">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8">About</h2>
-            <p class="text-lg text-secondary leading-relaxed mb-8">
+            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8" data-i18n="about.title">About</h2>
+            <p class="text-lg text-secondary leading-relaxed mb-8" data-i18n="about.description">
                 I specialize in building intelligent automation solutions using n8n, creating workflows that seamlessly integrate AI, APIs, and business logic. My work focuses on creating systems that are both powerful and maintainable.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
                 <div>
-                    <h3 class="text-xl font-heading font-medium text-primary mb-3">Automation</h3>
-                    <p class="text-sm text-secondary">Complex workflow orchestration and process automation</p>
+                    <h3 class="text-xl font-heading font-medium text-primary mb-3" data-i18n="about.automation.title">Automation</h3>
+                    <p class="text-sm text-secondary" data-i18n="about.automation.description">Complex workflow orchestration and process automation</p>
                 </div>
                 <div>
-                    <h3 class="text-xl font-heading font-medium text-primary mb-3">AI Integration</h3>
-                    <p class="text-sm text-secondary">Seamless AI model integration for intelligent responses</p>
+                    <h3 class="text-xl font-heading font-medium text-primary mb-3" data-i18n="about.ai.title">AI Integration</h3>
+                    <p class="text-sm text-secondary" data-i18n="about.ai.description">Seamless AI model integration for intelligent responses</p>
                 </div>
                 <div>
-                    <h3 class="text-xl font-heading font-medium text-primary mb-3">System Design</h3>
-                    <p class="text-sm text-secondary">Scalable architecture and modular workflow design</p>
+                    <h3 class="text-xl font-heading font-medium text-primary mb-3" data-i18n="about.system.title">System Design</h3>
+                    <p class="text-sm text-secondary" data-i18n="about.system.description">Scalable architecture and modular workflow design</p>
                 </div>
             </div>
         </div>
@@ -376,17 +375,13 @@
     <!-- Contact Section -->
     <section id="contact" class="py-24 px-4">
         <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8">Get in Touch</h2>
-            <p class="text-lg text-secondary mb-12">
+            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8" data-i18n="contact.title">Get in Touch</h2>
+            <p class="text-lg text-secondary mb-12" data-i18n="contact.description">
                 Interested in collaborating or learning more about my work? Let's connect.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="https://github.com" target="_blank" class="bg-primary text-white px-8 py-4 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer">
-                    View on GitHub
-                </a>
-                <a href="https://n8n.io" target="_blank" class="border-2 border-primary text-primary px-8 py-4 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
-                    Learn about n8n
-                </a>
+                <a href="https://github.com/poirotw66/n8n_workflow" target="_blank" class="bg-primary text-white px-8 py-4 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer" data-i18n="contact.github">View on GitHub</a>
+                <a href="https://n8n.io" target="_blank" class="border-2 border-primary text-primary px-8 py-4 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer" data-i18n="contact.learnN8n">Learn about n8n</a>
             </div>
         </div>
     </section>
@@ -394,7 +389,7 @@
     <!-- Footer -->
     <footer class="py-12 px-4 border-t border-gray-200">
         <div class="max-w-7xl mx-auto text-center">
-            <p class="text-sm text-secondary">© 2024 Portfolio. Built with n8n and modern web technologies.</p>
+            <p class="text-sm text-secondary" data-i18n="footer.copyright">© 2024 Portfolio. Built with n8n and modern web technologies.</p>
         </div>
     </footer>
 
@@ -406,6 +401,210 @@
     </div>
 
     <script>
+        // Language translations
+        const translations = {
+            en: {
+                nav: {
+                    portfolio: 'Portfolio',
+                    work: 'Work',
+                    about: 'About',
+                    contact: 'Contact'
+                },
+                hero: {
+                    title1: 'n8n Workflow',
+                    title2: 'Designer',
+                    description: 'Crafting intelligent automation solutions with n8n. Building LINE chatbots, AI agents, and workflow systems that transform business processes.',
+                    viewWork: 'View Work',
+                    getInTouch: 'Get in Touch'
+                },
+                work: {
+                    title: 'Featured Projects',
+                    subtitle: 'A collection of intelligent automation workflows and AI-powered solutions',
+                    main: {
+                        badge: 'Main Workflow',
+                        title: 'LINE Chatbot System',
+                        description: 'Core control workflow that receives LINE Webhook messages, analyzes user input with AI, and intelligently routes to specialized sub-workflows for processing.'
+                    },
+                    imageGenerator: { description: 'AI-powered text-to-image generation with custom prompts' },
+                    rag1399: { description: 'Retrieval-augmented generation for accurate information' },
+                    mcpRag: { description: 'MCP protocol-based RAG with enhanced capabilities' },
+                    newsAgent: { description: 'Latest news and summaries service' },
+                    stockAgent: { description: 'Stock prices and market information queries' },
+                    itrPhoto: { description: 'Professional infographic design with AI prompts' },
+                    itrPoster: { description: 'UI/UX presentation designer for business proposals' },
+                    foodImage: { description: 'Specialized food image generation module' },
+                    imageEditing: { description: 'Image processing and editing capabilities' }
+                },
+                courses: {
+                    title: 'n8n Course Workflows',
+                    subtitle: 'Educational workflows demonstrating n8n capabilities across different skill levels',
+                    beginner: 'Beginner',
+                    intermediate: 'Intermediate',
+                    lv1: {
+                        title: 'Level 1',
+                        description: 'Basic webhook, HTTP requests, and Airtable operations'
+                    },
+                    lv2w1: {
+                        title: 'Level 2 - Workflow 1',
+                        description: 'Data merging, API calls, and record updates'
+                    },
+                    lv2w2: {
+                        title: 'Level 2 - Workflow 2',
+                        description: 'Advanced data processing, loops, and file conversion'
+                    }
+                },
+                about: {
+                    title: 'About',
+                    description: 'I specialize in building intelligent automation solutions using n8n, creating workflows that seamlessly integrate AI, APIs, and business logic. My work focuses on creating systems that are both powerful and maintainable.',
+                    automation: {
+                        title: 'Automation',
+                        description: 'Complex workflow orchestration and process automation'
+                    },
+                    ai: {
+                        title: 'AI Integration',
+                        description: 'Seamless AI model integration for intelligent responses'
+                    },
+                    system: {
+                        title: 'System Design',
+                        description: 'Scalable architecture and modular workflow design'
+                    }
+                },
+                contact: {
+                    title: 'Get in Touch',
+                    description: 'Interested in collaborating or learning more about my work? Let\'s connect.',
+                    github: 'View on GitHub',
+                    learnN8n: 'Learn about n8n'
+                },
+                footer: {
+                    copyright: '© 2024 Portfolio. Built with n8n and modern web technologies.'
+                },
+                common: {
+                    view: 'View',
+                    clickToView: 'Click to view full size'
+                }
+            },
+            zh: {
+                nav: {
+                    portfolio: '作品集',
+                    work: '作品',
+                    about: '關於',
+                    contact: '聯絡'
+                },
+                hero: {
+                    title1: 'n8n 工作流',
+                    title2: '設計師',
+                    description: '使用 n8n 打造智能自動化解決方案。建構 LINE 聊天機器人、AI 代理和工作流系統，轉變商業流程。',
+                    viewWork: '查看作品',
+                    getInTouch: '聯絡我'
+                },
+                work: {
+                    title: '精選專案',
+                    subtitle: '一系列智能自動化工作流和 AI 驅動的解決方案',
+                    main: {
+                        badge: '主要工作流',
+                        title: 'LINE 聊天機器人系統',
+                        description: '核心控制工作流，接收 LINE Webhook 訊息，使用 AI 分析用戶輸入，並智能路由到專門的子工作流進行處理。'
+                    },
+                    imageGenerator: { description: '使用 AI 模型進行文字轉圖像生成，支援自訂提示詞' },
+                    rag1399: { description: '檢索增強生成，提供準確的資訊回答' },
+                    mcpRag: { description: '基於 MCP 協議的 RAG，提供更強大的知識檢索能力' },
+                    newsAgent: { description: '最新新聞資訊和摘要服務' },
+                    stockAgent: { description: '股票價格和市場資訊查詢' },
+                    itrPhoto: { description: '專業資訊圖表設計，生成 AI 繪圖提示詞' },
+                    itrPoster: { description: 'UI/UX 簡報設計師，用於商業提案' },
+                    foodImage: { description: '專門的食物圖像生成模組' },
+                    imageEditing: { description: '圖像處理和編輯功能' }
+                },
+                courses: {
+                    title: 'n8n 課程工作流',
+                    subtitle: '展示不同技能級別的 n8n 功能的教育工作流',
+                    beginner: '初級',
+                    intermediate: '中級',
+                    lv1: {
+                        title: '第一級',
+                        description: '基礎 Webhook、HTTP 請求和 Airtable 操作'
+                    },
+                    lv2w1: {
+                        title: '第二級 - 工作流 1',
+                        description: '數據合併、API 調用和記錄更新'
+                    },
+                    lv2w2: {
+                        title: '第二級 - 工作流 2',
+                        description: '進階數據處理、循環和文件轉換'
+                    }
+                },
+                about: {
+                    title: '關於',
+                    description: '我專注於使用 n8n 建構智能自動化解決方案，創建無縫整合 AI、API 和業務邏輯的工作流。我的工作重點是創建既強大又可維護的系統。',
+                    automation: {
+                        title: '自動化',
+                        description: '複雜的工作流編排和流程自動化'
+                    },
+                    ai: {
+                        title: 'AI 整合',
+                        description: '無縫的 AI 模型整合，提供智能回應'
+                    },
+                    system: {
+                        title: '系統設計',
+                        description: '可擴展的架構和模組化工作流設計'
+                    }
+                },
+                contact: {
+                    title: '聯絡我',
+                    description: '有興趣合作或了解更多我的作品嗎？讓我們聯繫吧。',
+                    github: '在 GitHub 查看',
+                    learnN8n: '了解 n8n'
+                },
+                footer: {
+                    copyright: '© 2024 作品集。使用 n8n 和現代網頁技術建構。'
+                },
+                common: {
+                    view: '查看',
+                    clickToView: '點擊查看大圖'
+                }
+            }
+        };
+
+        // Get current language from localStorage or default to 'zh'
+        let currentLang = localStorage.getItem('language') || 'zh';
+
+        // Update HTML lang attribute
+        document.documentElement.lang = currentLang === 'zh' ? 'zh-TW' : 'en';
+
+        // Function to update all text content
+        function updateLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang === 'zh' ? 'zh-TW' : 'en';
+            
+            // Update language toggle button
+            document.getElementById('langText').textContent = lang === 'zh' ? 'EN' : '繁中';
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const keys = key.split('.');
+                let value = translations[lang];
+                
+                for (const k of keys) {
+                    value = value?.[k];
+                }
+                
+                if (value !== undefined) {
+                    element.textContent = value;
+                }
+            });
+        }
+
+        // Toggle language function
+        function toggleLanguage() {
+            const newLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateLanguage(newLang);
+        }
+
+        // Initialize language on page load
+        updateLanguage(currentLang);
+
         // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
