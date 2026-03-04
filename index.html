@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio - n8n Workflow Designer</title>
+    <title>n8n Workflow Portfolio – Featured Projects & Course Workflows</title>
+    <meta name="description" content="LINE Chatbot system, AI agents, RAG, and n8n course workflows. Intelligent automation with n8n.">
+    <!-- Open Graph / social sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="n8n Workflow Portfolio">
+    <meta property="og:description" content="Featured projects: LINE Chatbot, AI agents, RAG. Plus n8n course workflows.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="n8n Workflow Portfolio">
+    <meta name="twitter:description" content="Featured projects & n8n course workflows.">
+    <!-- Optional: set og:image to your repo social preview or a workflow screenshot (absolute URL) -->
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,8 +40,16 @@
 </head>
 <body class="bg-background text-text font-body antialiased">
 
+    <!-- Minimal header: title + language toggle -->
+    <header class="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-lg font-heading font-medium text-primary">n8n Workflow Portfolio</h1>
+            <button type="button" id="langText" onclick="toggleLanguage()" class="text-sm text-secondary hover:text-primary border border-gray-300 hover:border-primary rounded-full px-4 py-2 transition-colors" aria-label="Toggle language">EN</button>
+        </div>
+    </header>
+
     <!-- Work Section -->
-    <section id="work" class="pt-16 pb-24 px-4">
+    <section id="work" class="pt-12 pb-24 px-4">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-4" data-i18n="work.title">Featured Projects</h2>
