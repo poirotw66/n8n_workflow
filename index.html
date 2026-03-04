@@ -30,42 +30,9 @@
     </script>
 </head>
 <body class="bg-background text-text font-body antialiased">
-    <!-- Navigation -->
-    <nav class="fixed top-4 left-4 right-4 z-50 max-w-7xl mx-auto">
-        <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="#home" class="text-xl font-heading font-semibold text-primary hover:text-accent transition-colors duration-200 cursor-pointer" data-i18n="nav.portfolio">Portfolio</a>
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#work" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer" data-i18n="nav.work">Work</a>
-                    <a href="#about" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer" data-i18n="nav.about">About</a>
-                    <a href="#contact" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer" data-i18n="nav.contact">Contact</a>
-                    <button id="langToggle" class="text-sm font-medium text-secondary hover:text-primary transition-colors duration-200 cursor-pointer px-3 py-1.5 rounded-lg hover:bg-gray-100" onclick="toggleLanguage()">
-                        <span id="langText">EN</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
-        <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-6xl md:text-8xl font-heading font-light text-primary mb-6 tracking-tight">
-                <span data-i18n="hero.title1">n8n Workflow</span>
-                <span class="block text-accent" data-i18n="hero.title2">Designer</span>
-            </h1>
-            <p class="text-xl md:text-2xl text-secondary font-light max-w-2xl mx-auto mb-8 leading-relaxed" data-i18n="hero.description">
-                Crafting intelligent automation solutions with n8n. Building LINE chatbots, AI agents, and workflow systems that transform business processes.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="#work" class="bg-primary text-white px-8 py-3 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer" data-i18n="hero.viewWork">View Work</a>
-                <a href="#contact" class="border-2 border-primary text-primary px-8 py-3 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer" data-i18n="hero.getInTouch">Get in Touch</a>
-            </div>
-        </div>
-    </section>
 
     <!-- Work Section -->
-    <section id="work" class="py-24 px-4">
+    <section id="work" class="pt-16 pb-24 px-4">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-4" data-i18n="work.title">Featured Projects</h2>
@@ -84,10 +51,6 @@
                             Core control workflow that receives LINE Webhook messages, analyzes user input with AI, and intelligently routes to specialized sub-workflows for processing.
                         </p>
                         <div class="workflow-image-container mb-6">
-                            <img src="image/[MAIN]LINE CHATBOT.png" 
-                                 alt="LINE CHATBOT Main Workflow" 
-                                 class="workflow-image rounded-xl"
-                                 onclick="openImageModal('image/[MAIN]LINE CHATBOT.png', 'LINE CHATBOT Main Workflow')">
                             <div class="image-overlay rounded-xl">
                                 <span class="image-hint" data-i18n="common.clickToView">Click to view full size</span>
                             </div>
@@ -348,51 +311,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="py-24 px-4 bg-white">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8" data-i18n="about.title">About</h2>
-            <p class="text-lg text-secondary leading-relaxed mb-8" data-i18n="about.description">
-                I specialize in building intelligent automation solutions using n8n, creating workflows that seamlessly integrate AI, APIs, and business logic. My work focuses on creating systems that are both powerful and maintainable.
-            </p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-                <div>
-                    <h3 class="text-xl font-heading font-medium text-primary mb-3" data-i18n="about.automation.title">Automation</h3>
-                    <p class="text-sm text-secondary" data-i18n="about.automation.description">Complex workflow orchestration and process automation</p>
-                </div>
-                <div>
-                    <h3 class="text-xl font-heading font-medium text-primary mb-3" data-i18n="about.ai.title">AI Integration</h3>
-                    <p class="text-sm text-secondary" data-i18n="about.ai.description">Seamless AI model integration for intelligent responses</p>
-                </div>
-                <div>
-                    <h3 class="text-xl font-heading font-medium text-primary mb-3" data-i18n="about.system.title">System Design</h3>
-                    <p class="text-sm text-secondary" data-i18n="about.system.description">Scalable architecture and modular workflow design</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-24 px-4">
-        <div class="max-w-2xl mx-auto text-center">
-            <h2 class="text-4xl md:text-5xl font-heading font-light text-primary mb-8" data-i18n="contact.title">Get in Touch</h2>
-            <p class="text-lg text-secondary mb-12" data-i18n="contact.description">
-                Interested in collaborating or learning more about my work? Let's connect.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="https://github.com/poirotw66/n8n_workflow" target="_blank" class="bg-primary text-white px-8 py-4 rounded-full font-medium hover:bg-secondary transition-all duration-300 hover:shadow-lg cursor-pointer" data-i18n="contact.github">View on GitHub</a>
-                <a href="https://n8n.io" target="_blank" class="border-2 border-primary text-primary px-8 py-4 rounded-full font-medium hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer" data-i18n="contact.learnN8n">Learn about n8n</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-12 px-4 border-t border-gray-200">
-        <div class="max-w-7xl mx-auto text-center">
-            <p class="text-sm text-secondary" data-i18n="footer.copyright">© 2024 Portfolio. Built with n8n and modern web technologies.</p>
-        </div>
-    </footer>
-
     <!-- Image Modal -->
     <div id="imageModal" class="image-modal" onclick="closeImageModal()">
         <span class="modal-close">&times;</span>
@@ -404,19 +322,6 @@
         // Language translations
         const translations = {
             en: {
-                nav: {
-                    portfolio: 'Portfolio',
-                    work: 'Work',
-                    about: 'About',
-                    contact: 'Contact'
-                },
-                hero: {
-                    title1: 'n8n Workflow',
-                    title2: 'Designer',
-                    description: 'Crafting intelligent automation solutions with n8n. Building LINE chatbots, AI agents, and workflow systems that transform business processes.',
-                    viewWork: 'View Work',
-                    getInTouch: 'Get in Touch'
-                },
                 work: {
                     title: 'Featured Projects',
                     subtitle: 'A collection of intelligent automation workflows and AI-powered solutions',
@@ -453,50 +358,12 @@
                         description: 'Advanced data processing, loops, and file conversion'
                     }
                 },
-                about: {
-                    title: 'About',
-                    description: 'I specialize in building intelligent automation solutions using n8n, creating workflows that seamlessly integrate AI, APIs, and business logic. My work focuses on creating systems that are both powerful and maintainable.',
-                    automation: {
-                        title: 'Automation',
-                        description: 'Complex workflow orchestration and process automation'
-                    },
-                    ai: {
-                        title: 'AI Integration',
-                        description: 'Seamless AI model integration for intelligent responses'
-                    },
-                    system: {
-                        title: 'System Design',
-                        description: 'Scalable architecture and modular workflow design'
-                    }
-                },
-                contact: {
-                    title: 'Get in Touch',
-                    description: 'Interested in collaborating or learning more about my work? Let\'s connect.',
-                    github: 'View on GitHub',
-                    learnN8n: 'Learn about n8n'
-                },
-                footer: {
-                    copyright: '© 2024 Portfolio. Built with n8n and modern web technologies.'
-                },
                 common: {
                     view: 'View',
                     clickToView: 'Click to view full size'
                 }
             },
             zh: {
-                nav: {
-                    portfolio: '作品集',
-                    work: '作品',
-                    about: '關於',
-                    contact: '聯絡'
-                },
-                hero: {
-                    title1: 'n8n 工作流',
-                    title2: '設計師',
-                    description: '使用 n8n 打造智能自動化解決方案。建構 LINE 聊天機器人、AI 代理和工作流系統，轉變商業流程。',
-                    viewWork: '查看作品',
-                    getInTouch: '聯絡我'
-                },
                 work: {
                     title: '精選專案',
                     subtitle: '一系列智能自動化工作流和 AI 驅動的解決方案',
@@ -533,31 +400,6 @@
                         description: '進階數據處理、循環和文件轉換'
                     }
                 },
-                about: {
-                    title: '關於',
-                    description: '我專注於使用 n8n 建構智能自動化解決方案，創建無縫整合 AI、API 和業務邏輯的工作流。我的工作重點是創建既強大又可維護的系統。',
-                    automation: {
-                        title: '自動化',
-                        description: '複雜的工作流編排和流程自動化'
-                    },
-                    ai: {
-                        title: 'AI 整合',
-                        description: '無縫的 AI 模型整合，提供智能回應'
-                    },
-                    system: {
-                        title: '系統設計',
-                        description: '可擴展的架構和模組化工作流設計'
-                    }
-                },
-                contact: {
-                    title: '聯絡我',
-                    description: '有興趣合作或了解更多我的作品嗎？讓我們聯繫吧。',
-                    github: '在 GitHub 查看',
-                    learnN8n: '了解 n8n'
-                },
-                footer: {
-                    copyright: '© 2024 作品集。使用 n8n 和現代網頁技術建構。'
-                },
                 common: {
                     view: '查看',
                     clickToView: '點擊查看大圖'
@@ -577,8 +419,9 @@
             localStorage.setItem('language', lang);
             document.documentElement.lang = lang === 'zh' ? 'zh-TW' : 'en';
             
-            // Update language toggle button
-            document.getElementById('langText').textContent = lang === 'zh' ? 'EN' : '繁中';
+            // Update language toggle button if present
+            const langText = document.getElementById('langText');
+            if (langText) langText.textContent = lang === 'zh' ? 'EN' : '繁中';
             
             // Update all elements with data-i18n attribute
             document.querySelectorAll('[data-i18n]').forEach(element => {
